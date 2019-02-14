@@ -3,41 +3,34 @@ public class FaceRecognition {
     public static void main(String[] args) {
         String ImageFolder = "";
 
-        read_images_from_database(folderName);
-        preproses_images(images); //only done first time
-        save_images(images);      //only done first time, don't override prievious folder
-        serch_for_patterns(); 
+        readImagesFromDatabase(folderName);
+        preProcessImages(images); //only done first time
+        saveImages(images);      //only done first time, don't override prievious folder
+        searchForPatterns();
+    }
 
+    public placeholder readImagesFromDatabase(String folderName) {
 
     }
 
-
-
-    public placeholder read_images_from_database(String folderName) {
-        
+    public placeholder preProcessImages(placeholder images) {
+        fixSize();
+        fixContrast();
     }
 
+    public placeholder fixSize(placeholder images) {
 
-    public placeholder preproses_images(placeholder images) {
-        fix_size();
-        fix_contrast();
-        
-    }
-    public placeholder fix_size(placeholder images) {
-        
-    }
-    public placeholder fix_contrast(placeholder images) {
-        
     }
 
+    public placeholder fixContrast(placeholder images) {
 
-
-    public placeholder save_images(placeholder images) {
-        
     }
 
+    public placeholder saveImages(placeholder images) {
 
-    public placeholder serch_for_patterns(placeholder images) {
+    }
+
+    public placeholder searchForPatterns(placeholder images) {
         //more methods needed
     }
 

@@ -1,27 +1,90 @@
 import Catalano.Imaging.FastBitmap;
 
-import java.io.File;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.Scanner;
 
 /**
  * This file should be run with the project root as working directory.
  */
 public class FaceRecognition {
-    FastBitmap b;
+
     public static void main(String[] args) {
         String imageFolder = "./res/att-faces";
 
-        readImagesFromDatabase(imageFolder);
+        try {
+            readImagesFromDatabase(imageFolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //preProcessImages(images); //only done first time
         //saveImages(images);      //only done first time, don't override previous folder
         //searchForPatterns();
     }
 
-    public static void readImagesFromDatabase(String folderName) {
+    /**
+     * Reads .pgm images from our folder structure.
+     *
+     * .pgm reading code mostly from: https://stackoverflow.com/questions/3639198/how-to-read-pgm-images-in-java
+     * @param folderName the name of our folder of folders containing .pgm images.
+     * @throws IOException
+     */
+    public static void readImagesFromDatabase(String folderName) throws IOException {
         System.out.println("Reading images...");
         File folder = new File(folderName);
         for (File f : folder.listFiles()) {
             if (f.isDirectory()) {
-                System.out.println(getContentString(f));
+                for (File g : f.listFiles()) {
+                    String imgPath = g.getPath();
+                    //System.out.println(imgPath);
+
+                    // Read image metadata
+                    FileInputStream fileInputStream = null;
+                    fileInputStream = new FileInputStream(imgPath);
+                    Scanner scan = new Scanner(fileInputStream);
+                    scan.nextLine(); // Discard magic number
+                    int picWidth = scan.nextInt(); // Image width
+                    int picHeight = scan.nextInt(); // Image height
+                    int maxValue = scan.nextInt(); // Maximum value of pixel.
+
+                    fileInputStream.close();
+
+                    // Read image as binary data
+                    fileInputStream = new FileInputStream(imgPath);
+                    DataInputStream dis = new DataInputStream(fileInputStream);
+
+                    // Discard header lines (the ones we read previously)
+                    int numnewlines = 3;
+                    while (numnewlines > 0) {
+                        char c;
+                        do {
+                            c = (char)(dis.readUnsignedByte());
+                        } while (c != '\n');
+                        numnewlines--;
+                    }
+
+                    // Read the image data
+                    int[][] data2D = new int[picHeight][picWidth];
+                    for (int row = 0; row < picHeight; row++) {
+                        for (int col = 0; col < picWidth; col++) {
+                            data2D[row][col] = dis.readUnsignedByte();
+                            //System.out.print(data2D[row][col] + " ");
+                        }
+                        //System.out.println();
+                    }
+
+                    // Create a FastBitmap. Part of the Catalano library.
+                    FastBitmap fb = new FastBitmap(data2D);
+                    System.out.println(g.getPath() + " " + fb.getGraphics());
+
+                    // Save FastBitmap as image
+                    BufferedImage bufferedImage = new BufferedImage(picWidth, picHeight, BufferedImage.TYPE_BYTE_GRAY);
+                    fb.getGraphics().drawImage(bufferedImage, 0, 0, null);
+
+                    // TODO Only saves a black image, but of the right size.
+                    ImageIO.write(bufferedImage, "PNG", new File("./processed/" + "a.png"));
+                }
             }
         }
     }

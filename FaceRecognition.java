@@ -9,6 +9,7 @@ public class FaceRecognition {
         searchForPatterns();
     }
 
+    /*
     public placeholder readImagesFromDatabase(String folderName) {
 
     }
@@ -32,7 +33,7 @@ public class FaceRecognition {
 
     public placeholder searchForPatterns(placeholder images) {
         //more methods needed
-    }
+    }*/
 
 
 

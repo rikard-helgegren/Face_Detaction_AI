@@ -1,9 +1,14 @@
+import Catalano.Imaging.FastBitmap;
+
 import java.io.File;
 
+/**
+ * This file should be run with the project root as working directory.
+ */
 public class FaceRecognition {
-
+    FastBitmap b;
     public static void main(String[] args) {
-        String imageFolder = "att-faces";
+        String imageFolder = "./res/att-faces";
 
         readImagesFromDatabase(imageFolder);
         //preProcessImages(images); //only done first time
@@ -15,8 +20,24 @@ public class FaceRecognition {
         System.out.println("Reading images...");
         File folder = new File(folderName);
         for (File f : folder.listFiles()) {
-            System.out.println(f.getName());
+            if (f.isDirectory()) {
+                System.out.println(getContentString(f));
+            }
         }
+    }
+
+    /**
+     * Returns a newline-separated string of all file names in a folder or empty string if folder is not a folder.
+     * @param folder a file handle representing a folder.
+     * @return a newline-separated string of file names
+     */
+    private static String getContentString(File folder) {
+        if (!folder.isDirectory()) return "";
+        String s = "";
+        for (File f : folder.listFiles()) {
+            s += f.getName() + "\n";
+        }
+        return s;
     }
 
     /*

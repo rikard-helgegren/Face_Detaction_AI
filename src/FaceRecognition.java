@@ -29,6 +29,8 @@ public class FaceRecognition {
         // Calculate integralImages
         IntegralImage[] integralImages = convertToIntegralImages(bitmaps);
 
+        System.out.println(integralImages[0]);
+
         // Do pattern recognition things
         //searchForPatterns();
     }
@@ -48,7 +50,7 @@ public class FaceRecognition {
             BufferedImage bi = ImageIO.read(imgFile);
             FastBitmap fb = new FastBitmap(bi);
             bitmaps[i] = fb;
-            System.out.printf("%d/%d\n", i, imageFolder.listFiles().length);
+            System.out.printf("%d/%d\n", i+1, imageFolder.listFiles().length);
         }
         return bitmaps;
     }

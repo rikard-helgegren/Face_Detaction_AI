@@ -1,4 +1,5 @@
 import Catalano.Imaging.FastBitmap;
+import Catalano.Imaging.Tools.IntegralImage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,14 +17,19 @@ public class FaceRecognition {
     public static void main(String[] args) {
         String imageFolder = "./res/att-faces-scaled";
 
+        // Read images from file system.
+        // FastBitmap is part of the Catalano library.
         FastBitmap[] bitmaps = {};
         try {
             bitmaps = readImagesFromDataBase(imageFolder); // Read images
         } catch (IOException e) {
             e.printStackTrace();
         }
-        preProcessImages(bitmaps); //only done first time
-        //saveImages(images);      //only done first time, don't override previous folder
+
+        // Calculate integralImages
+        IntegralImage[] integralImages = convertToIntegralImages(bitmaps);
+
+        // Do pattern recognition things
         //searchForPatterns();
     }
 
@@ -47,11 +53,19 @@ public class FaceRecognition {
         return bitmaps;
     }
 
+    public static IntegralImage[] convertToIntegralImages(FastBitmap[] bitmaps) {
+        IntegralImage[] integrals = new IntegralImage[bitmaps.length];
+        for (int i = 0; i < bitmaps.length; i++) {
+            integrals[i] = new IntegralImage(bitmaps[i]);
+        }
+        return integrals;
+    }
+
     // ImageMagick is much more convenient for size and contrast changes than java,
     // therefore, those tasks have been moved to bash script. See `prepareImages.sh`
-    public static void preProcessImages(FastBitmap[] bitmaps) {
-        
-    }
+    /*public static void preProcessImages(FastBitmap[] bitmaps) {
+
+    }*/
     /*
 
 

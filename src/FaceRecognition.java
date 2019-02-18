@@ -15,7 +15,7 @@ import java.util.Scanner;
 public class FaceRecognition {
 
     public static void main(String[] args) {
-        String faceImagesFolder = "./res/att-faces-scaled";
+        String faceImagesFolder = "./res/generated/att-faces-scaled";
         // String noFaceImagesFolder = "./res/att-faces-scaled";
 
         // Read images from file system.

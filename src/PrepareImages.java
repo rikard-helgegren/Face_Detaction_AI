@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class PrepareImages {
 
     public static void main(String[] args) {
-        String imageFolder = "./res/att-faces";
+        String imageFolder = "./res/source/att-faces";
 
         try {
             flattenConvertAttImages(imageFolder);
@@ -50,7 +50,7 @@ public class PrepareImages {
 
                     // Save FastBitmap as image. Can't save as pgm for some reason. Might not want to.
                     ImageIO.write(bufferedImage, "png",
-                            new File(String.format("./res/att-faces-java/%03d.png",imageNr++))
+                            new File(String.format("./res/generated/att-faces-java/%03d.png",imageNr++))
                     );
                     //System.out.println("Saved image.");
                 }

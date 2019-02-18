@@ -15,21 +15,28 @@ import java.util.Scanner;
 public class FaceRecognition {
 
     public static void main(String[] args) {
-        String imageFolder = "./res/att-faces-scaled";
+        String faceImagesFolder = "./res/att-faces-scaled";
+        // String noFaceImagesFolder = "./res/att-faces-scaled";
 
         // Read images from file system.
         // FastBitmap is part of the Catalano library.
-        FastBitmap[] bitmaps = {};
+        FastBitmap[] faceBitmaps = {};
+        FastBitmap[] noFaceBitmaps = {};
         try {
-            bitmaps = readImagesFromDataBase(imageFolder); // Read images
+            faceBitmaps = readImagesFromDataBase(faceImagesFolder); // Read face images
+            // TODO Read no-face images
+            // noFaceBitmaps = readImagesFromDataBase(imageFolder); // Read no-face images
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Calculate integralImages
-        IntegralImage[] integralImages = convertToIntegralImages(bitmaps);
+        // Calculate integral images of all face images.
+        HalIntegralImage[] integralFaceImages = convertToIntegralImages(faceBitmaps);
 
-        System.out.println(integralImages[0]);
+        // TODO Calculate integral images of all non-face images.
+        IntegralImage[] integralNoFaceImages;
+
+        System.out.println(integralFaceImages[0]);
 
         // Do pattern recognition things
         //searchForPatterns();
@@ -55,10 +62,10 @@ public class FaceRecognition {
         return bitmaps;
     }
 
-    public static IntegralImage[] convertToIntegralImages(FastBitmap[] bitmaps) {
-        IntegralImage[] integrals = new IntegralImage[bitmaps.length];
+    public static HalIntegralImage[] convertToIntegralImages(FastBitmap[] bitmaps) {
+        HalIntegralImage[] integrals = new HalIntegralImage[bitmaps.length];
         for (int i = 0; i < bitmaps.length; i++) {
-            integrals[i] = new IntegralImage(bitmaps[i]);
+            integrals[i] = new HalIntegralImage(bitmaps[i]);
         }
         return integrals;
     }

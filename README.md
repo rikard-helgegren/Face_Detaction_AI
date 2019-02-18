@@ -22,6 +22,10 @@ When running files, make sure that your current working directory is the project
 2. Run `prepareImages.sh` (bash script) to crop and rescale all images into `att-faces-scaled`.
 3. Use cropped and rescaled images somehow.
 
+### Catalano IntegralImage
+Catalano has limited documentation, so it can help to look at the source code, here is For reference, here is the [Catalano IntegralImage](https://github.com/DiegoCatalano/Catalano-Framework/blob/master/Catalano.Image/src/Catalano/Imaging/Tools/IntegralImage.java) on GitHub.
+
+In particular, when using `IntegralImage.getRectangularSum(x1, y1, x2, y2)` where `(x1, y1)` is the top left and `(x2, y2)` is the bottom right of the selection, note that `(0, 0)` is the bottom right of the image and `(24, 24)` is the top left, if the image is 25x25.
 
 ## TODO
 

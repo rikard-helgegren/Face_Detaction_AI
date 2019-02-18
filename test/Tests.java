@@ -3,6 +3,7 @@ import Catalano.Imaging.Tools.IntegralImage;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,35 +27,58 @@ public class Tests {
     }
 
     @Test
-    public void testIntegralImages() {
+    public void testIntegralImages() throws Exception {
         FastBitmap blackFB = readImage(path + "black-25px.png");
-        FastBitmap whiteFB = readImage(path + "black-25px.png");
+        FastBitmap whiteFB = readImage(path + "white-25px.png");
         FastBitmap faceFB = readImage(path + "000.png");
-        FastBitmap[] fbs = new FastBitmap[]{blackFB, whiteFB, faceFB};
-        IntegralImage[] iis = FaceRecognition.convertToIntegralImages(fbs);
+        FastBitmap face92x112FB = readImage(path + "92x112.png");
+        FastBitmap[] fbs = new FastBitmap[]{blackFB, whiteFB, faceFB, face92x112FB};
+        HalIntegralImage[] iis = FaceRecognition.convertToIntegralImages(fbs);
 
-        IntegralImage black = iis[0];
-        IntegralImage white = iis[1];
-        IntegralImage face = iis[2];
+        HalIntegralImage black = iis[0];
+        HalIntegralImage white = iis[1];
+        HalIntegralImage face = iis[2];
+        HalIntegralImage face92x112 = iis[3];
+
+        // Probably want assertions below, but this will do for now to check what happens.
 
         // Test black
         System.out.println("== BLACK ==");
-        System.out.println(Arrays.deepToString(blackFB.toMatrixGrayAsInt())); // Expecting this to be all 0. Is 1...
-        System.out.println(Arrays.deepToString(black.getInternalData())); // Consistent with above.
+        assertEquals(25, black.getHeight());
+        assertEquals(25, black.getWidth());
+        System.out.println(Arrays.deepToString(blackFB.toMatrixGrayAsInt())); // Expecting this to be all 0. Is all 1.
+        System.out.println(Arrays.deepToString(black.getInternalData())); // Consistent with above except first line is 0.
+        System.out.println(black.getRectangleSum(24, 24, 22, 22));
 
+        /* 1 1 1 1   1  2  3  4
+           1 1 1 1   2  4  6  8
+           1 1 1 1   3  6  9  12
+           1 1 1 1   4  8  12 16
+
+           (24, 24), (22, 22) ++> (23, 23)
+            4 + 1 - 2 - 4
+         */
 
         //Test white
         System.out.println("== WHITE ==");
-        System.out.println(Arrays.deepToString(whiteFB.toMatrixGrayAsInt())); // Expecting this to be all 255. Is 1..
-        System.out.println(Arrays.deepToString(white.getInternalData())); // Consistent with above.
+        System.out.println(Arrays.deepToString(whiteFB.toMatrixGrayAsInt())); // Expecting this to be all 254.
+        System.out.println(Arrays.deepToString(white.getInternalData())); // Consistent with above except first line is 0.
+        System.out.println(white.getWidth());
+        System.out.println(white.getInternalData().length); // Apparently, internal data is 1px larger than input img.
+        System.out.println(white.getRectangleSum(24, 24, 0, 0)); // This calculates the total sum
+
 
         //Test face
         System.out.println("== FACE ==");
         System.out.println(Arrays.deepToString(faceFB.toMatrixGrayAsInt())); // Seems reasonable.
         System.out.println(Arrays.deepToString(face.getInternalData()));
+
+        // Test that dimensions are correct.
+        assertEquals(92, face92x112.getWidth());
+        assertEquals(112, face92x112.getHeight());
     }
 
-    public FastBitmap readImage(String path) {
+    private FastBitmap readImage(String path) {
         File file = new File(path);
         FastBitmap fb = new FastBitmap();
         try {

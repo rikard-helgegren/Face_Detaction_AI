@@ -32,13 +32,15 @@ public class Tests {
         FastBitmap whiteFB = readImage(path + "white-25px.png");
         FastBitmap faceFB = readImage(path + "000.png");
         FastBitmap face92x112FB = readImage(path + "92x112.png");
-        FastBitmap[] fbs = new FastBitmap[]{blackFB, whiteFB, faceFB, face92x112FB};
+        FastBitmap blackTop10FB = readImage(path + "blackTop10-25px.png");
+        FastBitmap[] fbs = new FastBitmap[]{blackFB, whiteFB, faceFB, face92x112FB, blackTop10FB};
         HalIntegralImage[] iis = FaceRecognition.convertToIntegralImages(fbs);
 
         HalIntegralImage black = iis[0];
         HalIntegralImage white = iis[1];
         HalIntegralImage face = iis[2];
         HalIntegralImage face92x112 = iis[3];
+        HalIntegralImage blackTop10 = iis[4];
 
         // Probably want assertions below, but this will do for now to check what happens.
 
@@ -48,7 +50,8 @@ public class Tests {
         assertEquals(25, black.getWidth());
         System.out.println(Arrays.deepToString(blackFB.toMatrixGrayAsInt())); // Expecting this to be all 0. Is all 1.
         System.out.println(Arrays.deepToString(black.getInternalData())); // Consistent with above except first line is 0.
-        System.out.println(black.getRectangleSum(24, 24, 22, 22));
+        assertEquals(1, black.getRectangleSum(24, 24, 23, 23));
+        assertEquals(4, black.getRectangleSum(24, 24, 22, 22));
 
         /* 1 1 1 1   1  2  3  4
            1 1 1 1   2  4  6  8
@@ -66,12 +69,20 @@ public class Tests {
         System.out.println(white.getWidth());
         System.out.println(white.getInternalData().length); // Apparently, internal data is 1px larger than input img.
         System.out.println(white.getRectangleSum(24, 24, 0, 0)); // This calculates the total sum
+        assertEquals(254, white.getInternalData()[0][0]);
 
 
         //Test face
         System.out.println("== FACE ==");
         System.out.println(Arrays.deepToString(faceFB.toMatrixGrayAsInt())); // Seems reasonable.
         System.out.println(Arrays.deepToString(face.getInternalData()));
+
+        // Test image with where top 10 rows are black, bottom 15 rows are white.
+        System.out.println("== Black top 10 ==");
+        //System.out.println(Arrays.deepToString(blackTop10.getInternalData()));
+        assertEquals(1, blackTop10.getInternalData()[0][0]);
+        assertEquals(10, blackTop10.getInternalData()[9][0]);
+        assertEquals(265, blackTop10.getInternalData()[10][0]); // Should expected not be 264? Hm...
 
         // Test that dimensions are correct.
         assertEquals(92, face92x112.getWidth());

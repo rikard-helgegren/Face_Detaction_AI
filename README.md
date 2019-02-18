@@ -11,3 +11,8 @@ When running files, make sure that your current working directory is the project
 1. Run java file in project root to copy and rename images from att folder structure to `att-faces-java`.
 2. Run `prepareImages.sh` (bash script) to crop and rescale all images into `att-faces-scaled`.
 3. Use cropped and rescaled images somehow.
+
+
+## TODO
+
+* Get and add to the dataset images that are not faces.

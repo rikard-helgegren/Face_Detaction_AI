@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
+// DO NOT RUN THIS FILE, NO LONGER NEEDED
 /**
  * Helps prepare images. Currently, run this and then `prepareImages.sh` to prepare images.
  */

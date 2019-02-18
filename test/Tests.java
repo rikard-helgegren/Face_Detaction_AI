@@ -16,31 +16,25 @@ public class Tests {
 
     @Test
     public void testImageRead() {
-        FastBitmap[] bitmaps = {};
+        HalIntegralImage[] images = {};
         try {
-            bitmaps = FaceRecognition.readImagesFromDataBase(path); // Read images
-        } catch (IOException e) {
+            images = FaceRecognition.readImagesFromDataBase(path); // Read images
+        } catch (Exception e) {
             e.printStackTrace();
         }
         // Correctly reads all images
-        assertEquals(bitmaps.length, new File(path).listFiles().length);
+        assertEquals(images.length, new File(path).listFiles().length);
     }
 
     @Test
     public void testIntegralImages() throws Exception {
-        FastBitmap blackFB = readImage(path + "black-25px.png");
-        FastBitmap whiteFB = readImage(path + "white-25px.png");
-        FastBitmap faceFB = readImage(path + "000.png");
-        FastBitmap face92x112FB = readImage(path + "92x112.png");
-        FastBitmap blackTop10FB = readImage(path + "blackTop10-25px.png");
-        FastBitmap[] fbs = new FastBitmap[]{blackFB, whiteFB, faceFB, face92x112FB, blackTop10FB};
-        HalIntegralImage[] iis = FaceRecognition.convertToIntegralImages(fbs);
+        HalIntegralImage black = readImage(path + "black-25px.png");
+        HalIntegralImage white = readImage(path + "white-25px.png");
+        HalIntegralImage face = readImage(path + "000.png");
+        HalIntegralImage face92x112 = readImage(path + "92x112.png");
+        HalIntegralImage blackTop10 = readImage(path + "blackTop10-25px.png");
+        HalIntegralImage[] fbs = new HalIntegralImage[]{black, white, face, face92x112, blackTop10};
 
-        HalIntegralImage black = iis[0];
-        HalIntegralImage white = iis[1];
-        HalIntegralImage face = iis[2];
-        HalIntegralImage face92x112 = iis[3];
-        HalIntegralImage blackTop10 = iis[4];
 
         // Probably want assertions below, but this will do for now to check what happens.
 
@@ -48,7 +42,7 @@ public class Tests {
         System.out.println("== BLACK ==");
         assertEquals(25, black.getHeight());
         assertEquals(25, black.getWidth());
-        System.out.println(Arrays.deepToString(blackFB.toMatrixGrayAsInt())); // Expecting this to be all 0. Is all 1.
+        //System.out.println(Arrays.deepToString(blackFB.toMatrixGrayAsInt())); // Expecting this to be all 0. Is all 1.
         System.out.println(Arrays.deepToString(black.getInternalData())); // Consistent with above except first line is 0.
         assertEquals(1, black.getRectangleSum(24, 24, 23, 23));
         assertEquals(4, black.getRectangleSum(24, 24, 22, 22));
@@ -64,7 +58,7 @@ public class Tests {
 
         //Test white
         System.out.println("== WHITE ==");
-        System.out.println(Arrays.deepToString(whiteFB.toMatrixGrayAsInt())); // Expecting this to be all 254.
+        //System.out.println(Arrays.deepToString(whiteFB.toMatrixGrayAsInt())); // Expecting this to be all 254.
         System.out.println(Arrays.deepToString(white.getInternalData())); // Consistent with above except first line is 0.
         System.out.println(white.getWidth());
         System.out.println(white.getInternalData().length); // Apparently, internal data is 1px larger than input img.
@@ -74,7 +68,7 @@ public class Tests {
 
         //Test face
         System.out.println("== FACE ==");
-        System.out.println(Arrays.deepToString(faceFB.toMatrixGrayAsInt())); // Seems reasonable.
+        //System.out.println(Arrays.deepToString(faceFB.toMatrixGrayAsInt())); // Seems reasonable.
         System.out.println(Arrays.deepToString(face.getInternalData()));
 
         // Test image with where top 10 rows are black, bottom 15 rows are white.
@@ -89,14 +83,9 @@ public class Tests {
         assertEquals(112, face92x112.getHeight());
     }
 
-    private FastBitmap readImage(String path) {
+    private HalIntegralImage readImage(String path) throws Exception {
         File file = new File(path);
-        FastBitmap fb = new FastBitmap();
-        try {
-            fb = new FastBitmap(ImageIO.read(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return fb;
+        HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)));
+        return img;
     }
 }

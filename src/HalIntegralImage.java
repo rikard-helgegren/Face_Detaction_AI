@@ -1,9 +1,6 @@
 import Catalano.Imaging.FastBitmap;
-import Catalano.Imaging.Tools.IntegralImage;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.util.Arrays;
 
 /**
  * Represents an integral image.
@@ -15,21 +12,30 @@ public class HalIntegralImage {
     // First coordinate is Y, second is X.
     public int[][] data;
 
-    public HalIntegralImage(BufferedImage bi) {
+    public HalIntegralImage(BufferedImage bi) throws Exception {
         this(new FastBitmap(bi));
     }
 
-    public HalIntegralImage(FastBitmap fb) {
-        data = toIntegralImage(fb);
+    public HalIntegralImage(FastBitmap fb) throws Exception {
+        if (!fb.isGrayscale()) throw new Exception("Image must be grayscale.");
+        data = toIntegralData(fb);
     }
 
-    public int[][] toIntegralImage(FastBitmap fb) {
+    private int[][] toIntegralData(FastBitmap fb) {
         int[][] integral = new int[fb.getWidth()][fb.getHeight()];
+        //System.out.printf("Dimension: %s, %s\n", fb.getWidth(), fb.getHeight());
+
+        // TODO Seems to not always work if images are not square. Fix or find out what this depends on.
+        /*if (fb.getWidth() != fb.getHeight()) {
+            System.out.printf("Dimension: %s, %s\n", fb.getWidth(), fb.getHeight());
+            return integral;
+        }*/
 
         // Calculate sums.
-        for (int y = 0; y < integral[0].length; y++) {
+        for (int y = 0; y < fb.getHeight(); y++) {
             int rowSum = 0;
-            for (int x = 0; x < integral.length; x++) {
+            for (int x = 0; x < fb.getWidth(); x++) {
+                //System.out.printf("\t%s, %s\n", x, y);
                 rowSum += fb.getGray(x, y);
                 int aboveSum = 0; // Default to 0 for first row, when y is 0.
                 if (y > 0) aboveSum = integral[x][y-1];
@@ -37,7 +43,6 @@ public class HalIntegralImage {
                 //System.out.println(rowSum + " + " + aboveSum);
             }
         }
-
         return integral;
     }
 

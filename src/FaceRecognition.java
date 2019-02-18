@@ -2,11 +2,8 @@ import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.Tools.IntegralImage;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.Scanner;
 
 /**
  * This file should be run with the project root as working directory.
@@ -16,27 +13,19 @@ public class FaceRecognition {
 
     public static void main(String[] args) {
         String faceImagesFolder = "./res/generated/att-faces-scaled";
-        // String noFaceImagesFolder = "./res/att-faces-scaled";
+        String noFaceImagesFolder = "./res/source/no-faces-crawled";
 
-        // Read images from file system.
-        // FastBitmap is part of the Catalano library.
-        FastBitmap[] faceBitmaps = {};
-        FastBitmap[] noFaceBitmaps = {};
+        // Read images from file system amd calculate integralImages.
+        // This now uses our own HalIntegralImage. It seems to work.
+        HalIntegralImage[] faces = {};
+        HalIntegralImage[] noFaces = {};
         try {
-            faceBitmaps = readImagesFromDataBase(faceImagesFolder); // Read face images
-            // TODO Read no-face images
-            // noFaceBitmaps = readImagesFromDataBase(imageFolder); // Read no-face images
-        } catch (IOException e) {
+            faces = readImagesFromDataBase(faceImagesFolder); // Read face images
+            noFaces = readImagesFromDataBase(noFaceImagesFolder); // Read no-face images
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // Calculate integral images of all face images.
-        HalIntegralImage[] integralFaceImages = convertToIntegralImages(faceBitmaps);
-
-        // TODO Calculate integral images of all non-face images.
-        IntegralImage[] integralNoFaceImages;
-
-        System.out.println(integralFaceImages[0]);
 
         // Do pattern recognition things
         //searchForPatterns();
@@ -47,27 +36,19 @@ public class FaceRecognition {
      * @param path a path to a folder containing only images. Images should have correct size and other properties.
      * @throws IOException
      */
-    public static FastBitmap[] readImagesFromDataBase(String path) throws IOException{
+    public static HalIntegralImage[] readImagesFromDataBase(String path) throws Exception {
         File imageFolder = new File(path);
-        FastBitmap[] bitmaps = new FastBitmap[imageFolder.listFiles().length];
+        HalIntegralImage[] images = new HalIntegralImage[imageFolder.listFiles().length];
 
         File[] listFiles = imageFolder.listFiles();
         for (int i = 0; i < listFiles.length; i++) {
             File imgFile = listFiles[i];
             BufferedImage bi = ImageIO.read(imgFile);
             FastBitmap fb = new FastBitmap(bi);
-            bitmaps[i] = fb;
-            System.out.printf("%d/%d\n", i+1, imageFolder.listFiles().length);
+            images[i] = new HalIntegralImage(fb);
+            //System.out.printf("%7s: %d/%d\n", imgFile.getName(), i+1, imageFolder.listFiles().length);
         }
-        return bitmaps;
-    }
-
-    public static HalIntegralImage[] convertToIntegralImages(FastBitmap[] bitmaps) {
-        HalIntegralImage[] integrals = new HalIntegralImage[bitmaps.length];
-        for (int i = 0; i < bitmaps.length; i++) {
-            integrals[i] = new HalIntegralImage(bitmaps[i]);
-        }
-        return integrals;
+        return images;
     }
 
     // ImageMagick is much more convenient for size and contrast changes than java,

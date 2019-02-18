@@ -9,9 +9,10 @@ One way to setup your local development environment for this project is the foll
 
 1. Create an IDE project (Intellij IDEA, Eclipse, etc.) in the __parent__ folder of project root, that is, outside of source control (git).
 2. Add the repository folder (by default called `code`) to your project if it was not visible automatically.
-3. Mark `code/src` as the code source folder. (In Intellij, right click -> mark as.. -> source folder)
-4. Mark `code/res` as resources folder, `code/test` as test source, `code/test-res` as test resources.
-5. Try running a main file to create a run configuration. It will fail to find any files to run on. Now edit your run configuration and set the __working directory__ to point to the project root directory (`code`).
+3. Add libraries in `code/libs` to your project libraries. (In Intellij File -> Project structure -> libraries -> plus symbol -> select all jars and the zip file containing javadoc)
+4. Mark `code/src` as the code source folder. (In Intellij, right click -> mark as.. -> source folder)
+5. Mark `code/res` as resources folder, `code/test` as test source, `code/test-res` as test resources.
+6. Try running a main file to create a run configuration. It will fail to find any files to run on. Now edit your run configuration and set the __working directory__ to point to the project root directory (`code`).
 
 
 ## Current Usage

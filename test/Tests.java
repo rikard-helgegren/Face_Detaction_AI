@@ -38,16 +38,19 @@ public class Tests {
         IntegralImage face = iis[2];
 
         // Test black
-        //System.out.println(black.getInternalData(2, 2));
-        System.out.println(Arrays.deepToString(black.getInternalData()));
+        System.out.println("== BLACK ==");
+        System.out.println(Arrays.deepToString(blackFB.toMatrixGrayAsInt())); // Expecting this to be all 0. Is 1...
+        System.out.println(Arrays.deepToString(black.getInternalData())); // Consistent with above.
 
 
         //Test white
-        //System.out.println(white.getInternalData(2, 2));
-        System.out.println(Arrays.deepToString(white.getInternalData()));
+        System.out.println("== WHITE ==");
+        System.out.println(Arrays.deepToString(whiteFB.toMatrixGrayAsInt())); // Expecting this to be all 255. Is 1..
+        System.out.println(Arrays.deepToString(white.getInternalData())); // Consistent with above.
 
         //Test face
-        //System.out.println(white.getInternalData(2, 2));
+        System.out.println("== FACE ==");
+        System.out.println(Arrays.deepToString(faceFB.toMatrixGrayAsInt())); // Seems reasonable.
         System.out.println(Arrays.deepToString(face.getInternalData()));
     }
 

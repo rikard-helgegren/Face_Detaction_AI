@@ -22,7 +22,7 @@ public class HalIntegralImage {
     }
 
     private int[][] toIntegralData(FastBitmap fb) {
-        int[][] integral = new int[fb.getWidth()][fb.getHeight()];
+        int[][] integral = new int[fb.getHeight()][fb.getWidth()];
         //System.out.printf("Dimension: %s, %s\n", fb.getWidth(), fb.getHeight());
 
         // TODO Seems to not always work if images are not square. Fix or find out what this depends on.
@@ -36,10 +36,10 @@ public class HalIntegralImage {
             int rowSum = 0;
             for (int x = 0; x < fb.getWidth(); x++) {
                 //System.out.printf("\t%s, %s\n", x, y);
-                rowSum += fb.getGray(x, y);
+                rowSum += fb.getGray(y, x);
                 int aboveSum = 0; // Default to 0 for first row, when y is 0.
-                if (y > 0) aboveSum = integral[x][y-1];
-                integral[x][y] = rowSum + aboveSum;
+                if (y > 0) aboveSum = integral[y-1][x];
+                integral[y][x] = rowSum + aboveSum;
                 //System.out.println(rowSum + " + " + aboveSum);
             }
         }
@@ -78,10 +78,10 @@ public class HalIntegralImage {
     }
 
     public int getHeight(){
-        return data[0].length;
+        return data.length;
     }
 
     public int getWidth() {
-        return data.length;
+        return data[0].length;
     }
 }

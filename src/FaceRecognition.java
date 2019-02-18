@@ -16,7 +16,7 @@ public class FaceRecognition {
         String noFaceImagesFolder = "./res/source/no-faces-crawled";
 
         // Read images from file system amd calculate integralImages.
-        // This now uses our own HalIntegralImage. It seems to work.
+        // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
         HalIntegralImage[] faces = {};
         HalIntegralImage[] noFaces = {};
         try {
@@ -51,21 +51,11 @@ public class FaceRecognition {
         return images;
     }
 
-    // ImageMagick is much more convenient for size and contrast changes than java,
-    // therefore, those tasks have been moved to bash script. See `prepareImages.sh`
-    /*public static void preProcessImages(FastBitmap[] bitmaps) {
-
-    }*/
     /*
-
-
-    public placeholder saveImages(placeholder images) {
-
-    }
-
     public placeholder searchForPatterns(placeholder images) {
         //more methods needed
-    }*/
+    }
+    */
 
 
 }

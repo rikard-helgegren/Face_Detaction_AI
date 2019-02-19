@@ -2,6 +2,7 @@ import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.Tools.IntegralImage;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 

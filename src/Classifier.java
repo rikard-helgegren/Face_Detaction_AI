@@ -21,5 +21,9 @@ public class Classifier {
         return error;
     }
 
+    public double setError(double error) {
+        this.error = error;
+    }
+
 
 }

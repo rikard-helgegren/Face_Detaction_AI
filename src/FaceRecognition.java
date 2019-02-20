@@ -13,21 +13,18 @@ import java.util.*;
 public class FaceRecognition {
 
     private static class LabeledIntegralImage {
-        private boolean isFace;
-        private HalIntegralImage img;
-        private double weight;
+        public int isFace; // 1 for true, 0 for false
+        public HalIntegralImage img;
+        public double weight;
 
-        public LabeledIntegralImage(HalIntegralImage img, boolean isFace, double weight) {
+        public LabeledIntegralImage(HalIntegralImage img, int isFace, double weight) {
             this.isFace = isFace;
             this.img = img;
             this.weight = weight;
         }
-
-        public boolean isFace() { return isFace; }
-        public HalIntegralImage getImage() { return img; }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
         HalIntegralImage[] trainFaces = {};
@@ -56,19 +53,38 @@ public class FaceRecognition {
 
         // Re-store arrays of training data as a list and add face label.
         ArrayList<LabeledIntegralImage> trainingData = new ArrayList<>(5000);
-        for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, true, weightFace));
-        for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, false, weightNoFace));
+        for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, 1, weightFace));
+        for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, 0, weightNoFace));
         Collections.shuffle(trainingData);
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         ArrayList<LabeledIntegralImage> testData = new ArrayList<>(20000);
-        for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, true, 0));
-        for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, false, 0));
+        for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, 1, 0));
+        for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, 0, 0));
         Collections.shuffle(testData);
 
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         Collections.shuffle(allFeatures);
+
+        // For each t
+        // Normalize weights
+        double weightSum = 0;
+        for (LabeledIntegralImage img : trainingData) {
+            weightSum += img.weight;
+        }
+        for (LabeledIntegralImage img : trainingData) {
+            img.weight = img.weight / weightSum;
+        }
+
+        for (Feature j : allFeatures) {
+            double error = 0;
+            Classifier h = new Classifier(j);
+            for (LabeledIntegralImage img : trainingData) {
+                error = Math.abs(j.calculateFeatureValue(img.img) - img.isFace); // Throws exception
+            }
+            h.setError(error * weightSum);
+        }
 
 
 

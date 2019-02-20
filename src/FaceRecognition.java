@@ -116,6 +116,14 @@ public class FaceRecognition {
         return img.getRectangleSum(x, y, x+w-1, y+h-1) - img.getRectangleSum(x, y+h, x+w-1, y+2*h-1);
     }
 
+    public static int calcThreeRectFeature(HalIntegralImage img, int x, int y, int w, int h) throws Exception {
+        return 0; // TODO
+    }
+
+    public static int calcFourRectFeature(HalIntegralImage img, int x, int y, int w, int h) throws Exception {
+        return 0; // TODO
+    }
+
     /**
      * Uses features to determine if the image might be a face.
      * @param img

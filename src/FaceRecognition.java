@@ -77,5 +77,52 @@ public class FaceRecognition {
     }
     */
 
+    /**
+     * Calculates the difference between the rectangle sums of two rectangles located next to each other horizontally.
+     * Note that x+2*w may not be larger than the width of the image.
+     * Note that y+h may not be larger than the height of the image.
+     *
+     * Left rectangle: upper left corner is (x, y), bottom right is (x+w, y+h).
+     * Right rectangle: upper left corner is (x+w, y), bottom right is (x+2*w, y+h).
+     *
+     * @param img the integral image to operate on
+     * @param x coordinate for the upper left corner of the left rectangle.
+     * @param y coordinate for the upper left corner of the left rectangle.
+     * @param w the width of each rectangle.
+     * @param h the height of each rectangle.
+     * @return
+     * @throws Exception
+     */
+    public static int calcHorizontalTwoRectFeature(HalIntegralImage img, int x, int y, int w, int h) throws Exception {
+        // -1 on end coordinates because getRectangleSum uses inclusive coordinates,
+        // but width and height are generally thought of as exclusive.
+        // That is rectangle at (0, 0) with w=3 and h=3 means a 3x3 rectangle.
+        // However, if rectangleSum gets (0, 0) and (3, 3) it will use a 4x4 rectangle in top left corner.
+        return img.getRectangleSum(x, y, x+w-1, y+h-1) - img.getRectangleSum(x+w, y, x+2*w-1, y+h-1);
+    }
+
+    /**
+     * Calculates the difference between the rectangle sums of two rectangles located next to each other vertically.
+     *
+     * @param img the integral image to operate on
+     * @param x coordinate for the upper left corner of the top rectangle.
+     * @param y coordinate for the upper left corner of the top rectangle.
+     * @param w the width of each rectangle.
+     * @param h the height of each rectangle.
+     * @return
+     * @throws Exception
+     */
+    public static int calcVerticalTwoRectFeature(HalIntegralImage img, int x, int y, int w, int h) throws Exception {
+        return img.getRectangleSum(x, y, x+w-1, y+h-1) - img.getRectangleSum(x, y+h, x+w-1, y+2*h-1);
+    }
+
+    /**
+     * Uses features to determine if the image might be a face.
+     * @param img
+     * @return true if the image might be a face
+     */
+    public static boolean couldBeFace(HalIntegralImage img) {
+        return false;
+    }
 
 }

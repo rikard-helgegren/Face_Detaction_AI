@@ -64,14 +64,20 @@ public class HalIntegralImage {
         if (    ( x2 < 0 ) || ( y2 < 0 ) || ( x1 < 0 ) || ( y1 < 0 ) ||
                 ( x1 >= this.getHeight() ) || ( y1 >= this.getWidth() ) ||
                 ( x2 >= this.getHeight() ) || ( y2 >= this.getWidth() )) {
-
             throw new Exception("Coordinates are outside of image!");
         }
+        if ( x2 < x1 || y2 < y1) throw new Exception("Coordinates are given in the wrong order.");
 
-        if ( x2 > this.getHeight() )  x2 = this.getHeight();
-        if ( y2 > this.getWidth() ) y2 = this.getWidth();
+        //if ( x2 > this.getHeight() )  x2 = this.getHeight();
+        //if ( y2 > this.getWidth() ) y2 = this.getWidth();
+        //if ( x2 == this.getHeight() )  x2 = this.getHeight();
+        //if ( y2 == this.getWidth() ) y2 = this.getWidth();
+        int corner = (x1 == 0 || y1 == 0) ? 0 : data[x1-1][y1-1]; // If x1 or y1 is 0, there is no corner piece.
+        int left = (x1 == 0) ? 0 : data[x1-1][y2]; // If x1 is 0, there is no left piece
+        int top = (y1 == 0) ? 0: data[x2][y1-1]; // If y1 is 0, there is no top piece
+        int main = data[x2][y2]; // There is always a main piece
 
-        return data[x2][y2] + data[x1][y1] - data[x1][y2] - data[x2][y1];
+        return main + corner - left - top;
     }
 
     public int[][] getInternalData() {

@@ -26,6 +26,7 @@ public class HalIntegralImage {
         //System.out.printf("Dimension: %s, %s\n", fb.getWidth(), fb.getHeight());
 
         // TODO Seems to not always work if images are not square. Fix or find out what this depends on.
+        // I have done some more testing since that might have fixed it. I am not entirely certain however. /Ecen
         /*if (fb.getWidth() != fb.getHeight()) {
             System.out.printf("Dimension: %s, %s\n", fb.getWidth(), fb.getHeight());
             return integral;

@@ -66,25 +66,9 @@ public class FaceRecognition {
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         Collections.shuffle(allFeatures);
+        
 
-        // For each t
-        // Normalize weights
-        double weightSum = 0;
-        for (LabeledIntegralImage img : trainingData) {
-            weightSum += img.weight;
-        }
-        for (LabeledIntegralImage img : trainingData) {
-            img.weight = img.weight / weightSum;
-        }
 
-        for (Feature j : allFeatures) {
-            double error = 0;
-            Classifier h = new Classifier(j);
-            for (LabeledIntegralImage img : trainingData) {
-                error = Math.abs(j.calculateFeatureValue(img.img) - img.isFace); // Throws exception
-            }
-            h.setError(error * weightSum);
-        }
 
 
 

@@ -15,10 +15,12 @@ public class FaceRecognition {
     private static class LabeledIntegralImage {
         private boolean isFace;
         private HalIntegralImage img;
+        private double weight;
 
-        public LabeledIntegralImage(HalIntegralImage img, boolean isFace) {
+        public LabeledIntegralImage(HalIntegralImage img, boolean isFace, double weight) {
             this.isFace = isFace;
             this.img = img;
+            this.weight = weight;
         }
 
         public boolean isFace() { return isFace; }
@@ -50,16 +52,20 @@ public class FaceRecognition {
             e.printStackTrace();
         }
 
-        // Re-store arrays as a java collections array and add face label for training data.
+        // Calculate initial weights. TODO Verify that this is correct. I'm not sure.
+        double weightFace = 1.0 / (2 * trainFaces.length);
+        double weightNoFace = 1.0 / (2 * trainNoFaces.length);
+
+        // Re-store arrays of training data as a list and add face label.
         ArrayList<LabeledIntegralImage> trainingData = new ArrayList<>(5000);
-        for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, true));
-        for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, false));
+        for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, true, weightFace));
+        for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, false, weightNoFace));
         Collections.shuffle(trainingData);
 
-        // Do the same for test data.
+        // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         ArrayList<LabeledIntegralImage> testData = new ArrayList<>(20000);
-        for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, true));
-        for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, false));
+        for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, true, 0));
+        for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, false, 0));
         Collections.shuffle(testData);
 
         // Generate all possible features

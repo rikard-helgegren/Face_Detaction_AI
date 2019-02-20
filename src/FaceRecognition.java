@@ -1,5 +1,4 @@
 import Catalano.Imaging.FastBitmap;
-import Catalano.Imaging.Tools.IntegralImage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -55,7 +54,7 @@ public class FaceRecognition {
         ArrayList<LabeledIntegralImage> trainingData = new ArrayList<>(5000);
         for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, 1, weightFace));
         for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, 0, weightNoFace));
-        Collections.shuffle(trainingData);
+        //Collections.shuffle(trainingData);
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         ArrayList<LabeledIntegralImage> testData = new ArrayList<>(20000);
@@ -79,14 +78,19 @@ public class FaceRecognition {
 
         // 2. Train a classifier for every feature. Each is trained on all trainingData
         ArrayList<Classifier> classifiers = new ArrayList<>(allFeatures.size());
-        for (Feature j : allFeatures) {
+        for (int i = 0; i < allFeatures.size(); i++) {
+            Feature j = allFeatures.get(i);
+            int threshold = calcBestThreshold(trainingData, j);
+
+            // Actual step 2
             double error = 0;
-            Classifier h = new Classifier(j);
+            Classifier h = new Classifier(j, threshold, 1); // TODO Calculate parity!! It should be 1 or -1.
             for (LabeledIntegralImage img : trainingData) {
                 error = Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
             }
             h.setError(error * weightSum);
             classifiers.add(h);
+            System.out.printf("Feature %d/%d\n", i, allFeatures.size()-1);
         }
         // 3. Choose the classifier with the lowest error
         Classifier bestClassifier = classifiers.get(0);
@@ -130,6 +134,62 @@ public class FaceRecognition {
             //if ((i+1) % 1000 == 0) System.out.printf("%d/%d\n", i+1, imageFolder.listFiles().length);
         }
         return images;
+    }
+
+    /**
+     * Calculates the best threshold for a single weak classifier.
+     * @param trainingData the training data used in adaboost.
+     * @param j the current feature being evaluated in adaboost
+     * @return
+     * @throws Exception if calculateFeatureValue throws an exception
+     */
+    public static int calcBestThreshold(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
+        // Sort training data based on features
+        trainingData.sort((a, b) -> {
+            try {
+                // No attention given to order here. Might have to do that if things doesn't work.
+                return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+            } catch (Exception e) {
+                System.err.println("Features could not be sorted due to an error.");
+                e.printStackTrace();
+            }
+            return 0;
+        });
+
+        ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
+        for (LabeledIntegralImage img : trainingData) {
+            featureValues.add(j.calculateFeatureValue(img.img));
+        }
+
+        int bestThreshold = 0;
+        double lowestError = Double.MAX_VALUE; // Corresponding error for the best threshold.
+        for (Integer threshold : featureValues) {
+            double tPlus = 0;
+            double tMinus = 0;
+            double sPlus = 0;
+            double sMinus = 0;
+            for (LabeledIntegralImage img : trainingData) {
+                if (img.isFace == 1) {
+                    tPlus += img.weight;
+                    if (img.weight < threshold) {
+                        sPlus += img.weight;
+                    }
+                } else if (img.isFace == 0) {
+                    tMinus += img.weight;
+                    if (img.weight < threshold) {
+                        sMinus += img.weight;
+                    }
+                }
+            }
+            double error = Math.min(sPlus + tMinus - sMinus, sMinus + tPlus - sPlus);
+            if (error < lowestError) {
+                lowestError = error;
+                // Final best threshold would probably be a value in-between the best threshold and one of the
+                // possible thresholds next to it. If we want we can implement that at some point.
+                bestThreshold = threshold;
+            }
+        }
+        return bestThreshold;
     }
 
 

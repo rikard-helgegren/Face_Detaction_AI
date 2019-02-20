@@ -9,8 +9,10 @@ public class Classifier {
      * Constructs a classifier that uses the the given type of feature with the given values.
      * @param feature the feature this classifier should use.
      */
-    public Classifier(Feature feature) {
+    public Classifier(Feature feature, int threshold, int parity) {
         this.feature = feature;
+        this.threshold = threshold;
+        this.parity = parity;
         this.error = 0;
     }
 
@@ -28,7 +30,7 @@ public class Classifier {
     }
 
     public int canBeFace(HalIntegralImage img) throws Exception {
-        if (parity != 1 || parity != -1) throw new Exception("Parity was not 1 or -1. It was: " + parity);
+        if (parity != 1 && parity != -1) throw new Exception("Parity was not 1 or -1. It was: " + parity);
         if (parity * feature.calculateFeatureValue(img) < parity * threshold) {
             return 1;
         }

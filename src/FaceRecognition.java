@@ -36,6 +36,8 @@ public class FaceRecognition {
             }
         }
 
+        System.out.println("# of features: " + generateAllFeatures(19, 19).size());
+
 
         // Do pattern recognition things
         //searchForPatterns();
@@ -87,7 +89,7 @@ public class FaceRecognition {
                 }
             }
         }
-
+        // TODO Only generates 39 150 features, should be about 160 000 or 180 000.
         return allFeatures;
     }
 

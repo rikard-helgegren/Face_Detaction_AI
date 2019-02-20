@@ -86,13 +86,13 @@ public class Tests {
 
         // Test horizontal feature calculation
         int expectedFace = face92x112.getRectangleSum(0, 0, 1, 3) - face92x112.getRectangleSum(2, 0, 3, 3);
-        int actualFace = FaceRecognition.calcHorizontalTwoRectFeature(face92x112, 0, 0, 4, 4);
+        int actualFace = Feature.calcHorizontalTwoRectFeature(face92x112, 0, 0, 4, 4);
         assertEquals(expectedFace, actualFace);
 
         // Test vertical feature calculation
         assertEquals(
                 face92x112.getRectangleSum(1, 1, 4, 2) - face92x112.getRectangleSum(1, 3, 4, 4),
-                FaceRecognition.calcVerticalTwoRectFeature(face92x112, 1, 1, 4, 4)
+                Feature.calcVerticalTwoRectFeature(face92x112, 1, 1, 4, 4)
         );
 
         // TODO Test type three feature calculation

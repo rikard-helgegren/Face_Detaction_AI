@@ -5,6 +5,9 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * This file should be run with the project root as working directory.
@@ -12,19 +15,29 @@ import java.io.*;
  */
 public class FaceRecognition {
 
-    public static void main(String[] args) {
-        String faceImagesFolder = "./res/generated/att-faces-scaled";
-        String noFaceImagesFolder = "./res/source/no-faces-crawled";
+    public static void main(String[] args) throws IOException {
+        String[] faceImagesFolder = {"./res/source/data/train/face", "./res/generated/att-faces-scaled"};
+        String[] noFaceImagesFolder = {"./res/source/data/train/non-face", "./res/source/no-faces-crawled"};
+
+        String zipPath = "./res/source/data.zip";
 
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
         HalIntegralImage[] faces = {};
         HalIntegralImage[] noFaces = {};
-        try {
-            faces = readImagesFromDataBase(faceImagesFolder); // Read face images
-            noFaces = readImagesFromDataBase(noFaceImagesFolder); // Read no-face images
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (int i = 0; i < faceImagesFolder.length; i++) {
+            try {
+                faces = readImagesFromDataBase(faceImagesFolder[i]); // Read face images
+                noFaces = readImagesFromDataBase(noFaceImagesFolder[i]); // Read no-face images
+                //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
+                break;
+            } catch (IOException e) {
+                System.err.println("Data folder (" + faceImagesFolder[i] + ") not found.");
+                System.out.println("Trying next location...");
+            } catch (Exception e) {
+                System.err.println("There was an error reading images.");
+                e.printStackTrace();
+            }
         }
 
 
@@ -46,8 +59,14 @@ public class FaceRecognition {
             File imgFile = listFiles[i];
             BufferedImage bi = ImageIO.read(imgFile);
             FastBitmap fb = new FastBitmap(bi);
-            images[i] = new HalIntegralImage(fb);
-            //System.out.printf("%7s: %d/%d\n", imgFile.getName(), i+1, imageFolder.listFiles().length);
+            try {
+                images[i] = new HalIntegralImage(fb);
+            } catch (Exception e) {
+                System.err.println("Could not read " + imgFile.getPath());
+                e.printStackTrace();
+                break;
+            }
+            //if ((i+1) % 1000 == 0) System.out.printf("%d/%d\n", i+1, imageFolder.listFiles().length);
         }
         return images;
     }

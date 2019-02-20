@@ -27,9 +27,7 @@ public class FaceRecognition {
         public HalIntegralImage getImage() { return img; }
     }
 
-    public static void main(String[] args) throws IOException {
-        String zipPath = "./res/source/data.zip";
-
+    public static void main(String[] args) {
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
         HalIntegralImage[] trainFaces = {};

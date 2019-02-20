@@ -1,9 +1,10 @@
 import Catalano.Imaging.FastBitmap;
+import Catalano.Imaging.Tools.IntegralImage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * This file should be run with the project root as working directory.
@@ -11,32 +12,60 @@ import java.util.ArrayList;
  */
 public class FaceRecognition {
 
-    public static void main(String[] args) throws IOException {
-        String[] faceImagesFolder = {"./res/source/data/train/face", "./res/generated/att-faces-scaled"};
-        String[] noFaceImagesFolder = {"./res/source/data/train/non-face", "./res/source/no-faces-crawled"};
+    private static class LabeledIntegralImage {
+        private boolean isFace;
+        private HalIntegralImage img;
 
+        public LabeledIntegralImage(HalIntegralImage img, boolean isFace) {
+            this.isFace = isFace;
+            this.img = img;
+        }
+
+        public boolean isFace() { return isFace; }
+        public HalIntegralImage getImage() { return img; }
+    }
+
+    public static void main(String[] args) throws IOException {
         String zipPath = "./res/source/data.zip";
 
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
-        HalIntegralImage[] faces = {};
-        HalIntegralImage[] noFaces = {};
-        for (int i = 0; i < faceImagesFolder.length; i++) {
-            try {
-                faces = readImagesFromDataBase(faceImagesFolder[i]); // Read face images
-                noFaces = readImagesFromDataBase(noFaceImagesFolder[i]); // Read no-face images
-                //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
-                break;
-            } catch (IOException e) {
-                System.err.println("Data folder (" + faceImagesFolder[i] + ") not found.");
-                System.out.println("Trying next location...");
-            } catch (Exception e) {
-                System.err.println("There was an error reading images.");
-                e.printStackTrace();
-            }
+        HalIntegralImage[] trainFaces = {};
+        HalIntegralImage[] trainNoFaces = {};
+        HalIntegralImage[] testFaces = {};
+        HalIntegralImage[] testNoFaces = {};
+        try {
+            // Read images for training set
+            trainFaces = readImagesFromDataBase("./res/source/data/train/face"); // Read face images
+            trainNoFaces = readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
+
+            // Read images for test set
+            testFaces = readImagesFromDataBase("./res/source/data/test/face");
+            testNoFaces = readImagesFromDataBase("./res/source/data/test/non-face");
+            //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
+        } catch (IOException e) {
+            System.err.println("Data folder not found. Have you extracted data.zip correctly?");
+        } catch (Exception e) {
+            System.err.println("There was an error reading images.");
+            e.printStackTrace();
         }
 
-        System.out.println("# of features: " + Feature.generateAllFeatures(19, 19).size());
+        // Re-store arrays as a java collections array and add face label for training data.
+        ArrayList<LabeledIntegralImage> trainingData = new ArrayList<>(5000);
+        for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, true));
+        for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, false));
+        Collections.shuffle(trainingData);
+
+        // Do the same for test data.
+        ArrayList<LabeledIntegralImage> testData = new ArrayList<>(20000);
+        for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, true));
+        for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, false));
+        Collections.shuffle(testData);
+
+        // Generate all possible features
+        ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
+        Collections.shuffle(allFeatures);
+
 
 
         // Do pattern recognition things

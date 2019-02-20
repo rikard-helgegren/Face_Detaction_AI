@@ -30,6 +30,22 @@ public class Feature {
     }
 
     /**
+     * Evaluates an image with this feature by selecting one of Feature's static methods for calculating feature value.
+     * @param img the image to evaluate using this features.
+     * @return
+     * @throws Exception if any calculation fails or the given feature was not a recognized type.
+     */
+    public int calculateFeatureValue(HalIntegralImage img) throws Exception {
+        switch (type) {
+            case HORIZONTAL: return calcHorizontalTwoRectFeature(img, x, y, w, h);
+            case VERTICAL: return calcVerticalTwoRectFeature(img, x, y, w, h);
+            case THREE: return calcThreeRectFeature(img, x, y, w, h);
+            case FOUR: return calcFourRectFeature(img, x, y, w, h);
+        }
+        throw new Exception("The feature was not of a recognized type. Type was: " + type);
+    }
+
+    /**
      * Generate a list of all possible feature types.
      * @param imageWidth
      * @param imageHeight

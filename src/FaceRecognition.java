@@ -95,17 +95,14 @@ public class FaceRecognition {
 
     /**
      * Calculates the difference between the rectangle sums of two rectangles located next to each other horizontally.
-     * Note that x+2*w may not be larger than the width of the image.
+     * Note that x+w may not be larger than the width of the image.
      * Note that y+h may not be larger than the height of the image.
      *
-     * Left rectangle: upper left corner is (x, y), bottom right is (x+w, y+h).
-     * Right rectangle: upper left corner is (x+w, y), bottom right is (x+2*w, y+h).
-     *
      * @param img the integral image to operate on
-     * @param x coordinate for the upper left corner of the left rectangle.
-     * @param y coordinate for the upper left corner of the left rectangle.
-     * @param w the width of total feature.
-     * @param h the height of total feature.
+     * @param x coordinate for the upper left corner of the feature area.
+     * @param y coordinate for the upper left corner of the feature area.
+     * @param w the width of the total feature area.
+     * @param h the height of the total feature area.
      * @return
      * @throws Exception
      */
@@ -122,10 +119,10 @@ public class FaceRecognition {
      * Calculates the difference between the rectangle sums of two rectangles located next to each other vertically.
      *
      * @param img the integral image to operate on
-     * @param x coordinate for the upper left corner of the top rectangle.
-     * @param y coordinate for the upper left corner of the top rectangle.
-     * @param w the width of each rectangle.
-     * @param h the height of each rectangle.
+     * @param x coordinate for the upper left corner of the feature area.
+     * @param y coordinate for the upper left corner of the feature area.
+     * @param w the width of the total feature area.
+     * @param h the height of the total feature area.
      * @return
      * @throws Exception
      */

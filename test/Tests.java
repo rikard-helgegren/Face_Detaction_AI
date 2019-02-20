@@ -84,14 +84,20 @@ public class Tests {
         HalIntegralImage blackTop10 = readImage(path + "blackTop10-25px.png");
         HalIntegralImage blackLeft10 = readImage(path + "blackLeft10-25px.png");
 
-        int expected = blackTop10.getRectangleSum(0, 0, 3, 3) - blackTop10.getRectangleSum(4, 0, 7, 3);
-        int actual = FaceRecognition.calcHorizontalTwoRectFeature(blackTop10, 0, 0, 4, 4);
-        //System.out.println(blackTop10.getRectangleSum(0, 0, 3, 3) + " - " + blackTop10.getRectangleSum(4, 4, 7, 7) + " = " + expected + " : " + actual);
-        assertEquals(expected, actual);
+        // Test horizontal feature calculation
+        int expectedFace = face92x112.getRectangleSum(0, 0, 1, 3) - face92x112.getRectangleSum(2, 0, 3, 3);
+        int actualFace = FaceRecognition.calcHorizontalTwoRectFeature(face92x112, 0, 0, 4, 4);
+        assertEquals(expectedFace, actualFace);
+
+        // Test vertical feature calculation
         assertEquals(
-                blackTop10.getRectangleSum(1, 1, 3, 3) - blackTop10.getRectangleSum(1, 4, 3, 6),
-                FaceRecognition.calcVerticalTwoRectFeature(blackTop10, 1, 1, 4, 4)
+                face92x112.getRectangleSum(1, 1, 4, 2) - face92x112.getRectangleSum(1, 3, 4, 4),
+                FaceRecognition.calcVerticalTwoRectFeature(face92x112, 1, 1, 4, 4)
         );
+
+        // TODO Test type three feature calculation
+
+        // TODO Test type four feature calculation
     }
 
     private HalIntegralImage readImage(String path) throws Exception {

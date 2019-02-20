@@ -66,10 +66,40 @@ public class FaceRecognition {
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         Collections.shuffle(allFeatures);
-        
 
+        // For each t
+        // 1. Normalize weights
+        double weightSum = 0;
+        for (LabeledIntegralImage img : trainingData) {
+            weightSum += img.weight;
+        }
+        for (LabeledIntegralImage img : trainingData) {
+            img.weight = img.weight / weightSum;
+        }
 
-
+        // 2. Train a classifier for every feature. Each is trained on all trainingData
+        ArrayList<Classifier> classifiers = new ArrayList<>(allFeatures.size());
+        for (Feature j : allFeatures) {
+            double error = 0;
+            Classifier h = new Classifier(j);
+            for (LabeledIntegralImage img : trainingData) {
+                error = Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+            }
+            h.setError(error * weightSum);
+            classifiers.add(h);
+        }
+        // 3. Choose the classifier with the lowest error
+        Classifier bestClassifier = classifiers.get(0);
+        for (Classifier c : classifiers) {
+            if (c.getError() < bestClassifier.getError()) bestClassifier = c;
+        }
+        // 4. Update weights
+        double beta = bestClassifier.getError() / (1 - bestClassifier.getError());
+        for (LabeledIntegralImage img : trainingData) {
+            // If classifier is right, beta = 1.
+            if (bestClassifier.canBeFace(img.img)==img.isFace) beta = 1;
+            img.weight = img.weight * beta;
+        }
 
 
         // Do pattern recognition things

@@ -39,11 +39,9 @@ public class FaceRecognition {
             testFaces = readImagesFromDataBase("./res/source/data/test/face");
             testNoFaces = readImagesFromDataBase("./res/source/data/test/non-face");
             //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
-        } catch (IOException e) {
-            System.err.println("Data folder not found. Have you extracted data.zip correctly?");
         } catch (Exception e) {
-            System.err.println("There was an error reading images.");
-            e.printStackTrace();
+            System.err.println("Data folder not found. Have you extracted data.zip correctly?");
+            System.exit(1);
         }
 
         // Calculate initial weights. TODO Verify that this is correct. I'm not sure.

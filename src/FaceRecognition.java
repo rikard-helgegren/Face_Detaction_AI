@@ -66,6 +66,9 @@ public class FaceRecognition {
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         Collections.shuffle(allFeatures);
 
+        // These are the 4 core steps of the Adaboost algorithm
+        // as described in http://www.vision.caltech.edu/html-files/EE148-2005-Spring/pprs/viola04ijcv.pdf
+
         // For each t
         // 1. Normalize weights
         double weightSum = 0;
@@ -90,7 +93,7 @@ public class FaceRecognition {
             }
             h.setError(error * weightSum);
             classifiers.add(h);
-            System.out.printf("Feature %d/%d\n", i, allFeatures.size()-1);
+            if (i % 10 == 0) System.out.printf("Feature %d/%d\n", i, allFeatures.size());
         }
         // 3. Choose the classifier with the lowest error
         Classifier bestClassifier = classifiers.get(0);
@@ -163,7 +166,12 @@ public class FaceRecognition {
 
         int bestThreshold = 0;
         double lowestError = Double.MAX_VALUE; // Corresponding error for the best threshold.
-        for (Integer threshold : featureValues) {
+        // TODO In below for loop, i should be 1 to go through all thresholds.
+        //  However, it should be fine to take big jumps in i. This SIGNIFICANTLY reduces running time.
+        //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
+        //  to find the best threshold much faster.
+        for (int i = 0; i < featureValues.size(); i += 1) {
+            Integer threshold = featureValues.get(i);
             double tPlus = 0;
             double tMinus = 0;
             double sPlus = 0;

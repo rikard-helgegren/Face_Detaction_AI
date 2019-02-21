@@ -29,6 +29,12 @@ public class Classifier {
         this.error = error;
     }
 
+    /**
+     *
+     * @param img the image to classify
+     * @return 1 if this classifier thinks the image might be a face and 0 otherwise.
+     * @throws Exception
+     */
     public int canBeFace(HalIntegralImage img) throws Exception {
         if (parity != 1 && parity != -1) throw new Exception("Parity was not 1 or -1. It was: " + parity);
         if (parity * feature.calculateFeatureValue(img) < parity * threshold) {

@@ -37,8 +37,20 @@ When running files, make sure that your current working directory is the project
 * Load images into java application.
 * Create integral images in java.
 * Create a function to calculate rectangle sum from integral image. See `HalIntegralImage.getRectangleSum(x1, x2, y1, y2)`.
+* Implement function for calculating the 4 features.
+   * For horizontal rectangles.
+   * For vertical rectangles.
+* Implement core Adaboost algorithm.
 
 ## Things that are TODO
-* Implement function for recognizing the 4 features.
-* Apply features to training data.
-* More things probably.
+* Implement function for calculating the 4 features.
+   * For three rectangles (the nose feature). Dummy function in `Feature.calcThreeRectFeature()`.
+   * For four rectangles (the checkerboard feature). Dummy function in `Feature.calcFourRectFeature()`.
+* Calculate __parity__ value in Adaboost single-classifier training.
+* Make single classifier training faster. Right now it calculates about 10 features a second, out of 39150. Some leads:
+   * Optimize feature calculation. Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).
+   * `calcBestThreshold()` is the place where adaboost supposedly spends most time. See comment in that function for discussion.
+* Make sure that all features are actually generated in `Feature.generateAllFeatures()`. This might already be as it should be, but we have some fewer features than expected.
+* Finish Adaboost algorithm by iterating multiple times to create many weak classifiers. Currently we only create a single weak classifier.
+* Implement final cascade classifier using all the simple classifiers.
+* Implement a way to save and load trained classifiers so that we can use them without first training them every time.

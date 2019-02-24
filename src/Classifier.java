@@ -4,6 +4,8 @@ public class Classifier {
     private double threshold;
     private int parity; // should be +1 or -1
     private double error;
+    private double beta;
+    private double alpha;
 
     /**
      * Constructs a classifier that uses the the given type of feature with the given values.
@@ -14,6 +16,7 @@ public class Classifier {
         this.threshold = threshold;
         this.parity = parity;
         this.error = 0;
+        this.beta = 0;
     }
 
     // TODO Takes some parameter to update the error value for this classifier.
@@ -27,6 +30,22 @@ public class Classifier {
 
     public void setError(double error) {
         this.error = error;
+    }
+
+    public double getBeta() {
+        return beta;
+    }
+
+    public void setBeta(double beta) {
+        this.beta = beta;
+    }
+
+    public double getAlpha() {
+        return alpha;
+    }
+
+    public void setAlpha(double alpha) {
+        this.alpha = alpha;
     }
 
     /**

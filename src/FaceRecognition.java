@@ -10,6 +10,7 @@ import java.util.*;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
+    private static final int degenerateDecisionTreeSize = 6000;
 
     private static class LabeledIntegralImage {
         public int isFace; // 1 for true, 0 for false
@@ -54,7 +55,7 @@ public class FaceRecognition {
         ArrayList<LabeledIntegralImage> trainingData = new ArrayList<>(5000);
         for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, 1, weightFace));
         for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, 0, weightNoFace));
-        //Collections.shuffle(trainingData);
+
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         ArrayList<LabeledIntegralImage> testData = new ArrayList<>(20000);
@@ -69,48 +70,72 @@ public class FaceRecognition {
         // These are the 4 core steps of the Adaboost algorithm
         // as described in http://www.vision.caltech.edu/html-files/EE148-2005-Spring/pprs/viola04ijcv.pdf
 
+
+        ArrayList<Classifier> degenerateDecisionTree = new ArrayList<>(degenerateDecisionTreeSize);
+
         // For each t
-        // 1. Normalize weights
-        double weightSum = 0;
-        for (LabeledIntegralImage img : trainingData) {
-            weightSum += img.weight;
-        }
-        for (LabeledIntegralImage img : trainingData) {
-            img.weight = img.weight / weightSum;
-        }
-
-        // 2. Train a classifier for every feature. Each is trained on all trainingData
-        ArrayList<Classifier> classifiers = new ArrayList<>(allFeatures.size());
-        for (int i = 0; i < allFeatures.size(); i++) {
-            Feature j = allFeatures.get(i);
-            int threshold = calcBestThreshold(trainingData, j);
-
-            // Actual step 2
-            double error = 0;
-            Classifier h = new Classifier(j, threshold, 1); // TODO Calculate parity!! It should be 1 or -1.
+        for(int t=1;t<=degenerateDecisionTreeSize;t++) {
+            // 1. Normalize weights
+            double weightSum = 0;
             for (LabeledIntegralImage img : trainingData) {
-                error = Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+                weightSum += img.weight;
             }
-            h.setError(error * weightSum);
-            classifiers.add(h);
-            if (i % 10 == 0) System.out.printf("Feature %d/%d\n", i, allFeatures.size());
+            for (LabeledIntegralImage img : trainingData) {
+                img.weight = img.weight / weightSum;
+            }
+
+            // 2. Train a classifier for every feature. Each is trained on all trainingData
+            ArrayList<Classifier> classifiers = new ArrayList<>(allFeatures.size());
+            for (int i = 0; i < allFeatures.size(); i++) {
+                Feature j = allFeatures.get(i);
+                int threshold = calcBestThreshold(trainingData, j);
+
+                // Actual step 2
+                double error = 0;
+                Classifier h = new Classifier(j, threshold, 1); // TODO Calculate parity!! It should be 1 or -1.
+                for (LabeledIntegralImage img : trainingData) {
+                    error = Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+                }
+                h.setError(error * weightSum);
+                classifiers.add(h);
+                if (i % 10 == 0) System.out.printf("Feature %d/%d\n", i, allFeatures.size());
+            }
+            // 3. Choose the classifier with the lowest error
+            Classifier bestClassifier = classifiers.get(0);
+            for (Classifier c : classifiers) {
+                if (c.getError() < bestClassifier.getError()) bestClassifier = c;
+            }
+
+            // 4. Update weights
+            bestClassifier.setBeta(bestClassifier.getError() / (1 - bestClassifier.getError()));
+            bestClassifier.setAlpha(Math.log(1/bestClassifier.getBeta()));
+            for (LabeledIntegralImage img : trainingData) {
+                // If classifier is right, multiply by beta
+                if (bestClassifier.canBeFace(img.img) == img.isFace) img.weight = img.weight * bestClassifier.getBeta();
+            }
+
+            degenerateDecisionTree.add(bestClassifier);
         }
-        // 3. Choose the classifier with the lowest error
-        Classifier bestClassifier = classifiers.get(0);
-        for (Classifier c : classifiers) {
-            if (c.getError() < bestClassifier.getError()) bestClassifier = c;
-        }
-        // 4. Update weights
-        double beta = bestClassifier.getError() / (1 - bestClassifier.getError());
-        for (LabeledIntegralImage img : trainingData) {
-            // If classifier is right, beta = 1.
-            if (bestClassifier.canBeFace(img.img)==img.isFace) beta = 1;
-            img.weight = img.weight * beta;
-        }
+
 
 
         // Do pattern recognition things
         //searchForPatterns();
+    }
+
+    public static boolean isFace(ArrayList<Classifier> degenerateDecisionTree, HalIntegralImage i) throws Exception{
+        double threshold = 0;
+        for(Classifier c:degenerateDecisionTree){
+            threshold+=c.getAlpha();
+        }
+        threshold/=2;
+
+        double value = 0;
+        for(Classifier c:degenerateDecisionTree){
+            value+=c.getAlpha()*c.canBeFace(i);
+        }
+
+        return value>=threshold;
     }
 
     /**
@@ -159,6 +184,7 @@ public class FaceRecognition {
             return 0;
         });
 
+        //Go through the sorted training data and store the values from the feature j in featureValues.
         ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
         for (LabeledIntegralImage img : trainingData) {
             featureValues.add(j.calculateFeatureValue(img.img));

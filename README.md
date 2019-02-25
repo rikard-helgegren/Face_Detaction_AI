@@ -44,11 +44,12 @@ When running files, make sure that your current working directory is the project
 * Finish Adaboost algorithm by iterating multiple times to create many weak classifiers. Currently we only create a single weak classifier.
 * Implement final cascade classifier using all the simple classifiers. (But not finalized.)
 * Implement a way to save and load trained classifiers so that we can use them without first training them every time.
-
-## Things that are TODO
 * Implement function for calculating the 4 features.
    * For three rectangles (the nose feature). Dummy function in `Feature.calcThreeRectFeature()`.
    * For four rectangles (the checkerboard feature). Dummy function in `Feature.calcFourRectFeature()`.
+
+## Things that are TODO
+
 * Calculate __parity__ value in Adaboost single-classifier training.
 * Make single classifier training faster. Right now it calculates about 10 features a second, out of 39150. Some leads:
    * Optimize feature calculation. Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).

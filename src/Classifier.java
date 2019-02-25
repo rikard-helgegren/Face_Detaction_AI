@@ -1,6 +1,7 @@
 import java.awt.*;
+import java.io.Serializable;
 
-public class Classifier {
+public class Classifier implements Serializable {
 
     private Feature feature;
     private double threshold;
@@ -70,5 +71,17 @@ public class Classifier {
 
     public String toString(){
         return "Feature: "+feature.toString()+" threshold: "+threshold+" Parity: "+parity+" Error: "+error+" Beta: "+beta+" Alpha: "+ alpha;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Classifier)) return false;
+        Classifier c = (Classifier) o;
+
+        if (feature.equals(c.feature) && threshold == c.threshold && parity == c.parity &&
+                error == c.error && beta == c.beta && alpha == c.alpha) {
+            return true;
+        }
+        return false;
     }
 }

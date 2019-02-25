@@ -1,6 +1,8 @@
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Feature {
+public class Feature implements Serializable {
 
     /**
      * Represents the 4 different types of feature.
@@ -135,7 +137,19 @@ public class Feature {
     public Type getType() {
         return type;
     }
+
     public String toString(){
         return "x: "+getX()+" y: "+getY()+" w: "+getW()+" h: "+getH()+ " type: "+getType();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Feature)) return false;
+        Feature f = (Feature) o;
+        if (type.equals(f.type) && x == f.x && y == f.y && w == f.w && h == f.h) {
+            return true;
+        }
+        return false;
+    }
+
 }

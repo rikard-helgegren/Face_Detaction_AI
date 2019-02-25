@@ -289,14 +289,27 @@ public class FaceRecognition {
     }
 
 
+    public static void save(ArrayList<Classifier> classifiers, String fileName){
+        try {
+            FileOutputStream fileOut = new FileOutputStream(fileName);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(classifiers);
+            out.close();
+            fileOut.close();
+        } catch (IOException e) {
+            System.err.println("Save file could not be opened.");
+            e.printStackTrace();
+        }
+    }
 
-    /**
-     * Uses features to determine if the image might be a face.
-     * @param img
-     * @return true if the image might be a face
-     */
-    public static boolean couldBeFace(HalIntegralImage img) {
-        return false;
+    public static ArrayList<Classifier> load(String fileName) throws IOException, ClassNotFoundException {
+        ArrayList<Classifier> classifiers;
+        FileInputStream fileIn = new FileInputStream(fileName);
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+        classifiers = (ArrayList<Classifier>) in.readObject();
+        in.close();
+        fileIn.close();
+        return classifiers;
     }
 
 }

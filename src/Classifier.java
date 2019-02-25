@@ -18,7 +18,7 @@ public class Classifier implements Serializable {
         this.feature = feature;
         this.threshold = threshold;
         this.parity = parity;
-        this.error = 0;
+        setError(0);
         setBeta(0);
         this.alpha = 0;
     }
@@ -27,7 +27,8 @@ public class Classifier implements Serializable {
         return error;
     }
 
-    public void setError(double error) {
+    public void setError(double error) throws Exception {
+        if (error < 0 || error > 1) throw new Exception("Error must be in [0, 1]. Was: " + error);
         this.error = error;
     }
 

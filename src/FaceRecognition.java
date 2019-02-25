@@ -129,9 +129,9 @@ public class FaceRecognition {
                 double error = 0;
                 Classifier h = new Classifier(j, threshold, parity); // TODO Calculate parity!! It should be 1 or -1.
                 for (LabeledIntegralImage img : trainingData) {
-                    error += Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+                    error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
                 }
-                h.setError(error * weightSum);
+                h.setError(error);
                 classifiers.add(h);
                 if (i % 100 == 0) System.out.printf("Feature %d/%d, t=%d\n", i, allFeatures.size(),t);
             }

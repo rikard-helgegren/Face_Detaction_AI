@@ -145,7 +145,7 @@ public class FaceRecognition {
                 }
                 h.setError(error * weightSum);
                 classifiers.add(h);
-                if (i % 10 == 0) System.out.printf("Feature %d/%d\n", i, allFeatures.size());
+                if (i % 10 == 0) System.out.printf("Feature %d/%d, t=%d\n", i, allFeatures.size(),t);
             }
             // 3. Choose the classifier with the lowest error
             Classifier bestClassifier = classifiers.get(0);

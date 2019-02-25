@@ -160,7 +160,7 @@ public class FaceRecognition {
                 // If classifier is right, multiply by beta
                 if (bestClassifier.canBeFace(img.img) == img.isFace) img.weight = img.weight * bestClassifier.getBeta();
             }
-            //TODO: They always seem to choose the same feature.
+
             degenerateDecisionTree.add(bestClassifier);
             System.out.println("Best classifiers feature: ");
             System.out.println(bestClassifier);

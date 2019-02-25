@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Array;
+import java.sql.SQLOutput;
 import java.util.*;
 
 /**
@@ -11,7 +12,8 @@ import java.util.*;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final int degenerateDecisionTreeSize = 4;
+    private static final int degenerateDecisionTreeSize = 2;
+    private static final boolean loadFromFile = false; // Set this boolean to load or train.
 
     private static class LabeledIntegralImage {
         public int isFace; // 1 for true, 0 for false
@@ -80,9 +82,6 @@ public class FaceRecognition {
 
         ArrayList<Classifier> degenerateDecisionTree;
 
-        // Set this boolean to load or train.
-        boolean loadFromFile = false;
-
         if (loadFromFile) {
             // Load strong classifier from file
             degenerateDecisionTree = load("save.classifiers");
@@ -96,6 +95,7 @@ public class FaceRecognition {
 
         // Test strong classifier
         test(degenerateDecisionTree, testData);
+        test(degenerateDecisionTree, trainingData);
     }
 
     /**
@@ -145,7 +145,7 @@ public class FaceRecognition {
                 }
                 h.setError(error * weightSum);
                 classifiers.add(h);
-                if (i % 10 == 0) System.out.printf("Feature %d/%d, t=%d\n", i, allFeatures.size(),t);
+                if (i % 100 == 0) System.out.printf("Feature %d/%d, t=%d\n", i, allFeatures.size(),t);
             }
             // 3. Choose the classifier with the lowest error
             Classifier bestClassifier = classifiers.get(0);
@@ -160,7 +160,6 @@ public class FaceRecognition {
                 // If classifier is right, multiply by beta
                 if (bestClassifier.canBeFace(img.img) == img.isFace) img.weight = img.weight * bestClassifier.getBeta();
             }
-
             degenerateDecisionTree.add(bestClassifier);
             System.out.println("Best classifiers feature: ");
             System.out.println(bestClassifier);
@@ -175,7 +174,10 @@ public class FaceRecognition {
      * @throws Exception
      */
     public static void test(ArrayList<Classifier> degenerateDecisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
-        System.out.println("Testing now");
+        System.out.println("Testing decision tree");
+        for(Classifier c : degenerateDecisionTree) {
+            System.out.println("\t" + c);
+        }
 
         int nrCorrectIsFace = 0;
         int nrWrongIsFace = 0;
@@ -197,8 +199,10 @@ public class FaceRecognition {
                 }
             }
         }
-        System.out.println();
-        System.out.println("nrCorrectIsFace: "+nrCorrectIsFace+" nrWrongIsFace: "+nrWrongIsFace+" nrCorrectIsNotFace: "+nrCorrectIsNotFace+" nrWrongIsNotFace: "+nrWrongIsNotFace);
+        System.out.println("RESULTS");
+        //System.out.println("nrCorrectIsFace: "+nrCorrectIsFace+" nrWrongIsFace: "+nrWrongIsFace+" nrCorrectIsNotFace: "+nrCorrectIsNotFace+" nrWrongIsNotFace: "+nrWrongIsNotFace);
+        System.out.printf("When the image is     a face. Correct %d. Wrong: %d\n", nrCorrectIsFace, nrWrongIsFace);
+        System.out.printf("When the image is not a face. Correct %d. Wrong: %d\n", nrCorrectIsNotFace, nrWrongIsNotFace);
     }
 
 
@@ -293,7 +297,7 @@ public class FaceRecognition {
         //  However, it should be fine to take big jumps in i. This SIGNIFICANTLY reduces running time.
         //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
         //  to find the best threshold much faster.
-        for (int i = 0; i < featureValues.size(); i += 10) {
+        for (int i = 0; i < featureValues.size(); i += 100) {
             Integer threshold = featureValues.get(i);
             double tPlus = 0;
             double tMinus = 0;

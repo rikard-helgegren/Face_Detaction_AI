@@ -97,7 +97,7 @@ public class FaceRecognition {
     public static ArrayList<Classifier> train(ArrayList<LabeledIntegralImage> trainingData) throws Exception {
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
-        Collections.shuffle(allFeatures);
+        //Collections.shuffle(allFeatures);
 
         ArrayList<Classifier> degenerateDecisionTree = new ArrayList<>(degenerateDecisionTreeSize);
 
@@ -148,7 +148,9 @@ public class FaceRecognition {
             bestClassifier.setAlpha(Math.log(1/bestClassifier.getBeta()));
             for (LabeledIntegralImage img : trainingData) {
                 // If classifier is right, multiply by beta
-                if (bestClassifier.canBeFace(img.img) == img.isFace) img.setWeight(img.getWeight() * bestClassifier.getBeta());
+                if (bestClassifier.canBeFace(img.img) == img.isFace) {
+                    img.setWeight(img.getWeight() * bestClassifier.getBeta());
+                }
             }
             degenerateDecisionTree.add(bestClassifier);
             System.out.println("Best classifiers feature: ");

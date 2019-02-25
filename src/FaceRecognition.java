@@ -24,6 +24,16 @@ public class FaceRecognition {
         }
     }
 
+    private static class ThresholdParity{
+        public int threshold;
+        public int parity;
+
+        public ThresholdParity(int threshold, int  parity){
+            this.threshold = threshold;
+            this.parity = parity;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         System.out.println("1");
         // Read images from file system amd calculate integralImages.
@@ -92,13 +102,16 @@ public class FaceRecognition {
             ArrayList<Classifier> classifiers = new ArrayList<>(allFeatures.size());
             for (int i = 0; i < allFeatures.size(); i++) {
                 Feature j = allFeatures.get(i);
-                int threshold = calcBestThreshold(trainingData, j);
+                ThresholdParity p = calcBestThresholdAndParity(trainingData, j);
+                int threshold = p.threshold;
+                int parity = p.parity;
+
 
                 // Actual step 2
                 double error = 0;
-                Classifier h = new Classifier(j, threshold, 1); // TODO Calculate parity!! It should be 1 or -1.
+                Classifier h = new Classifier(j, threshold, parity); // TODO Calculate parity!! It should be 1 or -1.
                 for (LabeledIntegralImage img : trainingData) {
-                    error = Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+                    error += Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
                 }
                 h.setError(error * weightSum);
                 classifiers.add(h);
@@ -149,7 +162,7 @@ public class FaceRecognition {
     public static boolean isFace(ArrayList<Classifier> degenerateDecisionTree, HalIntegralImage i) throws Exception{
 
         //How it looks like you should do accorging to the paper:
-        /*
+
         double threshold = 0;
         for(Classifier c:degenerateDecisionTree){
             threshold+=c.getAlpha();
@@ -162,16 +175,18 @@ public class FaceRecognition {
         }
 
         return value>=threshold;
-        */
+
         //Test got 23550 corre475ct and 495 wrong
 
 
         //How it looks like you should do according to computerphile
+        /*
         for(Classifier c:degenerateDecisionTree){
             if(c.canBeFace(i)!=1) return false;
         }
 
         return true;
+        */
         //Test got 23570 correct and 475 wrong
     }
 
@@ -208,7 +223,7 @@ public class FaceRecognition {
      * @return
      * @throws Exception if calculateFeatureValue throws an exception
      */
-    public static int calcBestThreshold(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
+    public static ThresholdParity calcBestThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
         // Sort training data based on features
         trainingData.sort((a, b) -> {
             try {
@@ -228,6 +243,7 @@ public class FaceRecognition {
         }
 
         int bestThreshold = 0;
+        int bestThresholdParity = 0;
         double lowestError = Double.MAX_VALUE; // Corresponding error for the best threshold.
         // TODO In below for loop, i should be 1 to go through all thresholds.
         //  However, it should be fine to take big jumps in i. This SIGNIFICANTLY reduces running time.
@@ -252,15 +268,24 @@ public class FaceRecognition {
                     }
                 }
             }
-            double error = Math.min(sPlus + tMinus - sMinus, sMinus + tPlus - sPlus);
+            double error = sMinus + tPlus - sPlus; //Generally: above negative, below positve.
+            int parity = 1;
+            if(sPlus + tMinus - sMinus < sMinus + tPlus - sPlus){
+                error = sPlus + tMinus - sMinus; //Generally: above positive, below negative.
+                parity = -1;
+            }
+            //double error = Math.min(sPlus + tMinus - sMinus, sMinus + tPlus - sPlus);
+
+
             if (error < lowestError) {
                 lowestError = error;
                 // Final best threshold would probably be a value in-between the best threshold and one of the
                 // possible thresholds next to it. If we want we can implement that at some point.
                 bestThreshold = threshold;
+                bestThresholdParity = parity;
             }
         }
-        return bestThreshold;
+        return new ThresholdParity(bestThreshold, bestThresholdParity);
     }
 
 

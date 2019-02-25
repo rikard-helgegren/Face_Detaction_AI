@@ -69,6 +69,6 @@ public class Classifier {
     }
 
     public String toString(){
-        return "Feature: "+feature.toString()+" threshold: "+threshold+" Beta: "+beta+" Alpha: "+ alpha+" Error: "+error;
+        return "Feature: "+feature.toString()+" threshold: "+threshold+" Parity: "+parity+" Error: "+error+" Beta: "+beta+" Alpha: "+ alpha;
     }
 }

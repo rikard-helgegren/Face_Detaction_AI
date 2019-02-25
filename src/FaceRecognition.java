@@ -3,6 +3,7 @@ import Catalano.Imaging.FastBitmap;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -75,16 +76,45 @@ public class FaceRecognition {
         for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, 1, 0));
         for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, 0, 0));
         Collections.shuffle(testData);
+        System.out.println("4");
 
+        ArrayList<Classifier> degenerateDecisionTree;
+
+        // Set this boolean to load or train.
+        boolean loadFromFile = false;
+
+        if (loadFromFile) {
+            // Load strong classifier from file
+            degenerateDecisionTree = load("save.classifiers");
+        } else {
+            // Train strong classifier
+            degenerateDecisionTree = train(trainingData);
+
+            // Save strong classifier
+            save(degenerateDecisionTree, "save.classifiers");
+        }
+
+        // Test strong classifier
+        test(degenerateDecisionTree, testData);
+    }
+
+    /**
+     * Trains a network using the AdaBoost algorithm as described in
+     * http://www.vision.caltech.edu/html-files/EE148-2005-Spring/pprs/viola04ijcv.pdf
+     *
+     * @param trainingData the labeled training data
+     * @return a degenerate decision tree representing the strong classifier.
+     * @throws Exception if something goes wrong
+     */
+    public static ArrayList<Classifier> train(ArrayList<LabeledIntegralImage> trainingData) throws Exception {
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         Collections.shuffle(allFeatures);
 
-        // These are the 4 core steps of the Adaboost algorithm
-        // as described in http://www.vision.caltech.edu/html-files/EE148-2005-Spring/pprs/viola04ijcv.pdf
-        System.out.println("4");
-
         ArrayList<Classifier> degenerateDecisionTree = new ArrayList<>(degenerateDecisionTreeSize);
+
+        // This is the Adaboost training algorithm
+
 
         // For each t
         for(int t=1;t<=degenerateDecisionTreeSize;t++) {
@@ -135,7 +165,16 @@ public class FaceRecognition {
             System.out.println("Best classifiers feature: ");
             System.out.println(bestClassifier);
         }
+        return degenerateDecisionTree;
+    }
 
+    /**
+     * Tests a decision tree against some testdata.
+     * @param degenerateDecisionTree
+     * @param testData
+     * @throws Exception
+     */
+    public static void test(ArrayList<Classifier> degenerateDecisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
         System.out.println("Testing now");
 
         int nrCorrect = 0;
@@ -151,10 +190,6 @@ public class FaceRecognition {
         }
         System.out.println();
         System.out.println("Test got "+nrCorrect+" correct and "+nrWrong+" wrong");
-
-
-        // Do pattern recognition things
-        //searchForPatterns();
     }
 
 

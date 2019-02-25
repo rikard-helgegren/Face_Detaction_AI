@@ -75,7 +75,7 @@ public class FaceRecognition {
             degenerateDecisionTree = load("save.classifiers");
         } else {
             // Train strong classifier
-            degenerateDecisionTree = train(trainingData);
+            degenerateDecisionTree = train(trainingData, 2);
 
             // Save strong classifier
             save(degenerateDecisionTree, "save.classifiers");
@@ -83,7 +83,7 @@ public class FaceRecognition {
 
         // Test strong classifier
         test(degenerateDecisionTree, testData);
-        test(degenerateDecisionTree, trainingData);
+        //test(degenerateDecisionTree, trainingData);
     }
 
     /**
@@ -91,21 +91,22 @@ public class FaceRecognition {
      * http://www.vision.caltech.edu/html-files/EE148-2005-Spring/pprs/viola04ijcv.pdf
      *
      * @param trainingData the labeled training data
+     * @param size the depth of the returned decision tree
      * @return a degenerate decision tree representing the strong classifier.
      * @throws Exception if something goes wrong
      */
-    public static ArrayList<Classifier> train(ArrayList<LabeledIntegralImage> trainingData) throws Exception {
+    public static ArrayList<Classifier> train(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         //Collections.shuffle(allFeatures);
 
-        ArrayList<Classifier> degenerateDecisionTree = new ArrayList<>(degenerateDecisionTreeSize);
+        ArrayList<Classifier> degenerateDecisionTree = new ArrayList<>(size);
 
         // This is the Adaboost training algorithm
 
 
         // For each t
-        for(int t=1;t<=degenerateDecisionTreeSize;t++) {
+        for(int t=1;t<=size;t++) {
             System.out.println("t = "+t);
             // 1. Normalize weights
             double weightSum = 0;
@@ -214,13 +215,13 @@ public class FaceRecognition {
 
     public static boolean isFace(ArrayList<Classifier> degenerateDecisionTree, HalIntegralImage i) throws Exception{
 
-        //How it looks like you should do accorging to the paper:
+        //How it looks like you should do according to the paper:
 
         double threshold = 0;
         for(Classifier c:degenerateDecisionTree){
             threshold+=c.getAlpha();
         }
-        threshold/=2;
+        threshold = threshold * 0.;
 
         double value = 0;
         for(Classifier c:degenerateDecisionTree){
@@ -228,8 +229,6 @@ public class FaceRecognition {
         }
 
         return value>=threshold;
-
-        //Test got 23550 corre475ct and 495 wrong
 
 
         //How it looks like you should do according to computerphile
@@ -240,7 +239,6 @@ public class FaceRecognition {
 
         return true;
         */
-        //Test got 23570 correct and 475 wrong
     }
 
     /**

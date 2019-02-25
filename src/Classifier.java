@@ -20,11 +20,7 @@ public class Classifier implements Serializable {
         this.parity = parity;
         this.error = 0;
         this.beta = 0;
-    }
-
-    // TODO Takes some parameter to update the error value for this classifier.
-    public void updateError() {
-
+        this.alpha = 0;
     }
 
     public double getError() {

@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Array;
+import java.sql.SQLOutput;
 import java.util.*;
 
 /**
@@ -81,7 +82,7 @@ public class FaceRecognition {
         ArrayList<Classifier> degenerateDecisionTree;
 
         // Set this boolean to load or train.
-        boolean loadFromFile = false;
+        boolean loadFromFile = true;
 
         if (loadFromFile) {
             // Load strong classifier from file
@@ -96,6 +97,7 @@ public class FaceRecognition {
 
         // Test strong classifier
         test(degenerateDecisionTree, testData);
+        test(degenerateDecisionTree, trainingData);
     }
 
     /**
@@ -160,7 +162,6 @@ public class FaceRecognition {
                 // If classifier is right, multiply by beta
                 if (bestClassifier.canBeFace(img.img) == img.isFace) img.weight = img.weight * bestClassifier.getBeta();
             }
-            //TODO: They always seem to choose the same feature.
             degenerateDecisionTree.add(bestClassifier);
             System.out.println("Best classifiers feature: ");
             System.out.println(bestClassifier);
@@ -175,7 +176,10 @@ public class FaceRecognition {
      * @throws Exception
      */
     public static void test(ArrayList<Classifier> degenerateDecisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
-        System.out.println("Testing now");
+        System.out.println("Testing decision tree");
+        for(Classifier c : degenerateDecisionTree) {
+            System.out.println("\t" + c);
+        }
 
         int nrCorrectIsFace = 0;
         int nrWrongIsFace = 0;
@@ -197,8 +201,10 @@ public class FaceRecognition {
                 }
             }
         }
-        System.out.println();
-        System.out.println("nrCorrectIsFace: "+nrCorrectIsFace+" nrWrongIsFace: "+nrWrongIsFace+" nrCorrectIsNotFace: "+nrCorrectIsNotFace+" nrWrongIsNotFace: "+nrWrongIsNotFace);
+        System.out.println("RESULTS");
+        //System.out.println("nrCorrectIsFace: "+nrCorrectIsFace+" nrWrongIsFace: "+nrWrongIsFace+" nrCorrectIsNotFace: "+nrCorrectIsNotFace+" nrWrongIsNotFace: "+nrWrongIsNotFace);
+        System.out.printf("When the image is     a face. Correct %d. Wrong: %d\n", nrCorrectIsFace, nrWrongIsFace);
+        System.out.printf("When the image is not a face. Correct %d. Wrong: %d\n", nrCorrectIsNotFace, nrWrongIsNotFace);
     }
 
 

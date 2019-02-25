@@ -177,19 +177,28 @@ public class FaceRecognition {
     public static void test(ArrayList<Classifier> degenerateDecisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
         System.out.println("Testing now");
 
-        int nrCorrect = 0;
-        int nrWrong = 0;
+        int nrCorrectIsFace = 0;
+        int nrWrongIsFace = 0;
+        int nrCorrectIsNotFace = 0;
+        int nrWrongIsNotFace = 0;
         for(LabeledIntegralImage i:testData){
-            if((isFace(degenerateDecisionTree,i.img) && i.isFace==1) || (!isFace(degenerateDecisionTree,i.img) && i.isFace==0)){
-                nrCorrect++;
-                System.out.println("Correct guess");
-            }else{
-                nrWrong++;
-                System.out.println("Wrong guess");
+            if(i.isFace==1){
+                if(isFace(degenerateDecisionTree,i.img)){
+                    nrCorrectIsFace++;
+                }else{
+                    nrWrongIsFace++;
+                }
+            }
+            if(i.isFace==0){
+                if(!isFace(degenerateDecisionTree,i.img)){
+                    nrCorrectIsNotFace++;
+                }else{
+                    nrWrongIsNotFace++;
+                }
             }
         }
         System.out.println();
-        System.out.println("Test got "+nrCorrect+" correct and "+nrWrong+" wrong");
+        System.out.println("nrCorrectIsFace: "+nrCorrectIsFace+" nrWrongIsFace: "+nrWrongIsFace+" nrCorrectIsNotFace: "+nrCorrectIsNotFace+" nrWrongIsNotFace: "+nrWrongIsNotFace);
     }
 
 

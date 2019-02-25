@@ -199,11 +199,11 @@ public class FaceRecognition {
         //System.out.println("nrCorrectIsFace: "+nrCorrectIsFace+" nrWrongIsFace: "+nrWrongIsFace+" nrCorrectIsNotFace: "+nrCorrectIsNotFace+" nrWrongIsNotFace: "+nrWrongIsNotFace);
         System.out.printf("When the image is     a face. Correct: %d. Wrong: %d", nrCorrectIsFace, nrWrongIsFace);
         System.out.printf("When the image is not a face. Correct: %d. Wrong: %d", nrCorrectIsNotFace, nrWrongIsNotFace);
-        System.out.printf("When the image is     a face. Percent correct: %d. Percent wrong: %d\n",nrCorrectIsFace/(nrCorrectIsFace+nrWrongIsFace), nrWrongIsFace/(nrCorrectIsFace+ nrWrongIsFace));
-        System.out.printf("When the image is not a face. Percent correct: %d. Percent wrong: %d\n", nrCorrectIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace), nrWrongIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace));
+        System.out.printf("When the image is     a face. Percent correct: %d %%. Percent wrong: %d %%\n",nrCorrectIsFace/(nrCorrectIsFace+nrWrongIsFace), nrWrongIsFace/(nrCorrectIsFace+ nrWrongIsFace));
+        System.out.printf("When the image is not a face. Percent correct: %d %%. Percent wrong: %d %%\n", nrCorrectIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace), nrWrongIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace));
         System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
-        System.out.printf("Percent of guesses right: %.1f %\n",100*(nrCorrectIsFace+nrCorrectIsNotFace)/(testData.size()));
-        System.out.printf("Percent of guesses wrong: %.1f %\n",100*(nrWrongIsFace+nrWrongIsNotFace)/(testData.size()));
+        System.out.printf("Percent of guesses right: %.1f %%\n",100*(nrCorrectIsFace+nrCorrectIsNotFace)/(testData.size()));
+        System.out.printf("Percent of guesses wrong: %.1f %%\n",100*(nrWrongIsFace+nrWrongIsNotFace)/(testData.size()));
     }
 
 

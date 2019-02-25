@@ -94,13 +94,26 @@ public class Tests {
 
         // Test vertical feature calculation
         assertEquals(
-                face92x112.getRectangleSum(1, 1, 4, 2) - face92x112.getRectangleSum(1, 3, 4, 4),
+                face92x112.getRectangleSum(1, 1, 4, 2) -
+                         face92x112.getRectangleSum(1, 3, 4, 4),
                 Feature.calcVerticalTwoRectFeature(face92x112, 1, 1, 4, 4)
         );
+        // Test type three feature calculation
+        assertEquals(
+                face92x112.getRectangleSum(2, 0, 3, 3) -
+                         face92x112.getRectangleSum(0, 0, 1, 3) -
+                         face92x112.getRectangleSum(4, 0, 5, 3),
+                Feature.calcThreeRectFeature(face92x112, 0, 0, 6, 4)
+        );
 
-        // TODO Test type three feature calculation
-
-        // TODO Test type four feature calculation
+        // Test type four feature calculation
+        assertEquals(
+                face92x112.getRectangleSum(2, 0, 3, 1) +
+                         face92x112.getRectangleSum(0, 2, 1, 3) -
+                         face92x112.getRectangleSum(0, 0, 1, 1) -
+                         face92x112.getRectangleSum(2, 2, 3, 3),
+                Feature.calcFourRectFeature(face92x112, 0, 0, 4, 4)
+        );
     }
 
     // Tests saving and loading of classifiers.

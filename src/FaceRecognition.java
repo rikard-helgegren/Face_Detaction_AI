@@ -73,7 +73,15 @@ public class FaceRecognition {
             degenerateDecisionTree = load("save.classifiers");
         } else {
             // Train strong classifier
-            degenerateDecisionTree = train(trainingData, 2);
+
+            degenerateDecisionTree = new ArrayList<Classifier>();
+            ArrayList<LabeledIntegralImage> data = trainingData;
+            for (int i = 0; i < 10; i++) {
+                System.out.println("Training layer " + i);
+                degenerateDecisionTree.addAll(train(data, 1));
+                data = filterData(degenerateDecisionTree, data);
+            }
+
 
             // Save strong classifier
             save(degenerateDecisionTree, "save.classifiers");
@@ -126,7 +134,7 @@ public class FaceRecognition {
 
                 // Actual step 2
                 double error = 0;
-                Classifier h = new Classifier(j, threshold, parity); // TODO Calculate parity!! It should be 1 or -1.
+                Classifier h = new Classifier(j, threshold, parity);
                 for (LabeledIntegralImage img : trainingData) {
                     error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
                 }

@@ -135,4 +135,7 @@ public class Feature {
     public Type getType() {
         return type;
     }
+    public String toString(){
+        return "x: "+getX()+" y: "+getY()+" w: "+getW()+" h: "+getH()+ " type: "+getType();
+    }
 }

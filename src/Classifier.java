@@ -1,3 +1,5 @@
+import java.awt.*;
+
 public class Classifier {
 
     private Feature feature;
@@ -64,5 +66,9 @@ public class Classifier {
 
     public Feature getFeature() {
         return feature;
+    }
+
+    public String toString(){
+        return "Feature: "+feature.toString()+" threshold: "+threshold+" Beta: "+beta+" Alpha: "+ alpha+" Error: "+error;
     }
 }

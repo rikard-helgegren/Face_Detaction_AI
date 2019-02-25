@@ -120,7 +120,7 @@ public class FaceRecognition {
             //TODO: They always seem to choose the same feature.
             degenerateDecisionTree.add(bestClassifier);
             System.out.println("Best classifiers feature: ");
-            printFeature(bestClassifier.getFeature());
+            System.out.println(bestClassifier);
         }
 
         System.out.println("Testing now");
@@ -144,9 +144,7 @@ public class FaceRecognition {
         //searchForPatterns();
     }
 
-    public static void printFeature(Feature c){
-        System.out.println("x: "+c.getX()+" y: "+c.getY()+" w: "+c.getW()+" h: "+c.getH()+ " type: "+c.getType());
-    }
+
 
     public static boolean isFace(ArrayList<Classifier> degenerateDecisionTree, HalIntegralImage i) throws Exception{
 
@@ -165,7 +163,7 @@ public class FaceRecognition {
 
         return value>=threshold;
         */
-        //Test got 23550 correct and 495 wrong
+        //Test got 23550 corre475ct and 495 wrong
 
 
         //How it looks like you should do according to computerphile

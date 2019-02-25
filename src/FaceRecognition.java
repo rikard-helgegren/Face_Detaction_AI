@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class FaceRecognition {
     private static final int degenerateDecisionTreeSize = 10;
-    private static final boolean loadFromFile = false; // Set this boolean to load or train.
+    private static final boolean loadFromFile = true; // Set this boolean to load or train.
 
     private static class ThresholdParity{
         public int threshold;
@@ -200,8 +200,8 @@ public class FaceRecognition {
         System.out.printf("When the image is     a face. Correct %d. Wrong: %d\n", nrCorrectIsFace, nrWrongIsFace);
         System.out.printf("When the image is not a face. Correct %d. Wrong: %d\n", nrCorrectIsNotFace, nrWrongIsNotFace);
         System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
-        System.out.printf("Percent of guesses right: %d\n",100*(nrCorrectIsFace+nrCorrectIsNotFace)/(testData.size()));
-        System.out.printf("Percent of guesses wrong: %d\n",100*(nrWrongIsFace+nrWrongIsNotFace)/(testData.size()));
+        System.out.printf("Percent of guesses right: %.1f %\n",100*(nrCorrectIsFace+nrCorrectIsNotFace)/(testData.size()));
+        System.out.printf("Percent of guesses wrong: %.1f %\n",100*(nrWrongIsFace+nrWrongIsNotFace)/(testData.size()));
     }
 
 

@@ -209,7 +209,21 @@ public class FaceRecognition {
         System.out.printf("Percent of guesses wrong: %.1f %%\n",100*((double)nrWrongIsFace+nrWrongIsNotFace)/(testData.size()));
     }
 
-
+    /**
+     * Removes the data that does not pass the strong classifier.
+     * @param strongClassifier
+     * @param data
+     * @return an array of images that the strong classifier thinks could be faces
+     */
+    public static ArrayList<LabeledIntegralImage> filterData(ArrayList<Classifier> strongClassifier, ArrayList<LabeledIntegralImage> data) throws Exception {
+        ArrayList<LabeledIntegralImage> maybeFaces = new ArrayList<>(data.size()/2);
+        for (LabeledIntegralImage d : data) {
+            if (isFace(strongClassifier, d.img)) {
+                maybeFaces.add(d);
+            }
+        }
+        return maybeFaces;
+    }
 
     public static boolean isFace(ArrayList<Classifier> degenerateDecisionTree, HalIntegralImage i) throws Exception{
 

@@ -197,11 +197,11 @@ public class FaceRecognition {
         System.out.println("RESULTS");
         //System.out.println("nrCorrectIsFace: "+nrCorrectIsFace+" nrWrongIsFace: "+nrWrongIsFace+" nrCorrectIsNotFace: "+nrCorrectIsNotFace+" nrWrongIsNotFace: "+nrWrongIsNotFace);
         System.out.printf("When the image is     a face. Correct: %d. Wrong: %d.", nrCorrectIsFace, nrWrongIsFace);
-        System.out.printf(" Percent correct: %.1f %%. Percent wrong: %.1f %%\n",
+        System.out.printf(" True positive: %.1f %%. False negative: %.1f %%\n",
                 100*(double)nrCorrectIsFace/(nrCorrectIsFace+nrWrongIsFace),
                 100*(double)nrWrongIsFace/(nrCorrectIsFace+ nrWrongIsFace));
         System.out.printf("When the image is not a face. Correct: %d. Wrong: %d.", nrCorrectIsNotFace, nrWrongIsNotFace);
-        System.out.printf(" Percent correct: %.1f %%. Percent wrong: %.1f %%\n",
+        System.out.printf(" True negative: %.1f %%. False positive: %.1f %%\n",
                 100*(double)nrCorrectIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace),
                 100*(double)nrWrongIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace));
         System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
@@ -219,7 +219,7 @@ public class FaceRecognition {
         for(Classifier c:degenerateDecisionTree){
             threshold+=c.getAlpha();
         }
-        threshold = threshold * 0.;
+        threshold = threshold * 0.2;
 
         double value = 0;
         for(Classifier c:degenerateDecisionTree){

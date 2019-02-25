@@ -111,7 +111,7 @@ public class Feature implements Serializable {
     }
     
     /**
-     * Calculates the difference between the rectangle sums of thre rectangles located next to each other horisontally.
+     * Calculates the difference between the rectangle sums of three rectangles located next to each other horizontally.
      *
      * @param img the integral image to operate on
      * @param x coordinate for the upper left corner of the feature area.

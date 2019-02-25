@@ -156,6 +156,10 @@ public class FaceRecognition {
             // 4. Update weights
             bestClassifier.setBeta(bestClassifier.getError() / (1 - bestClassifier.getError()));
             bestClassifier.setAlpha(Math.log(1/bestClassifier.getBeta()));
+            System.out.println("Testing Alpha:");
+            System.out.println(bestClassifier.getBeta());
+            System.out.println(Math.log(1/bestClassifier.getBeta()));
+            System.out.println(bestClassifier.getAlpha());
             for (LabeledIntegralImage img : trainingData) {
                 // If classifier is right, multiply by beta
                 if (bestClassifier.canBeFace(img.img) == img.isFace) img.weight = img.weight * bestClassifier.getBeta();

@@ -12,7 +12,7 @@ import java.util.*;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final int degenerateDecisionTreeSize = 2;
+    private static final int degenerateDecisionTreeSize = 10;
     private static final boolean loadFromFile = false; // Set this boolean to load or train.
 
     private static class ThresholdParity{

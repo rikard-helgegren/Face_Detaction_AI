@@ -139,8 +139,8 @@ public class Feature implements Serializable {
      * @throws Exception
      */
     public static int calcFourRectFeature(HalIntegralImage img, int x, int y, int w, int h) throws Exception {
-    	if (w%3 != 0) throw new Exception("Four Rect feature, height has to be divisible by 2. Was " + h);
-    	if (w%3 != 0) throw new Exception("Four Rect feature, width has to be divisible by 2. Was " + h);
+    	if (h%2 != 0) throw new Exception("Four Rect feature, height has to be divisible by 2. Was " + h);
+    	if (w%2 != 0) throw new Exception("Four Rect feature, width has to be divisible by 2. Was " + h);
     	return  img.getRectangleSum(x, y, x+w/2-1, y+h/2-1) + img.getRectangleSum(x+w/2, y+h/2, x+w-1, y+h-1) - img.getRectangleSum(x+w/2-1, y, x+w-1, y+h/2-1) - img.getRectangleSum(x, y+h/2, x+w/2-1, y+h-1);
     }
 

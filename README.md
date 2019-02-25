@@ -55,3 +55,4 @@ When running files, make sure that your current working directory is the project
 * Implement final cascade classifier using all the simple classifiers.
 * Implement a way to save and load trained classifiers so that we can use them without first training them every time.
 * Consider exception handling. Right now most exception are just thrown, but not all. Generally, we want to throw exceptions and just crash rather than silently accepting missing files etc.
+* Plot threshold error.

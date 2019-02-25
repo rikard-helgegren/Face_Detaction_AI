@@ -106,8 +106,16 @@ public class Tests {
     // Tests saving and loading of classifiers.
     @Test
     public void testClassifierSaveLoad() {
-        Classifier a = new Classifier(new Feature(Feature.Type.HORIZONTAL, 1, 2, 4, 4), 10, 10);
-        Classifier b = new Classifier(new Feature(Feature.Type.VERTICAL, 2, 8, 6, 4), 5, 5);
+
+        Classifier a = null;
+        Classifier b = null;
+        try {
+            a = new Classifier(new Feature(Feature.Type.HORIZONTAL, 1, 2, 4, 4), 10, 10);
+            b = new Classifier(new Feature(Feature.Type.VERTICAL, 2, 8, 6, 4), 5, 5);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         ArrayList<Classifier> classifiers = new ArrayList<>(2);
         classifiers.add(a);

@@ -14,12 +14,12 @@ public class Classifier implements Serializable {
      * Constructs a classifier that uses the the given type of feature with the given values.
      * @param feature the feature this classifier should use.
      */
-    public Classifier(Feature feature, int threshold, int parity) {
+    public Classifier(Feature feature, int threshold, int parity) throws Exception {
         this.feature = feature;
         this.threshold = threshold;
         this.parity = parity;
-        this.error = 0;
-        this.beta = 0;
+        setError(0);
+        setBeta(0);
         this.alpha = 0;
     }
 
@@ -27,7 +27,8 @@ public class Classifier implements Serializable {
         return error;
     }
 
-    public void setError(double error) {
+    public void setError(double error) throws Exception {
+        if (error < 0 || error > 1) throw new Exception("Error must be in [0, 1]. Was: " + error);
         this.error = error;
     }
 
@@ -35,7 +36,8 @@ public class Classifier implements Serializable {
         return beta;
     }
 
-    public void setBeta(double beta) {
+    public void setBeta(double beta) throws Exception {
+        if (beta < 0 || beta > 1) throw new Exception("Beta must be in [0, 1]. Was: " + beta);
         this.beta = beta;
     }
 

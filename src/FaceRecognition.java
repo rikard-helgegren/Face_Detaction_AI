@@ -12,20 +12,8 @@ import java.util.*;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final int degenerateDecisionTreeSize = 2;
+    private static final int degenerateDecisionTreeSize = 10;
     private static final boolean loadFromFile = false; // Set this boolean to load or train.
-
-    private static class LabeledIntegralImage {
-        public int isFace; // 1 for true, 0 for false
-        public HalIntegralImage img;
-        public double weight;
-
-        public LabeledIntegralImage(HalIntegralImage img, int isFace, double weight) {
-            this.isFace = isFace;
-            this.img = img;
-            this.weight = weight;
-        }
-    }
 
     private static class ThresholdParity{
         public int threshold;
@@ -109,7 +97,7 @@ public class FaceRecognition {
     public static ArrayList<Classifier> train(ArrayList<LabeledIntegralImage> trainingData) throws Exception {
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
-        Collections.shuffle(allFeatures);
+        //Collections.shuffle(allFeatures);
 
         ArrayList<Classifier> degenerateDecisionTree = new ArrayList<>(degenerateDecisionTreeSize);
 
@@ -122,10 +110,10 @@ public class FaceRecognition {
             // 1. Normalize weights
             double weightSum = 0;
             for (LabeledIntegralImage img : trainingData) {
-                weightSum += img.weight;
+                weightSum += img.getWeight();
             }
             for (LabeledIntegralImage img : trainingData) {
-                img.weight = img.weight / weightSum;
+                img.setWeight(img.getWeight() / weightSum);
             }
 
             // 2. Train a classifier for every feature. Each is trained on all trainingData
@@ -141,9 +129,9 @@ public class FaceRecognition {
                 double error = 0;
                 Classifier h = new Classifier(j, threshold, parity); // TODO Calculate parity!! It should be 1 or -1.
                 for (LabeledIntegralImage img : trainingData) {
-                    error += Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+                    error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
                 }
-                h.setError(error * weightSum);
+                h.setError(error);
                 classifiers.add(h);
                 if (i % 100 == 0) System.out.printf("Feature %d/%d, t=%d\n", i, allFeatures.size(),t);
             }
@@ -155,6 +143,8 @@ public class FaceRecognition {
 
             // 4. Update weights
             bestClassifier.setBeta(bestClassifier.getError() / (1 - bestClassifier.getError()));
+            System.out.println("Beta is " + bestClassifier.getBeta());
+            System.out.println("Setting alpha to " + Math.log(1/bestClassifier.getBeta()));
             bestClassifier.setAlpha(Math.log(1/bestClassifier.getBeta()));
             System.out.println("Testing Alpha:");
             System.out.println(bestClassifier.getBeta());
@@ -162,7 +152,9 @@ public class FaceRecognition {
             System.out.println(bestClassifier.getAlpha());
             for (LabeledIntegralImage img : trainingData) {
                 // If classifier is right, multiply by beta
-                if (bestClassifier.canBeFace(img.img) == img.isFace) img.weight = img.weight * bestClassifier.getBeta();
+                if (bestClassifier.canBeFace(img.img) == img.isFace) {
+                    img.setWeight(img.getWeight() * bestClassifier.getBeta());
+                }
             }
             degenerateDecisionTree.add(bestClassifier);
             System.out.println("Best classifiers feature: ");
@@ -309,14 +301,14 @@ public class FaceRecognition {
             double sMinus = 0;
             for (LabeledIntegralImage img : trainingData) {
                 if (img.isFace == 1) {
-                    tPlus += img.weight;
-                    if (img.weight < threshold) {
-                        sPlus += img.weight;
+                    tPlus += img.getWeight();
+                    if (img.getWeight() < threshold) {
+                        sPlus += img.getWeight();
                     }
                 } else if (img.isFace == 0) {
-                    tMinus += img.weight;
-                    if (img.weight < threshold) {
-                        sMinus += img.weight;
+                    tMinus += img.getWeight();
+                    if (img.getWeight() < threshold) {
+                        sMinus += img.getWeight();
                     }
                 }
             }

@@ -107,13 +107,39 @@ public class Feature {
         if (h%2 != 0) throw new Exception("Vertical feature, height has to be divisible by 2. Was " + h);
         return img.getRectangleSum(x, y, x+w-1, y+h/2-1) - img.getRectangleSum(x, y+h/2, x+w-1, y+h-1);
     }
-
+    
+    /**
+     * Calculates the difference between the rectangle sums of thre rectangles located next to each other horisontally.
+     *
+     * @param img the integral image to operate on
+     * @param x coordinate for the upper left corner of the feature area.
+     * @param y coordinate for the upper left corner of the feature area.
+     * @param w the width of the total feature area.
+     * @param h the height of the total feature area.
+     * @return
+     * @throws Exception
+     */
     public static int calcThreeRectFeature(HalIntegralImage img, int x, int y, int w, int h) throws Exception {
-        return 0; // TODO
+    	if (w%3 != 0) throw new Exception("Three Vertical feature, width has to be divisible by 3. Was " + w);
+    	return - img.getRectangleSum(x, y, x+w/3-1, y+h-1) + img.getRectangleSum(x+w/3, y, x+2*w/3-1, y+h-1) - img.getRectangleSum(x+2*w/3, y, x+w-1, y+h-1);
     }
 
+    
+    /**
+     * Calculates the difference between the rectangle sums of four rectangles located next to each other like a chess board..
+     *
+     * @param img the integral image to operate on
+     * @param x coordinate for the upper left corner of the feature area.
+     * @param y coordinate for the upper left corner of the feature area.
+     * @param w the width of the total feature area.
+     * @param h the height of the total feature area.
+     * @return
+     * @throws Exception
+     */
     public static int calcFourRectFeature(HalIntegralImage img, int x, int y, int w, int h) throws Exception {
-        return 0; // TODO
+    	if (w%3 != 0) throw new Exception("Four Rect feature, height has to be divisible by 2. Was " + h);
+    	if (w%3 != 0) throw new Exception("Four Rect feature, width has to be divisible by 2. Was " + h);
+    	return  img.getRectangleSum(x, y, x+w/2-1, y+h/2-1) + img.getRectangleSum(x+w/2, y+h/2, x+w-1, y+h-1) - img.getRectangleSum(x+w/2-1, y, x+w-1, y+h/2-1) - img.getRectangleSum(x, y+h/2, x+w/2-1, y+h-1);
     }
 
 }

@@ -12,7 +12,8 @@ import java.util.*;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final int degenerateDecisionTreeSize = 4;
+    private static final int degenerateDecisionTreeSize = 2;
+    private static final boolean loadFromFile = false; // Set this boolean to load or train.
 
     private static class LabeledIntegralImage {
         public int isFace; // 1 for true, 0 for false
@@ -81,9 +82,6 @@ public class FaceRecognition {
 
         ArrayList<Classifier> degenerateDecisionTree;
 
-        // Set this boolean to load or train.
-        boolean loadFromFile = true;
-
         if (loadFromFile) {
             // Load strong classifier from file
             degenerateDecisionTree = load("save.classifiers");
@@ -147,7 +145,7 @@ public class FaceRecognition {
                 }
                 h.setError(error * weightSum);
                 classifiers.add(h);
-                if (i % 10 == 0) System.out.printf("Feature %d/%d, t=%d\n", i, allFeatures.size(),t);
+                if (i % 100 == 0) System.out.printf("Feature %d/%d, t=%d\n", i, allFeatures.size(),t);
             }
             // 3. Choose the classifier with the lowest error
             Classifier bestClassifier = classifiers.get(0);
@@ -299,7 +297,7 @@ public class FaceRecognition {
         //  However, it should be fine to take big jumps in i. This SIGNIFICANTLY reduces running time.
         //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
         //  to find the best threshold much faster.
-        for (int i = 0; i < featureValues.size(); i += 10) {
+        for (int i = 0; i < featureValues.size(); i += 100) {
             Integer threshold = featureValues.get(i);
             double tPlus = 0;
             double tMinus = 0;

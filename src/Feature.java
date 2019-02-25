@@ -1,6 +1,8 @@
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Feature {
+public class Feature implements Serializable {
 
     /**
      * Represents the 4 different types of feature.
@@ -53,8 +55,8 @@ public class Feature {
      */
     public static ArrayList<Feature> generateAllFeatures(int imageWidth, int imageHeight) {
         ArrayList<Feature> allFeatures = new ArrayList<>(160000);
-        for (int x = 0; x < imageWidth; x++){
-            for (int y = 0; y < imageHeight; y++) {
+        for (int x = 0; x < imageWidth; x+=2){           ///------------------------------TODO increased x and y faster
+            for (int y = 0; y < imageHeight; y+=2) {
                 for (int w = 2; w < imageWidth - x; w+=1) {
                     for (int h = 2; h < imageHeight - y; h += 1){
                         if (w % 2 == 0) allFeatures.add(new Feature(Feature.Type.HORIZONTAL, x, y, w, h));
@@ -114,6 +116,40 @@ public class Feature {
 
     public static int calcFourRectFeature(HalIntegralImage img, int x, int y, int w, int h) throws Exception {
         return 0; // TODO
+    }
+
+    public int getH() {
+        return h;
+    }
+
+    public int getW() {
+        return w;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public String toString(){
+        return "x: "+getX()+" y: "+getY()+" w: "+getW()+" h: "+getH()+ " type: "+getType();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Feature)) return false;
+        Feature f = (Feature) o;
+        if (type.equals(f.type) && x == f.x && y == f.y && w == f.w && h == f.h) {
+            return true;
+        }
+        return false;
     }
 
 }

@@ -62,5 +62,7 @@ public class Classifier {
         return 0;
     }
 
-
+    public Feature getFeature() {
+        return feature;
+    }
 }

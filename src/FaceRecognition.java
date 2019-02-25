@@ -10,7 +10,7 @@ import java.util.*;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final int degenerateDecisionTreeSize = 6000;
+    private static final int degenerateDecisionTreeSize = 4;
 
     private static class LabeledIntegralImage {
         public int isFace; // 1 for true, 0 for false
@@ -25,6 +25,7 @@ public class FaceRecognition {
     }
 
     public static void main(String[] args) throws Exception {
+        System.out.println("1");
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
         HalIntegralImage[] trainFaces = {};
@@ -32,13 +33,15 @@ public class FaceRecognition {
         HalIntegralImage[] testFaces = {};
         HalIntegralImage[] testNoFaces = {};
         try {
+            System.out.println("1.25");
             // Read images for training set
             trainFaces = readImagesFromDataBase("./res/source/data/train/face"); // Read face images
             trainNoFaces = readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
-
+            System.out.println("1.5");
             // Read images for test set
             testFaces = readImagesFromDataBase("./res/source/data/test/face");
             testNoFaces = readImagesFromDataBase("./res/source/data/test/non-face");
+            System.out.println("1.75");
             //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
         } catch (IOException e) {
             System.err.println("Data folder not found. Have you extracted data.zip correctly?");
@@ -46,7 +49,7 @@ public class FaceRecognition {
             System.err.println("There was an error reading images.");
             e.printStackTrace();
         }
-
+        System.out.println("2");
         // Calculate initial weights. TODO Verify that this is correct. I'm not sure.
         double weightFace = 1.0 / (2 * trainFaces.length);
         double weightNoFace = 1.0 / (2 * trainNoFaces.length);
@@ -55,7 +58,7 @@ public class FaceRecognition {
         ArrayList<LabeledIntegralImage> trainingData = new ArrayList<>(5000);
         for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, 1, weightFace));
         for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, 0, weightNoFace));
-
+        System.out.println("3");
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         ArrayList<LabeledIntegralImage> testData = new ArrayList<>(20000);
@@ -69,12 +72,13 @@ public class FaceRecognition {
 
         // These are the 4 core steps of the Adaboost algorithm
         // as described in http://www.vision.caltech.edu/html-files/EE148-2005-Spring/pprs/viola04ijcv.pdf
-
+        System.out.println("4");
 
         ArrayList<Classifier> degenerateDecisionTree = new ArrayList<>(degenerateDecisionTreeSize);
 
         // For each t
         for(int t=1;t<=degenerateDecisionTreeSize;t++) {
+            System.out.println("t = "+t);
             // 1. Normalize weights
             double weightSum = 0;
             for (LabeledIntegralImage img : trainingData) {
@@ -113,17 +117,41 @@ public class FaceRecognition {
                 // If classifier is right, multiply by beta
                 if (bestClassifier.canBeFace(img.img) == img.isFace) img.weight = img.weight * bestClassifier.getBeta();
             }
-
+            //TODO: They always seem to choose the same feature.
             degenerateDecisionTree.add(bestClassifier);
+            System.out.println("Best classifiers feature: ");
+            printFeature(bestClassifier.getFeature());
         }
 
+        System.out.println("Testing now");
+
+        int nrCorrect = 0;
+        int nrWrong = 0;
+        for(LabeledIntegralImage i:testData){
+            if((isFace(degenerateDecisionTree,i.img) && i.isFace==1) || (!isFace(degenerateDecisionTree,i.img) && i.isFace==0)){
+                nrCorrect++;
+                System.out.println("Correct guess");
+            }else{
+                nrWrong++;
+                System.out.println("Wrong guess");
+            }
+        }
+        System.out.println();
+        System.out.println("Test got "+nrCorrect+" correct and "+nrWrong+" wrong");
 
 
         // Do pattern recognition things
         //searchForPatterns();
     }
 
+    public static void printFeature(Feature c){
+        System.out.println("x: "+c.getX()+" y: "+c.getY()+" w: "+c.getW()+" h: "+c.getH()+ " type: "+c.getType());
+    }
+
     public static boolean isFace(ArrayList<Classifier> degenerateDecisionTree, HalIntegralImage i) throws Exception{
+
+        //How it looks like you should do accorging to the paper:
+        /*
         double threshold = 0;
         for(Classifier c:degenerateDecisionTree){
             threshold+=c.getAlpha();
@@ -136,6 +164,17 @@ public class FaceRecognition {
         }
 
         return value>=threshold;
+        */
+        //Test got 23550 correct and 495 wrong
+
+
+        //How it looks like you should do according to computerphile
+        for(Classifier c:degenerateDecisionTree){
+            if(c.canBeFace(i)!=1) return false;
+        }
+
+        return true;
+        //Test got 23570 correct and 475 wrong
     }
 
     /**
@@ -196,7 +235,7 @@ public class FaceRecognition {
         //  However, it should be fine to take big jumps in i. This SIGNIFICANTLY reduces running time.
         //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
         //  to find the best threshold much faster.
-        for (int i = 0; i < featureValues.size(); i += 1) {
+        for (int i = 0; i < featureValues.size(); i += 10) {
             Integer threshold = featureValues.get(i);
             double tPlus = 0;
             double tMinus = 0;

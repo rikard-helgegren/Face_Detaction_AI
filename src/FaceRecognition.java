@@ -146,6 +146,10 @@ public class FaceRecognition {
             System.out.println("Beta is " + bestClassifier.getBeta());
             System.out.println("Setting alpha to " + Math.log(1/bestClassifier.getBeta()));
             bestClassifier.setAlpha(Math.log(1/bestClassifier.getBeta()));
+            System.out.println("Testing Alpha:");
+            System.out.println(bestClassifier.getBeta());
+            System.out.println(Math.log(1/bestClassifier.getBeta()));
+            System.out.println(bestClassifier.getAlpha());
             for (LabeledIntegralImage img : trainingData) {
                 // If classifier is right, multiply by beta
                 if (bestClassifier.canBeFace(img.img) == img.isFace) {
@@ -195,6 +199,9 @@ public class FaceRecognition {
         //System.out.println("nrCorrectIsFace: "+nrCorrectIsFace+" nrWrongIsFace: "+nrWrongIsFace+" nrCorrectIsNotFace: "+nrCorrectIsNotFace+" nrWrongIsNotFace: "+nrWrongIsNotFace);
         System.out.printf("When the image is     a face. Correct %d. Wrong: %d\n", nrCorrectIsFace, nrWrongIsFace);
         System.out.printf("When the image is not a face. Correct %d. Wrong: %d\n", nrCorrectIsNotFace, nrWrongIsNotFace);
+        System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
+        System.out.printf("Percent of guesses right: %d\n",100*(nrCorrectIsFace+nrCorrectIsNotFace)/(testData.size()));
+        System.out.printf("Percent of guesses wrong: %d\n",100*(nrWrongIsFace+nrWrongIsNotFace)/(testData.size()));
     }
 
 

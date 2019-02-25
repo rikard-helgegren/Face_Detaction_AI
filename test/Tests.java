@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -98,6 +101,41 @@ public class Tests {
         // TODO Test type three feature calculation
 
         // TODO Test type four feature calculation
+    }
+
+    // Tests saving and loading of classifiers.
+    @Test
+    public void testClassifierSaveLoad() {
+
+        Classifier a = null;
+        Classifier b = null;
+        try {
+            a = new Classifier(new Feature(Feature.Type.HORIZONTAL, 1, 2, 4, 4), 10, 10);
+            b = new Classifier(new Feature(Feature.Type.VERTICAL, 2, 8, 6, 4), 5, 5);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        ArrayList<Classifier> classifiers = new ArrayList<>(2);
+        classifiers.add(a);
+        classifiers.add(b);
+
+        FaceRecognition.save(classifiers, "test.classifiers");
+
+        ArrayList<Classifier> loaded = new ArrayList<>();
+        try {
+            loaded = FaceRecognition.load("test.classifiers");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(classifiers.get(0), loaded.get(0));
+        assertEquals(classifiers.get(1), loaded.get(1));
+
+        new File("test.classifiers").delete();
     }
 
     private HalIntegralImage readImage(String path) throws Exception {

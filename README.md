@@ -41,6 +41,9 @@ When running files, make sure that your current working directory is the project
    * For horizontal rectangles.
    * For vertical rectangles.
 * Implement core Adaboost algorithm.
+* Finish Adaboost algorithm by iterating multiple times to create many weak classifiers. Currently we only create a single weak classifier.
+* Implement final cascade classifier using all the simple classifiers. (But not finalized.)
+* Implement a way to save and load trained classifiers so that we can use them without first training them every time.
 
 ## Things that are TODO
 * Implement function for calculating the 4 features.
@@ -51,7 +54,6 @@ When running files, make sure that your current working directory is the project
    * Optimize feature calculation. Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).
    * `calcBestThreshold()` is the place where adaboost supposedly spends most time. See comment in that function for discussion.
 * Make sure that all features are actually generated in `Feature.generateAllFeatures()`. This might already be as it should be, but we have some fewer features than expected.
-* Finish Adaboost algorithm by iterating multiple times to create many weak classifiers. Currently we only create a single weak classifier.
-* Implement final cascade classifier using all the simple classifiers.
-* Implement a way to save and load trained classifiers so that we can use them without first training them every time.
-* Consider exception handling. Right now most exception are just thrown, but not all. Generally, we want to throw exceptions and just crash rather than silently accepting missing files etc.
+* Test and improve AdaBoost and cascade classifier.
+
+

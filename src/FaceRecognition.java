@@ -14,7 +14,7 @@ import java.util.*;
 public class FaceRecognition {
     private static final int degenerateDecisionTreeSize = 10;
     private static final boolean loadFromFile = false; // Set this boolean to load or train.
-    private double overallFalsePositiveRate = 0.1;
+    private static final double overallFalsePositiveRate = 0.1;
 
     private static class ThresholdParity{
         public int threshold;
@@ -91,13 +91,29 @@ public class FaceRecognition {
             ArrayList<LabeledIntegralImage> data = trainingData;
 
 
-            double currentFalsePositiveRate = 1;
-            double currentDetectionRate = 1;
+            double maxFalsePositiveRatePerLayer = 0.8;
+            double minDetectionRatePerLayer = 0.95;
+            double prevFalsePositiveRate = 1;
+            double curFalsePositiveRate = 1;
+            double curDetectionRate = 1;
+            ArrayList<ArrayList<Classifier>> cascadedClassifier = new ArrayList<>();
 
-            for (int i = 0; i < 10; i++) {
-                System.out.println("Training layer " + i);
-                degenerateDecisionTree.addAll(train(data, 1));
-                data = filterData(degenerateDecisionTree, data);
+            while(curFalsePositiveRate>overallFalsePositiveRate) {
+                System.out.println("Training");
+
+                curFalsePositiveRate = prevFalsePositiveRate;
+                int featuresPerClassfier = 0;
+
+                while(curFalsePositiveRate>maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
+                    featuresPerClassfier++;
+                    ArrayList<Classifier> strongClassifier = train(data, featuresPerClassfier);
+                    cascadedClassifier.add(strongClassifier);
+                    getPerformance();
+                }
+
+
+                //degenerateDecisionTree.addAll(train(data, 1));
+                //data = filterData(degenerateDecisionTree, data);
             }
 
 

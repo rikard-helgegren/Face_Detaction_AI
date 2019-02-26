@@ -25,6 +25,16 @@ public class FaceRecognition {
         }
     }
 
+    private static class PerformanceStats {
+        public double falsePositive;
+        public double falseNegative;
+
+        public PerformanceStats(double falsePositive, double falseNegative){
+            this.falsePositive = falsePositive;
+            this.falseNegative = falseNegative;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         System.out.println("1");
         // Read images from file system amd calculate integralImages.
@@ -207,14 +217,12 @@ public class FaceRecognition {
         System.out.printf("When the image is     a face. Correct: %d. Wrong: %d.", nrCorrectIsFace, nrWrongIsFace);
         System.out.printf(" True positive: %.1f %%. False negative: %.1f %%\n",
                 100*(double)nrCorrectIsFace/(nrCorrectIsFace+nrWrongIsFace),
-                100*(double)nrWrongIsFace/(nrCorrectIsFace+ nrWrongIsFace));
+                100*getPerformance(degenerateDecisionTree, testData).falseNegative);
         System.out.printf("When the image is not a face. Correct: %d. Wrong: %d.", nrCorrectIsNotFace, nrWrongIsNotFace);
         System.out.printf(" True negative: %.1f %%. False positive: %.1f %%\n",
                 100*(double)nrCorrectIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace),
-                100*(double)nrWrongIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace));
+                100*getPerformance(degenerateDecisionTree, testData).falsePositive);
         System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
-        System.out.printf("Percent of guesses right: %.1f %%\n",100*((double)nrCorrectIsFace+nrCorrectIsNotFace)/(testData.size()));
-        System.out.printf("Percent of guesses wrong: %.1f %%\n",100*((double)nrWrongIsFace+nrWrongIsNotFace)/(testData.size()));
     }
 
     /**
@@ -231,6 +239,32 @@ public class FaceRecognition {
             }
         }
         return maybeFaces;
+    }
+
+    public static PerformanceStats getPerformance(ArrayList<Classifier> decisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
+        int nrCorrectIsFace = 0;
+        int nrWrongIsFace = 0;
+        int nrCorrectIsNotFace = 0;
+        int nrWrongIsNotFace = 0;
+        for(LabeledIntegralImage i:testData){
+            if(i.isFace==1){
+                if(isFace(decisionTree,i.img)){
+                    nrCorrectIsFace++;
+                }else{
+                    nrWrongIsFace++;
+                }
+            }
+            if(i.isFace==0){
+                if(!isFace(decisionTree,i.img)){
+                    nrCorrectIsNotFace++;
+                }else{
+                    nrWrongIsNotFace++;
+                }
+            }
+        }
+        double falseNegative = (double)nrWrongIsFace/(nrCorrectIsFace+ nrWrongIsFace);
+        double falsePositive = (double)nrWrongIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace);
+        return new PerformanceStats(falsePositive, falseNegative);
     }
 
     public static boolean isFace(ArrayList<Classifier> degenerateDecisionTree, HalIntegralImage i) throws Exception{

@@ -4,7 +4,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Array;
-import java.sql.SQLOutput;
 import java.util.*;
 
 /**
@@ -79,15 +78,15 @@ public class FaceRecognition {
         Collections.shuffle(testData);
         System.out.println("4");
 
-        ArrayList<Classifier> degenerateDecisionTree;
+        ArrayList<StrongClassifier> cascadedClassifier = new ArrayList<>();
 
         if (loadFromFile) {
             // Load strong classifier from file
-            degenerateDecisionTree = load("save.classifiers");
+            cascadedClassifier = load("save.classifiers");
         } else {
             // Train strong classifier
 
-            degenerateDecisionTree = new ArrayList<Classifier>();
+            cascadedClassifier = new ArrayList<StrongClassifier>();
             ArrayList<LabeledIntegralImage> data = trainingData;
 
 
@@ -95,8 +94,15 @@ public class FaceRecognition {
             double minDetectionRatePerLayer = 0.95;
             double prevFalsePositiveRate = 1;
             double curFalsePositiveRate = 1;
-            double curDetectionRate = 1;
-            ArrayList<ArrayList<Classifier>> cascadedClassifier = new ArrayList<>();
+            double prevDetectionRate = 1;
+
+            ArrayList<LabeledIntegralImage> negativeSamples = new ArrayList<>();
+            ArrayList<LabeledIntegralImage> positiveSamples = new ArrayList<>();
+            ArrayList<LabeledIntegralImage> allSamples = new ArrayList<>();
+            for (HalIntegralImage img : trainNoFaces) negativeSamples.add(new LabeledIntegralImage(img, 0, weightNoFace));//TODO change maybe
+            for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
+
+
 
             while(curFalsePositiveRate>overallFalsePositiveRate) {
                 System.out.println("Training");
@@ -105,10 +111,20 @@ public class FaceRecognition {
                 int featuresPerClassfier = 0;
 
                 while(curFalsePositiveRate>maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
+                    allSamples = new ArrayList<>();
+                    allSamples.addAll(negativeSamples);
+                    allSamples.addAll(positiveSamples);
+
                     featuresPerClassfier++;
-                    ArrayList<Classifier> strongClassifier = train(data, featuresPerClassfier);
+                    StrongClassifier strongClassifier = train(data, featuresPerClassfier);
                     cascadedClassifier.add(strongClassifier);
-                    getPerformance();
+                    while(true) {
+                        PerformanceStats stats = evalCascade(cascadedClassifier, trainingData);
+                        if(stats.truePositive>=minDetectionRatePerLayer*prevDetectionRate) break;
+                    }
+                    if(curFalsePositiveRate > overallFalsePositiveRate){
+                        negativeSamples = filterData(cascadedClassifier, negativeSamples);
+                    }
                 }
 
 
@@ -118,11 +134,11 @@ public class FaceRecognition {
 
 
             // Save strong classifier
-            save(degenerateDecisionTree, "save.classifiers");
+            save(cascadedClassifier, "save.classifiers");
         }
 
         // Test strong classifier
-        test(degenerateDecisionTree, testData);
+        test(cascadedClassifier, testData);
         //test(degenerateDecisionTree, trainingData);
     }
 
@@ -135,7 +151,7 @@ public class FaceRecognition {
      * @return a degenerate decision tree representing the strong classifier.
      * @throws Exception if something goes wrong
      */
-    public static ArrayList<Classifier> train(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {
+    public static StrongClassifier train(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         //Collections.shuffle(allFeatures);
@@ -201,7 +217,7 @@ public class FaceRecognition {
             System.out.println("Best classifiers feature: ");
             System.out.println(bestClassifier);
         }
-        return degenerateDecisionTree;
+        return new StrongClassifier(degenerateDecisionTree);
     }
 
     /**
@@ -210,9 +226,9 @@ public class FaceRecognition {
      * @param testData
      * @throws Exception
      */
-    public static void test(ArrayList<Classifier> degenerateDecisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
+    public static void test(ArrayList<StrongClassifier> degenerateDecisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
         System.out.println("Testing decision tree");
-        for(Classifier c : degenerateDecisionTree) {
+        for(StrongClassifier c : degenerateDecisionTree) {
             System.out.println("\t" + c);
         }
 
@@ -241,11 +257,11 @@ public class FaceRecognition {
         System.out.printf("When the image is     a face. Correct: %d. Wrong: %d.", nrCorrectIsFace, nrWrongIsFace);
         System.out.printf(" True positive: %.1f %%. False negative: %.1f %%\n",
                 100*(double)nrCorrectIsFace/(nrCorrectIsFace+nrWrongIsFace),
-                100*getPerformance(degenerateDecisionTree, testData).falseNegative);
+                100* evalCascade(degenerateDecisionTree, testData).falseNegative);
         System.out.printf("When the image is not a face. Correct: %d. Wrong: %d.", nrCorrectIsNotFace, nrWrongIsNotFace);
         System.out.printf(" True negative: %.1f %%. False positive: %.1f %%\n",
                 100*(double)nrCorrectIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace),
-                100*getPerformance(degenerateDecisionTree, testData).falsePositive);
+                100* evalCascade(degenerateDecisionTree, testData).falsePositive);
         System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
     }
 
@@ -255,7 +271,7 @@ public class FaceRecognition {
      * @param data
      * @return an array of images that the strong classifier thinks could be faces
      */
-    public static ArrayList<LabeledIntegralImage> filterData(ArrayList<Classifier> strongClassifier, ArrayList<LabeledIntegralImage> data) throws Exception {
+    public static ArrayList<LabeledIntegralImage> filterData(ArrayList<StrongClassifier> strongClassifier, ArrayList<LabeledIntegralImage> data) throws Exception {
         ArrayList<LabeledIntegralImage> maybeFaces = new ArrayList<>(data.size()/2);
         for (LabeledIntegralImage d : data) {
             if (isFace(strongClassifier, d.img)) {
@@ -265,7 +281,7 @@ public class FaceRecognition {
         return maybeFaces;
     }
 
-    public static PerformanceStats getPerformance(ArrayList<Classifier> decisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
+    public static PerformanceStats evalCascade(ArrayList<StrongClassifier> decisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
         int nrCorrectIsFace = 0;
         int nrWrongIsFace = 0;
         int nrCorrectIsNotFace = 0;
@@ -295,7 +311,7 @@ public class FaceRecognition {
     public static boolean isFace(ArrayList<StrongClassifier> strongClassifiers, HalIntegralImage i) throws Exception{
         //How it looks like you should do according to computerphile
         for(StrongClassifier c:strongClassifiers){
-            if(c.canBeFace(i)!=1) return false;
+            if(!c.canBeFace(i)) return false;
         }
 
         return true;
@@ -400,7 +416,7 @@ public class FaceRecognition {
     }
 
 
-    public static void save(ArrayList<Classifier> classifiers, String fileName){
+    public static void save(ArrayList<StrongClassifier> classifiers, String fileName){
         try {
             FileOutputStream fileOut = new FileOutputStream(fileName);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -413,11 +429,11 @@ public class FaceRecognition {
         }
     }
 
-    public static ArrayList<Classifier> load(String fileName) throws IOException, ClassNotFoundException {
-        ArrayList<Classifier> classifiers;
+    public static ArrayList<StrongClassifier> load(String fileName) throws IOException, ClassNotFoundException {
+        ArrayList<StrongClassifier> classifiers;
         FileInputStream fileIn = new FileInputStream(fileName);
         ObjectInputStream in = new ObjectInputStream(fileIn);
-        classifiers = (ArrayList<Classifier>) in.readObject();
+        classifiers = (ArrayList<StrongClassifier>) in.readObject();
         in.close();
         fileIn.close();
         return classifiers;

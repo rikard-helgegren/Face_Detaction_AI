@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class StrongClassifier {
+public class StrongClassifier implements Serializable{
     ArrayList<Classifier> weakClassifiers;
     private double threshold;
     private double thresholdMultiplier = 1;
@@ -33,5 +34,22 @@ public class StrongClassifier {
         }
 
         return value>=threshold*thresholdMultiplier;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof StrongClassifier)) return false;
+        StrongClassifier c = (StrongClassifier) o;
+
+        if(weakClassifiers.size() != c.weakClassifiers.size()) return false;
+
+        for (int i = 0; i < weakClassifiers.size(); i++) {
+            Classifier weakClassifier = weakClassifiers.get(i);
+
+            if(!weakClassifier.equals(c.weakClassifiers.get(i))){
+                return false;
+            }
+        }
+        return true;
     }
 }

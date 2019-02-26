@@ -2,18 +2,29 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class StrongClassifier implements Serializable{
-    ArrayList<Classifier> weakClassifiers;
+    private ArrayList<Classifier> weakClassifiers;
     private double threshold;
     private double thresholdMultiplier = 1;
 
+    public StrongClassifier() {
+        weakClassifiers = new ArrayList<>();
+    }
+
     public StrongClassifier(ArrayList<Classifier> weakClassifiers) throws Exception {
         this.weakClassifiers = weakClassifiers;
+        calcThreshold();
+    }
 
+    private void calcThreshold() {
         threshold = 0;
         for(Classifier c:weakClassifiers){
             threshold+=c.getAlpha();
         }
+    }
 
+    public void addClassifier(Classifier c) {
+        weakClassifiers.add(c);
+        calcThreshold();
     }
 
     public void setThresholdMultiplier(double thresholdMultiplier) throws Exception {
@@ -26,6 +37,7 @@ public class StrongClassifier implements Serializable{
     }
 
     public boolean canBeFace(HalIntegralImage img) throws Exception {
+        if (weakClassifiers.size() < 1) throw new Exception("This strong classifier has no weak classifiers.");
         //How it looks like you should do according to the paper:
 
         double value = 0;
@@ -34,6 +46,10 @@ public class StrongClassifier implements Serializable{
         }
 
         return value>=threshold*thresholdMultiplier;
+    }
+
+    public int getSize() {
+        return weakClassifiers.size();
     }
 
     @Override

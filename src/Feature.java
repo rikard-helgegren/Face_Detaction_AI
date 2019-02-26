@@ -77,6 +77,11 @@ public class Feature implements Serializable {
      * Note that x+w may not be larger than the width of the image.
      * Note that y+h may not be larger than the height of the image.
      *
+     * |‾‾‾‾‾‾‾‾|
+     * |        |
+     * |        |
+     * |________|
+     *
      * @param img the integral image to operate on
      * @param x coordinate for the upper left corner of the feature area.
      * @param y coordinate for the upper left corner of the feature area.

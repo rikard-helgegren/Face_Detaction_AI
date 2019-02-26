@@ -13,6 +13,17 @@ public class FaceRecognition {
     private static final boolean loadFromFile = false; // Set this boolean to load or train.
     private static final double overallFalsePositiveRate = 0.3;
     public static final double DELTA = 0.00001;
+    public static PrintWriter writer;
+
+    static {
+        try {
+            writer = new PrintWriter("the-file-name.txt", "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
 
     private static class ThresholdParity{
         public int threshold;
@@ -131,16 +142,22 @@ public class FaceRecognition {
                     strongClassifier.setThresholdMultiplier(1);
 
                     while(true) {
-                        //System.out.println("=== Evaluating threshold " + strongClassifier.getThresholdMultiplier() + " ===");
+                        System.out.printf("Evaluating threshold %.2f. ", cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier());
                         PerformanceStats stats = evalCascade(cascadedClassifier, testData);
+                        System.out.printf("Performance: %s. ", stats);
                         curFalsePositiveRate = stats.falsePositive;
                         curDetectionRate = stats.truePositive;
-                        if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) break;
+                        if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) {
+                            System.out.printf("GOOD! Using this one. \n");
+                            break;
+                        } else {
+                            System.out.printf("\n");
+                        }
 
                         strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
                         if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, threshold was 0.");
-                        //System.out.println(stats.toString() + "\n ======");
                     }
+                    writer.close();
                 }
 
                 if(curFalsePositiveRate > overallFalsePositiveRate){
@@ -203,6 +220,7 @@ public class FaceRecognition {
         for (LabeledIntegralImage img : allSamples) {
             weightSum += img.getWeight();
         }
+        System.out.println("ws: "+weightSum);
         for (LabeledIntegralImage img : allSamples) {
             img.setWeight(img.getWeight() / weightSum);
         }
@@ -214,7 +232,6 @@ public class FaceRecognition {
             ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
             int threshold = p.threshold;
             int parity = p.parity;
-
 
             // Actual step 2
             double error = 0;
@@ -230,13 +247,17 @@ public class FaceRecognition {
         Classifier bestClassifier = classifiers.get(0);
         for (Classifier c : classifiers) {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
+            System.out.printf("%s. Err: %f\n", c, c.getError());
         }
 
         // 4. Update weights
+        System.out.println("Error: " + bestClassifier.getError());
+        System.out.println("Beta: " + bestClassifier.getError() / (1 - bestClassifier.getError()));
         bestClassifier.setBeta(bestClassifier.getError() / (1 - bestClassifier.getError()));
         //System.out.println("Beta is " + bestClassifier.getBeta());
         //System.out.println("Setting alpha to " + Math.log(1/bestClassifier.getBeta()));
-        bestClassifier.setAlpha(Math.log(1/bestClassifier.getBeta()));
+        System.out.println("Alpha: " + Math.log(1.0/bestClassifier.getBeta()));
+        bestClassifier.setAlpha(Math.log(1.0/bestClassifier.getBeta()));
         //System.out.println("Testing Alpha:");
         //System.out.println(bestClassifier.getBeta());
         //System.out.println(Math.log(1/bestClassifier.getBeta()));
@@ -336,15 +357,15 @@ public class FaceRecognition {
                 }
             }
         }
-        double falseNegative = ((double)nrWrongIsFace)/(nrCorrectIsFace+ nrWrongIsFace);
-        double falsePositive = ((double)nrWrongIsNotFace)/(nrCorrectIsNotFace+nrWrongIsNotFace);
-        double truePositive = ((double)nrCorrectIsFace)/(nrCorrectIsFace+nrWrongIsFace);
+        double falsePositive = ((double)nrWrongIsNotFace) / (nrCorrectIsNotFace + nrWrongIsNotFace);
+        double truePositive  = ((double)nrCorrectIsFace)  / (nrCorrectIsFace    + nrWrongIsFace);
+        double falseNegative = ((double)nrWrongIsFace)    / (nrCorrectIsFace    + nrWrongIsFace);
         return new PerformanceStats(truePositive, falsePositive, falseNegative);
     }
 
     public static boolean isFace(ArrayList<StrongClassifier> strongClassifiers, HalIntegralImage i) throws Exception{
         //How it looks like you should do according to computerphile
-        for(StrongClassifier c:strongClassifiers){
+        for(StrongClassifier c : strongClassifiers){
             if(!c.canBeFace(i)) return false;
         }
 

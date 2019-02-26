@@ -1,9 +1,10 @@
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class StrongClassifier implements Serializable{
     private ArrayList<Classifier> weakClassifiers;
-    private double threshold;
+    //private double threshold;
     private double thresholdMultiplier = 1;
 
     public StrongClassifier() {
@@ -12,19 +13,21 @@ public class StrongClassifier implements Serializable{
 
     public StrongClassifier(ArrayList<Classifier> weakClassifiers) throws Exception {
         this.weakClassifiers = weakClassifiers;
-        calcThreshold();
+        //calcThreshold();
     }
 
-    private void calcThreshold() {
-        threshold = 0;
+    private double getThreshold() {
+        double threshold = 0;
         for(Classifier c:weakClassifiers){
             threshold+=c.getAlpha();
+            //FaceRecognition.writer.printf("Alpha: %.3f\n", c.getAlpha());
         }
+        return threshold;
     }
 
     public void addClassifier(Classifier c) {
         weakClassifiers.add(c);
-        calcThreshold();
+        //calcThreshold();
     }
 
     public void setThresholdMultiplier(double thresholdMultiplier) throws Exception {
@@ -44,8 +47,9 @@ public class StrongClassifier implements Serializable{
         for(Classifier c:weakClassifiers){
             value+=c.getAlpha()*c.canBeFace(img);
         }
+        //FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
 
-        return value>=threshold*thresholdMultiplier;
+        return value>=getThreshold()*thresholdMultiplier;
     }
 
     public int getSize() {
@@ -71,7 +75,7 @@ public class StrongClassifier implements Serializable{
 
     @Override
     public String toString() {
-        String s = String.format("=== Strong Classifier. Size: %d. Threshold: %.2f.\n", weakClassifiers.size(), threshold);
+        String s = String.format("=== Strong Classifier. Size: %d. Threshold: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
         for (Classifier c : weakClassifiers) {
             s += "====== " + c + "\n";
         }

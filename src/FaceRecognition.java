@@ -116,21 +116,26 @@ public class FaceRecognition {
 
                 ArrayList<LabeledIntegralImage> allSamples = initAdaBoost(positiveSamples, negativeSamples);
                 StrongClassifier strongClassifier = new StrongClassifier();
+                cascadedClassifier.add(strongClassifier);
 
-                while(curFalsePositiveRate>maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
+                prevDetectionRate = curDetectionRate;
+                prevFalsePositiveRate = curFalsePositiveRate;
+
+                while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
                     System.out.printf("Current false positive rate is %.3f\n", curFalsePositiveRate);
+                    System.out.printf("Current detection rate rate is %.3f\n", curDetectionRate);
                     System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
                     strongClassifier.addClassifier(trainOneWeak(allSamples));
-                    cascadedClassifier.add(strongClassifier);
+                    strongClassifier.setThresholdMultiplier(1);
+
                     while(true) {
                         //System.out.println("=== Evaluating threshold " + strongClassifier.getThresholdMultiplier() + " ===");
                         PerformanceStats stats = evalCascade(cascadedClassifier, testData);
                         curFalsePositiveRate = stats.falsePositive;
                         curDetectionRate = stats.truePositive;
-                        if(curDetectionRate>=minDetectionRatePerLayer*prevDetectionRate) break;
+                        if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) break;
 
-                        // TODO Will crash if multiplier gets < 0. Fix so this does not happen.
                         strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
                         //System.out.println(stats.toString() + "\n ======");
                     }
@@ -140,8 +145,7 @@ public class FaceRecognition {
                     negativeSamples = filterData(cascadedClassifier, negativeSamples);
                 }
 
-                prevDetectionRate = curDetectionRate;
-                prevFalsePositiveRate = curFalsePositiveRate;
+
                 //degenerateDecisionTree.addAll(train(data, 1));
                 //data = filterData(degenerateDecisionTree, data);
             }
@@ -295,14 +299,14 @@ public class FaceRecognition {
 
     /**
      * Removes the data that does not pass the strong classifier.
-     * @param strongClassifier
+     * @param cascadedClassifier
      * @param data
      * @return an array of images that the strong classifier thinks could be faces
      */
-    public static ArrayList<LabeledIntegralImage> filterData(ArrayList<StrongClassifier> strongClassifier, ArrayList<LabeledIntegralImage> data) throws Exception {
+    public static ArrayList<LabeledIntegralImage> filterData(ArrayList<StrongClassifier> cascadedClassifier, ArrayList<LabeledIntegralImage> data) throws Exception {
         ArrayList<LabeledIntegralImage> maybeFaces = new ArrayList<>(data.size()/2);
         for (LabeledIntegralImage d : data) {
-            if (isFace(strongClassifier, d.img)) {
+            if (isFace(cascadedClassifier, d.img)) {
                 maybeFaces.add(d);
             }
         }

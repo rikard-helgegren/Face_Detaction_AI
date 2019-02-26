@@ -27,10 +27,12 @@ public class FaceRecognition {
     }
 
     private static class PerformanceStats {
+        public double truePositive;
         public double falsePositive;
         public double falseNegative;
 
-        public PerformanceStats(double falsePositive, double falseNegative){
+        public PerformanceStats(double truePositive, double falsePositive, double falseNegative){
+            this.truePositive = truePositive;
             this.falsePositive = falsePositive;
             this.falseNegative = falseNegative;
         }
@@ -270,7 +272,8 @@ public class FaceRecognition {
         }
         double falseNegative = (double)nrWrongIsFace/(nrCorrectIsFace+ nrWrongIsFace);
         double falsePositive = (double)nrWrongIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace);
-        return new PerformanceStats(falsePositive, falseNegative);
+        double truePositive = (double)nrCorrectIsFace/(nrCorrectIsFace+nrWrongIsFace);
+        return new PerformanceStats(truePositive, falsePositive, falseNegative);
     }
 
     public static boolean isFace(ArrayList<Classifier> degenerateDecisionTree, HalIntegralImage i) throws Exception{

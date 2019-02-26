@@ -95,7 +95,7 @@ public class FaceRecognition {
 
 
             double maxFalsePositiveRatePerLayer = 0.7;
-            double minDetectionRatePerLayer = 0.95;
+            double minDetectionRatePerLayer = 0.85;
             double prevFalsePositiveRate = 1;
             double curFalsePositiveRate = 1;
             double prevDetectionRate = 1;
@@ -122,8 +122,9 @@ public class FaceRecognition {
                 prevFalsePositiveRate = curFalsePositiveRate;
 
                 while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
-                    System.out.printf("Current false positive rate is %.3f\n", curFalsePositiveRate);
-                    System.out.printf("Current detection rate rate is %.3f\n", curDetectionRate);
+                    System.out.printf("Current false positive rate is %.2f\n", curFalsePositiveRate);
+                    System.out.printf("Current detection rate rate is %.2f\n", curDetectionRate);
+                    System.out.println(strongClassifier);
                     System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
                     strongClassifier.addClassifier(trainOneWeak(allSamples));
@@ -137,6 +138,7 @@ public class FaceRecognition {
                         if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) break;
 
                         strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
+                        if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, threshold was 0.");
                         //System.out.println(stats.toString() + "\n ======");
                     }
                 }
@@ -334,9 +336,9 @@ public class FaceRecognition {
                 }
             }
         }
-        double falseNegative = (double)nrWrongIsFace/(nrCorrectIsFace+ nrWrongIsFace);
-        double falsePositive = (double)nrWrongIsNotFace/(nrCorrectIsNotFace+nrWrongIsNotFace);
-        double truePositive = (double)nrCorrectIsFace/(nrCorrectIsFace+nrWrongIsFace);
+        double falseNegative = ((double)nrWrongIsFace)/(nrCorrectIsFace+ nrWrongIsFace);
+        double falsePositive = ((double)nrWrongIsNotFace)/(nrCorrectIsNotFace+nrWrongIsNotFace);
+        double truePositive = ((double)nrCorrectIsFace)/(nrCorrectIsFace+nrWrongIsFace);
         return new PerformanceStats(truePositive, falsePositive, falseNegative);
     }
 

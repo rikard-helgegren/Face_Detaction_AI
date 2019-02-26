@@ -100,6 +100,7 @@ public class FaceRecognition {
             double prevFalsePositiveRate = 1;
             double curFalsePositiveRate = 1;
             double prevDetectionRate = 1;
+            double curDetectionRate = 1;
 
             ArrayList<LabeledIntegralImage> negativeSamples = new ArrayList<>();
             ArrayList<LabeledIntegralImage> positiveSamples = new ArrayList<>();
@@ -112,7 +113,6 @@ public class FaceRecognition {
             while(curFalsePositiveRate>overallFalsePositiveRate) {
                 System.out.println("Training");
 
-                curFalsePositiveRate = prevFalsePositiveRate;
                 int featuresPerClassfier = 0;
 
                 while(curFalsePositiveRate>maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
@@ -127,7 +127,9 @@ public class FaceRecognition {
                     while(true) {
                         System.out.println("=== Evaluating threshold " + strongClassifier.getThresholdMultiplier() + " ===");
                         PerformanceStats stats = evalCascade(cascadedClassifier, trainingData);
-                        if(stats.truePositive>=minDetectionRatePerLayer*prevDetectionRate) break;
+                        curFalsePositiveRate = stats.falsePositive;
+                        curDetectionRate = stats.truePositive;
+                        if(curDetectionRate>=minDetectionRatePerLayer*prevDetectionRate) break;
 
                         // TODO Will crash if multiplier gets < 0. Fix so this does not happen.
                         strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
@@ -138,7 +140,8 @@ public class FaceRecognition {
                     }
                 }
 
-
+                prevDetectionRate = curDetectionRate;
+                prevFalsePositiveRate = curFalsePositiveRate;
                 //degenerateDecisionTree.addAll(train(data, 1));
                 //data = filterData(degenerateDecisionTree, data);
             }

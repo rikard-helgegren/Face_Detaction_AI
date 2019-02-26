@@ -1,19 +1,33 @@
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class StrongClassifier implements Serializable{
-    ArrayList<Classifier> weakClassifiers;
-    private double threshold;
+    private ArrayList<Classifier> weakClassifiers;
+    //private double threshold;
     private double thresholdMultiplier = 1;
+
+    public StrongClassifier() {
+        weakClassifiers = new ArrayList<>();
+    }
 
     public StrongClassifier(ArrayList<Classifier> weakClassifiers) throws Exception {
         this.weakClassifiers = weakClassifiers;
+        //calcThreshold();
+    }
 
-        threshold = 0;
+    private double getThreshold() {
+        double threshold = 0;
         for(Classifier c:weakClassifiers){
             threshold+=c.getAlpha();
+            //FaceRecognition.writer.printf("Alpha: %.3f\n", c.getAlpha());
         }
+        return threshold;
+    }
 
+    public void addClassifier(Classifier c) {
+        weakClassifiers.add(c);
+        //calcThreshold();
     }
 
     public void setThresholdMultiplier(double thresholdMultiplier) throws Exception {
@@ -26,14 +40,20 @@ public class StrongClassifier implements Serializable{
     }
 
     public boolean canBeFace(HalIntegralImage img) throws Exception {
+        if (weakClassifiers.size() < 1) throw new Exception("This strong classifier has no weak classifiers.");
         //How it looks like you should do according to the paper:
 
         double value = 0;
         for(Classifier c:weakClassifiers){
             value+=c.getAlpha()*c.canBeFace(img);
         }
+        //FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
 
-        return value>=threshold*thresholdMultiplier;
+        return value>=getThreshold()*thresholdMultiplier;
+    }
+
+    public int getSize() {
+        return weakClassifiers.size();
     }
 
     @Override
@@ -51,5 +71,14 @@ public class StrongClassifier implements Serializable{
             }
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        String s = String.format("=== Strong Classifier. Size: %d. Threshold: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
+        for (Classifier c : weakClassifiers) {
+            s += "====== " + c + "\n";
+        }
+        return s;
     }
 }

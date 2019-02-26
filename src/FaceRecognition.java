@@ -270,32 +270,13 @@ public class FaceRecognition {
         return new PerformanceStats(truePositive, falsePositive, falseNegative);
     }
 
-    public static boolean isFace(ArrayList<Classifier> degenerateDecisionTree, HalIntegralImage i) throws Exception{
-
-        //How it looks like you should do according to the paper:
-
-        double threshold = 0;
-        for(Classifier c:degenerateDecisionTree){
-            threshold+=c.getAlpha();
-        }
-        threshold = threshold * 0.2;
-
-        double value = 0;
-        for(Classifier c:degenerateDecisionTree){
-            value+=c.getAlpha()*c.canBeFace(i);
-        }
-
-        return value>=threshold;
-
-
+    public static boolean isFace(ArrayList<StrongClassifier> strongClassifiers, HalIntegralImage i) throws Exception{
         //How it looks like you should do according to computerphile
-        /*
-        for(Classifier c:degenerateDecisionTree){
+        for(StrongClassifier c:strongClassifiers){
             if(c.canBeFace(i)!=1) return false;
         }
 
         return true;
-        */
     }
 
     /**

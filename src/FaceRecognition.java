@@ -65,6 +65,7 @@ public class FaceRecognition {
             System.exit(1);
         }
         System.out.println("2");
+
         // Calculate initial weights. TODO Verify that this is correct. I'm not sure.
         double weightFace = 1.0 / (2 * trainFaces.length);
         double weightNoFace = 1.0 / (2 * trainNoFaces.length);
@@ -120,16 +121,16 @@ public class FaceRecognition {
                 while(curFalsePositiveRate>maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
                     System.out.println("Current false positive rate is " + curFalsePositiveRate);
                     System.out.printf("Retraining strong classifier with %d weak.\n", featuresPerClassfier + 1);
-                    allSamples = new ArrayList<>();
-                    allSamples.addAll(negativeSamples);
-                    allSamples.addAll(positiveSamples);
+                    //allSamples = new ArrayList<>();
+                    //allSamples.addAll(negativeSamples);
+                    //allSamples.addAll(positiveSamples);
 
                     featuresPerClassfier++;
-                    StrongClassifier strongClassifier = train(data, featuresPerClassfier);
+                    StrongClassifier strongClassifier = train(positiveSamples, negativeSamples, featuresPerClassfier);
                     cascadedClassifier.add(strongClassifier);
                     while(true) {
                         //System.out.println("=== Evaluating threshold " + strongClassifier.getThresholdMultiplier() + " ===");
-                        PerformanceStats stats = evalCascade(cascadedClassifier, trainingData);
+                        PerformanceStats stats = evalCascade(cascadedClassifier, testData);
                         curFalsePositiveRate = stats.falsePositive;
                         curDetectionRate = stats.truePositive;
                         if(curDetectionRate>=minDetectionRatePerLayer*prevDetectionRate) break;
@@ -163,12 +164,28 @@ public class FaceRecognition {
      * Trains a network using the AdaBoost algorithm as described in
      * http://www.vision.caltech.edu/html-files/EE148-2005-Spring/pprs/viola04ijcv.pdf
      *
-     * @param trainingData the labeled training data
+     * @param positiveSamples the labeled training data that are faces
+     * @param negativeSamples the labeled training data that are not faces
      * @param size the depth of the returned decision tree
      * @return a degenerate decision tree representing the strong classifier.
      * @throws Exception if something goes wrong
      */
-    public static StrongClassifier train(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {
+    public static StrongClassifier train(ArrayList<LabeledIntegralImage> positiveSamples, ArrayList<LabeledIntegralImage> negativeSamples, int size) throws Exception {
+        // Calculate initial weights.
+        double weightFace = 1.0 / (2 * positiveSamples.size());
+        double weightNoFace = 1.0 / (2 * negativeSamples.size());
+
+        for (LabeledIntegralImage s : positiveSamples) {
+            s.setWeight(weightFace);
+        }
+        for (LabeledIntegralImage s : negativeSamples) {
+            s.setWeight(weightNoFace);
+        }
+
+        ArrayList<LabeledIntegralImage> allSamples = new ArrayList<>();
+        allSamples.addAll(negativeSamples);
+        allSamples.addAll(positiveSamples);
+
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         //Collections.shuffle(allFeatures);
@@ -183,10 +200,10 @@ public class FaceRecognition {
             System.out.println("t = "+t);
             // 1. Normalize weights
             double weightSum = 0;
-            for (LabeledIntegralImage img : trainingData) {
+            for (LabeledIntegralImage img : allSamples) {
                 weightSum += img.getWeight();
             }
-            for (LabeledIntegralImage img : trainingData) {
+            for (LabeledIntegralImage img : allSamples) {
                 img.setWeight(img.getWeight() / weightSum);
             }
 
@@ -194,7 +211,7 @@ public class FaceRecognition {
             ArrayList<Classifier> classifiers = new ArrayList<>(allFeatures.size());
             for (int i = 0; i < allFeatures.size(); i++) {
                 Feature j = allFeatures.get(i);
-                ThresholdParity p = calcBestThresholdAndParity(trainingData, j);
+                ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
                 int threshold = p.threshold;
                 int parity = p.parity;
 
@@ -202,7 +219,7 @@ public class FaceRecognition {
                 // Actual step 2
                 double error = 0;
                 Classifier h = new Classifier(j, threshold, parity);
-                for (LabeledIntegralImage img : trainingData) {
+                for (LabeledIntegralImage img : allSamples) {
                     error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
                 }
                 h.setError(error);
@@ -224,7 +241,7 @@ public class FaceRecognition {
             //System.out.println(bestClassifier.getBeta());
             //System.out.println(Math.log(1/bestClassifier.getBeta()));
             //System.out.println(bestClassifier.getAlpha());
-            for (LabeledIntegralImage img : trainingData) {
+            for (LabeledIntegralImage img : allSamples) {
                 // If classifier is right, multiply by beta
                 if (bestClassifier.canBeFace(img.img) == img.isFace) {
                     img.setWeight(img.getWeight() * bestClassifier.getBeta());

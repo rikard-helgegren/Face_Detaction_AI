@@ -118,7 +118,7 @@ public class FaceRecognition {
                 StrongClassifier strongClassifier = new StrongClassifier();
 
                 while(curFalsePositiveRate>maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
-                    System.out.println("Current false positive rate is " + curFalsePositiveRate);
+                    System.out.printf("Current false positive rate is %.3f\n", curFalsePositiveRate);
                     System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
                     strongClassifier.addClassifier(trainOneWeak(allSamples));

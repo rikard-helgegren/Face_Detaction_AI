@@ -52,4 +52,13 @@ public class StrongClassifier implements Serializable{
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        String s = "=== Strong Classifier. Size: " + weakClassifiers.size() + "\n";
+        for (Classifier c : weakClassifiers) {
+            s += "====== " + c + "\n";
+        }
+        return s;
+    }
 }

@@ -247,7 +247,7 @@ public class FaceRecognition {
         Classifier bestClassifier = classifiers.get(0);
         for (Classifier c : classifiers) {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
-            System.out.printf("%s. Err: %f\n", c, c.getError());
+            System.out.printf("%s. Err: %f\n", c, c.getError()); // TODO First run, all classifiers have exactly 0.5 error.
         }
 
         // 4. Update weights

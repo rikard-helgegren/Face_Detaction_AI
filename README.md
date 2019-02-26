@@ -52,7 +52,6 @@ At the top of `FaceRecognition.java` is a boolean variable `loadFromFile` that a
 * Make single classifier training faster. Right now it calculates about 10 features a second, out of 39150. Some leads:
    * Optimize feature calculation. Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).
    * `calcBestThreshold()` is the place where adaboost supposedly spends most time. See comment in that function for discussion.
-* Make sure that all features are actually generated in `Feature.generateAllFeatures()`. This might already be as it should be, but we have some fewer features than expected.
 * Test and improve AdaBoost and cascade classifier.
 
 

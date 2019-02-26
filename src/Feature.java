@@ -67,8 +67,6 @@ public class Feature implements Serializable {
                 }
             }
         }
-        // TODO Only generates 39 150 features, should be about 160 000 or 180 000.
-        //  Maybe. We are using 19x19, not 25x25 images. If run for 25x25, this generates 125 616 features.
         return allFeatures;
     }
 

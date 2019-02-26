@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class FaceRecognition {
     private static final boolean loadFromFile = false; // Set this boolean to load or train.
-    private static final double overallFalsePositiveRate = 0.1;
+    private static final double overallFalsePositiveRate = 0.3;
 
     private static class ThresholdParity{
         public int threshold;
@@ -94,7 +94,7 @@ public class FaceRecognition {
             ArrayList<LabeledIntegralImage> data = trainingData;
 
 
-            double maxFalsePositiveRatePerLayer = 0.8;
+            double maxFalsePositiveRatePerLayer = 0.7;
             double minDetectionRatePerLayer = 0.95;
             double prevFalsePositiveRate = 1;
             double curFalsePositiveRate = 1;
@@ -110,7 +110,7 @@ public class FaceRecognition {
 
 
             while(curFalsePositiveRate>overallFalsePositiveRate) {
-                System.out.println("Cascaded classifier :");
+                System.out.printf("Cascaded classifier. %.3f detectionRate, %.3f false positive", evalCascade(cascadedClassifier, testData));
                 for(StrongClassifier c:cascadedClassifier){
                     System.out.println(c);
                 }
@@ -119,6 +119,7 @@ public class FaceRecognition {
 
                 while(curFalsePositiveRate>maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
                     System.out.println("Current false positive rate is " + curFalsePositiveRate);
+                    System.out.printf("Retraining strong classifier with %d weak.\n", featuresPerClassfier + 1);
                     allSamples = new ArrayList<>();
                     allSamples.addAll(negativeSamples);
                     allSamples.addAll(positiveSamples);
@@ -127,7 +128,7 @@ public class FaceRecognition {
                     StrongClassifier strongClassifier = train(data, featuresPerClassfier);
                     cascadedClassifier.add(strongClassifier);
                     while(true) {
-                        System.out.println("=== Evaluating threshold " + strongClassifier.getThresholdMultiplier() + " ===");
+                        //System.out.println("=== Evaluating threshold " + strongClassifier.getThresholdMultiplier() + " ===");
                         PerformanceStats stats = evalCascade(cascadedClassifier, trainingData);
                         curFalsePositiveRate = stats.falsePositive;
                         curDetectionRate = stats.truePositive;
@@ -135,7 +136,7 @@ public class FaceRecognition {
 
                         // TODO Will crash if multiplier gets < 0. Fix so this does not happen.
                         strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
-                        System.out.println(stats.toString() + "\n ======");
+                        //System.out.println(stats.toString() + "\n ======");
                     }
                     if(curFalsePositiveRate > overallFalsePositiveRate){
                         negativeSamples = filterData(cascadedClassifier, negativeSamples);
@@ -216,13 +217,13 @@ public class FaceRecognition {
 
             // 4. Update weights
             bestClassifier.setBeta(bestClassifier.getError() / (1 - bestClassifier.getError()));
-            System.out.println("Beta is " + bestClassifier.getBeta());
-            System.out.println("Setting alpha to " + Math.log(1/bestClassifier.getBeta()));
+            //System.out.println("Beta is " + bestClassifier.getBeta());
+            //System.out.println("Setting alpha to " + Math.log(1/bestClassifier.getBeta()));
             bestClassifier.setAlpha(Math.log(1/bestClassifier.getBeta()));
-            System.out.println("Testing Alpha:");
-            System.out.println(bestClassifier.getBeta());
-            System.out.println(Math.log(1/bestClassifier.getBeta()));
-            System.out.println(bestClassifier.getAlpha());
+            //System.out.println("Testing Alpha:");
+            //System.out.println(bestClassifier.getBeta());
+            //System.out.println(Math.log(1/bestClassifier.getBeta()));
+            //System.out.println(bestClassifier.getAlpha());
             for (LabeledIntegralImage img : trainingData) {
                 // If classifier is right, multiply by beta
                 if (bestClassifier.canBeFace(img.img) == img.isFace) {
@@ -230,8 +231,8 @@ public class FaceRecognition {
                 }
             }
             degenerateDecisionTree.add(bestClassifier);
-            System.out.println("Best classifiers feature: ");
-            System.out.println(bestClassifier);
+            //System.out.println("Best classifiers feature: ");
+            //System.out.println(bestClassifier);
         }
         return new StrongClassifier(degenerateDecisionTree);
     }

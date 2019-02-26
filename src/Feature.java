@@ -78,7 +78,7 @@ public class Feature implements Serializable {
      * Note that y+h may not be larger than the height of the image.
      *
      * |‾‾‾‾‾‾‾‾|
-     * |        |
+     * |    |    |
      * |        |
      * |________|
      *

@@ -50,21 +50,21 @@ public class FaceRecognition {
         HalIntegralImage[] testFaces = {};
         HalIntegralImage[] testNoFaces = {};
         try {
-            System.out.println("1.25");
+            System.out.println("2");
             // Read images for training set
             trainFaces = readImagesFromDataBase("./res/source/data/train/face"); // Read face images
             trainNoFaces = readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
-            System.out.println("1.5");
+            System.out.println("3");
             // Read images for test set
             testFaces = readImagesFromDataBase("./res/source/data/test/face");
             testNoFaces = readImagesFromDataBase("./res/source/data/test/non-face");
-            System.out.println("1.75");
+            System.out.println("4");
             //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
         } catch (Exception e) {
             System.err.println("Data folder not found. Have you extracted data.zip correctly?");
             System.exit(1);
         }
-        System.out.println("2");
+        System.out.println("5");
         // Calculate initial weights. TODO Verify that this is correct. I'm not sure.
         double weightFace = 1.0 / (2 * trainFaces.length);
         double weightNoFace = 1.0 / (2 * trainNoFaces.length);
@@ -73,14 +73,14 @@ public class FaceRecognition {
         ArrayList<LabeledIntegralImage> trainingData = new ArrayList<>(5000);
         for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, 1, weightFace));
         for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, 0, weightNoFace));
-        System.out.println("3");
+        System.out.println("6");
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         ArrayList<LabeledIntegralImage> testData = new ArrayList<>(20000);
         for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, 1, 0));
         for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, 0, 0));
         Collections.shuffle(testData);
-        System.out.println("4");
+        System.out.println("7");
 
         ArrayList<StrongClassifier> cascadedClassifier = new ArrayList<>();
 

@@ -35,6 +35,11 @@ public class FaceRecognition {
             this.falsePositive = falsePositive;
             this.falseNegative = falseNegative;
         }
+
+        @Override
+        public String toString(){
+            return String.format("%.2f detection rate, %.2f falsePositive", truePositive, falsePositive);
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -111,6 +116,7 @@ public class FaceRecognition {
                 int featuresPerClassfier = 0;
 
                 while(curFalsePositiveRate>maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
+                    System.out.println("Current false positive rate is " + curFalsePositiveRate);
                     allSamples = new ArrayList<>();
                     allSamples.addAll(negativeSamples);
                     allSamples.addAll(positiveSamples);
@@ -119,8 +125,13 @@ public class FaceRecognition {
                     StrongClassifier strongClassifier = train(data, featuresPerClassfier);
                     cascadedClassifier.add(strongClassifier);
                     while(true) {
+                        System.out.println("=== Evaluating threshold " + strongClassifier.getThresholdMultiplier() + " ===");
                         PerformanceStats stats = evalCascade(cascadedClassifier, trainingData);
                         if(stats.truePositive>=minDetectionRatePerLayer*prevDetectionRate) break;
+
+                        // TODO Will crash if multiplier gets < 0. Fix so this does not happen.
+                        strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
+                        System.out.println(stats.toString() + "\n ======");
                     }
                     if(curFalsePositiveRate > overallFalsePositiveRate){
                         negativeSamples = filterData(cascadedClassifier, negativeSamples);

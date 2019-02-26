@@ -11,7 +11,6 @@ import java.util.*;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final int degenerateDecisionTreeSize = 10;
     private static final boolean loadFromFile = false; // Set this boolean to load or train.
     private static final double overallFalsePositiveRate = 0.1;
 
@@ -111,7 +110,10 @@ public class FaceRecognition {
 
 
             while(curFalsePositiveRate>overallFalsePositiveRate) {
-                System.out.println("Training");
+                System.out.println("Cascaded classifier :");
+                for(StrongClassifier c:cascadedClassifier){
+                    System.out.println(c);
+                }
 
                 int featuresPerClassfier = 0;
 
@@ -204,7 +206,7 @@ public class FaceRecognition {
                 }
                 h.setError(error);
                 classifiers.add(h);
-                if (i % 100 == 0) System.out.printf("Feature %d/%d, t=%d\n", i, allFeatures.size(),t);
+                if (i % 2000 == 0) System.out.printf("Feature %d/%d, t=%d\n", i, allFeatures.size(),t);
             }
             // 3. Choose the classifier with the lowest error
             Classifier bestClassifier = classifiers.get(0);

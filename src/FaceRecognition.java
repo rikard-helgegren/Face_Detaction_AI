@@ -111,7 +111,7 @@ public class FaceRecognition {
 
 
             while(curFalsePositiveRate>overallFalsePositiveRate) {
-                System.out.printf("Cascaded classifier. %.3f detectionRate, %.3f false positive", evalCascade(cascadedClassifier, testData));
+                System.out.printf("Cascaded classifier. Performance: %s", evalCascade(cascadedClassifier, testData));
                 for(StrongClassifier c:cascadedClassifier){
                     System.out.println(c);
                 }

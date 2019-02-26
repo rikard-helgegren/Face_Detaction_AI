@@ -118,25 +118,29 @@ public class Tests {
 
     // Tests saving and loading of classifiers.
     @Test
-    public void testClassifierSaveLoad() {
+    public void testClassifierSaveLoad() throws Exception {
 
-        Classifier a = null;
-        Classifier b = null;
+        Classifier a1 = null;
+        Classifier b1 = null;
+
         try {
-            a = new Classifier(new Feature(Feature.Type.HORIZONTAL, 1, 2, 4, 4), 10, 10);
-            b = new Classifier(new Feature(Feature.Type.VERTICAL, 2, 8, 6, 4), 5, 5);
+            a1 = new Classifier(new Feature(Feature.Type.HORIZONTAL, 1, 2, 4, 4), 10, 10);
+            b1 = new Classifier(new Feature(Feature.Type.VERTICAL, 2, 8, 6, 4), 5, 5);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        StrongClassifier a = new StrongClassifier(new ArrayList<Classifier>(Arrays.asList(a1)));
+        StrongClassifier b = new StrongClassifier(new ArrayList<Classifier>(Arrays.asList(b1)));
 
-        ArrayList<Classifier> classifiers = new ArrayList<>(2);
+
+        ArrayList<StrongClassifier> classifiers = new ArrayList<>(2);
         classifiers.add(a);
         classifiers.add(b);
 
         FaceRecognition.save(classifiers, "test.classifiers");
 
-        ArrayList<Classifier> loaded = new ArrayList<>();
+        ArrayList<StrongClassifier> loaded = new ArrayList<>();
         try {
             loaded = FaceRecognition.load("test.classifiers");
         } catch (IOException e) {

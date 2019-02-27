@@ -49,7 +49,7 @@ public class StrongClassifier implements Serializable{
         }
         //FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
 
-        return value>=getThreshold()*thresholdMultiplier;
+        return value >= getThreshold()*thresholdMultiplier;
     }
 
     public int getSize() {

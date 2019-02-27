@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 
+// Target: 70% true positive, 105 false positive
 /**
  * This file should be run with the project root as working directory.
  * Make sure images exist before running.
@@ -168,7 +169,12 @@ public class FaceRecognition {
                     System.out.println(strongClassifier);
                     System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
-                    strongClassifier.addClassifier(trainOneWeak(allSamples));
+                    if (strongClassifier.getSize() == 0) {
+                        strongClassifier.addClassifier(trainOneWeak(allSamples));
+                        strongClassifier.addClassifier(trainOneWeak(allSamples));
+                    } else {
+                        strongClassifier.addClassifier(trainOneWeak(allSamples));
+                    }
                     strongClassifier.setThresholdMultiplier(1);
 
                     while(true) {
@@ -462,6 +468,8 @@ public class FaceRecognition {
      * @throws Exception if calculateFeatureValue throws an exception
      */
     public static ThresholdParity calcBestThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
+
+        // ------------------------------ TODO don't calculate many times
         // Sort training data based on features
         trainingData.sort((a, b) -> {
             try {
@@ -480,6 +488,7 @@ public class FaceRecognition {
             featureValues.add(j.calculateFeatureValue(img.img));
         }
         //System.out.println("Testing feature: "+j);
+        // ----------------------------------
 
         int bestThreshold = 0;
         int bestThresholdParity = 0;
@@ -497,6 +506,7 @@ public class FaceRecognition {
             double sPlus = 0;
             double sMinus = 0;
             //System.out.println("Looping through all trainingdata");
+            // TODO Check calculations here by hand
             for (int k=0; k<trainingData.size(); k++) {
                 LabeledIntegralImage img = trainingData.get(k);
                 if (img.isFace == 1) {

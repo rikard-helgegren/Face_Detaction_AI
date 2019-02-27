@@ -54,5 +54,9 @@ At the top of `FaceRecognition.java` is a boolean variable `loadFromFile` that a
    * `calcBestThreshold()` is the place where adaboost supposedly spends most time. See comment in that function for discussion.
 * Make sure that all features are actually generated in `Feature.generateAllFeatures()`. This might already be as it should be, but we have some fewer features than expected.
 * Test and improve AdaBoost and cascade classifier.
+* Report performance for 36 feature strong classifier.
+* Hand check S+T+ part of adaboost.
+* Move calculating featurevalues so that it is done once.
+* Use 10 jumps instead.
 
 

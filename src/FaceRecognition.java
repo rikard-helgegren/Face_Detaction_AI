@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class FaceRecognition {
     private static final boolean trainCascade = false; // Should a cascade be trained? If not, a strong will be trained.
-    private static final boolean loadFromFile = true; // Set this boolean to loadCascade or train.
+    private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
     private static final double overallFalsePositiveRate = 0.3;
     public static final double DELTA = 0.00001;
     public static PrintWriter writer;
@@ -122,7 +122,11 @@ public class FaceRecognition {
                 // Load strong classifier from file
                 strongClassifier = loadStrong("save.strong");
             } else {
-                strongClassifier = trainStrongClassifier(allSamples, 36);
+                strongClassifier = trainStrongClassifier(allSamples, 1);
+                for (int i = 0; i < 36; i++) {
+                    testStrong(strongClassifier, testData);
+                    strongClassifier = trainStrongClassifier(allSamples, strongClassifier, 1);
+                }
                 // Save cascaded classifier
                 saveStrong(strongClassifier, "save.strong");
             }
@@ -135,10 +139,15 @@ public class FaceRecognition {
     }
 
     public static StrongClassifier trainStrongClassifier(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {
-        System.out.println("Training strong classifier of size " + size);
         StrongClassifier strongClassifier = new StrongClassifier();
-        for (int i = 0; i < size; i++) {
-            System.out.printf("Training weak classifier %d/%d.\n", i+1, size);
+        strongClassifier.setThresholdMultiplier(0.5);
+        return trainStrongClassifier(trainingData, strongClassifier, size);
+    }
+
+    public static StrongClassifier trainStrongClassifier(
+            ArrayList<LabeledIntegralImage> trainingData, StrongClassifier strongClassifier, int extraSize) throws Exception {
+        for (int i = 0; i < extraSize; i++) {
+            System.out.printf("Training weak classifier %d/%d.\n", strongClassifier.getSize() + i + 1, strongClassifier.getSize() + extraSize);
             strongClassifier.addClassifier(trainOneWeak(trainingData));
         }
         return strongClassifier;
@@ -322,7 +331,7 @@ public class FaceRecognition {
         System.out.println("Testing Strong Classifier");
         System.out.println(strongClassifier);
 
-        strongClassifier = new StrongClassifier(strongClassifier, 1);
+        //strongClassifier = new StrongClassifier(strongClassifier, 1);
         PerformanceStats stats = null;
         try {
             stats = evalStrong(strongClassifier, testData);

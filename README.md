@@ -53,5 +53,9 @@ At the top of `FaceRecognition.java` is a boolean variable `loadFromFile` that a
    * Optimize feature calculation. Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).
    * `calcBestThreshold()` is the place where adaboost supposedly spends most time. See comment in that function for discussion.
 * Test and improve AdaBoost and cascade classifier.
+* Report performance for 36 feature strong classifier.
+* Hand check S+T+ part of adaboost.
+* Move calculating featurevalues so that it is done once.
+* Use 10 jumps instead.
 
 

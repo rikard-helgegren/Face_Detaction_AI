@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 
+// Target: 70% true positive, 105 false positive
 /**
  * This file should be run with the project root as working directory.
  * Make sure images exist before running.
@@ -168,7 +169,12 @@ public class FaceRecognition {
                     System.out.println(strongClassifier);
                     System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
-                    strongClassifier.addClassifier(trainOneWeak(allSamples));
+                    if (strongClassifier.getSize() == 0) {
+                        strongClassifier.addClassifier(trainOneWeak(allSamples));
+                        strongClassifier.addClassifier(trainOneWeak(allSamples));
+                    } else {
+                        strongClassifier.addClassifier(trainOneWeak(allSamples));
+                    }
                     strongClassifier.setThresholdMultiplier(1);
 
                     while(true) {
@@ -193,10 +199,6 @@ public class FaceRecognition {
                 if(curFalsePositiveRate > overallFalsePositiveRate){
                     negativeSamples = filterData(cascadedClassifier, negativeSamples);
                 }
-
-
-                //degenerateDecisionTree.addAll(train(data, 1));
-                //data = filterData(degenerateDecisionTree, data);
             }
 
 
@@ -437,6 +439,33 @@ public class FaceRecognition {
         return images;
     }
 
+    public static ThresholdParity calcAvgThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
+        trainingData.sort((a, b) -> {
+            try {
+                // The order here matters.
+                return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+            } catch (Exception e) {
+                System.err.println("Features could not be sorted due to an error.");
+                e.printStackTrace();
+            }
+            return 0;
+        });
+        //TODO Sort this directly?
+        //Go through the sorted training data and store the values from the feature j in featureValues.
+        ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
+        int featureValueSum = 0;
+        for (LabeledIntegralImage img : trainingData) {
+            int fv = j.calculateFeatureValue(img.img);
+            featureValues.add(fv);
+            featureValueSum += fv;
+        }
+
+        double threshold = Math.round((double) featureValueSum / trainingData.size());
+        int parity = (threshold > 0) ? -1 : 1; // If threshold > 0, parity = -1.
+        return new ThresholdParity((int) threshold, parity);
+
+    }
+
     /**
      * Calculates the best threshold for a single weak classifier.
      * @param trainingData the training data used in adaboost.
@@ -445,10 +474,12 @@ public class FaceRecognition {
      * @throws Exception if calculateFeatureValue throws an exception
      */
     public static ThresholdParity calcBestThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
+
+        // ------------------------------ TODO don't calculate many times
         // Sort training data based on features
         trainingData.sort((a, b) -> {
             try {
-                // No attention given to order here. Might have to do that if things doesn't work.
+                // The order here matters.
                 return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
             } catch (Exception e) {
                 System.err.println("Features could not be sorted due to an error.");
@@ -466,6 +497,7 @@ public class FaceRecognition {
         //System.out.println("Sorted list from feture: "+j+": First value"+featureValues.get(0)+", Last: "+featureValues.get(featureValues.size()-1));
 
         //System.out.println("Testing feature: "+j);
+        // ----------------------------------
 
         int bestThreshold = 0;
         int bestThresholdParity = 0;
@@ -483,6 +515,7 @@ public class FaceRecognition {
             double sPlus = 0;
             double sMinus = 0;
             //System.out.println("Looping through all trainingdata");
+            // TODO Check calculations here by hand
             for (int k=0; k<trainingData.size(); k++) {
                 LabeledIntegralImage img = trainingData.get(k);
                 if (img.isFace == 1) {

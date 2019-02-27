@@ -48,7 +48,7 @@ public class StrongClassifier implements Serializable{
             value+=c.getAlpha()*c.canBeFace(img);
         }
 
-        FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
+        //FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
         return value>=getThreshold()*thresholdMultiplier;
     }
 

@@ -127,7 +127,6 @@ public class FaceRecognition {
                 saveStrong(strongClassifier, "save.strong");
             }
             testStrong(strongClassifier, testData);
-
         }
 
 
@@ -609,51 +608,44 @@ public class FaceRecognition {
         return new ThresholdParity(bestThreshold, bestThresholdParity);
     }
 
-
-    public static void saveCascade(ArrayList<StrongClassifier> classifiers, String fileName){
+    public static void save(Serializable s, String fileName) {
         try {
             FileOutputStream fileOut = new FileOutputStream(fileName);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(classifiers);
+            out.writeObject(s);
             out.close();
             fileOut.close();
         } catch (IOException e) {
             System.err.println("Save file could not be opened.");
             e.printStackTrace();
         }
+    }
+
+    public static Serializable load(String fileName) throws IOException, ClassNotFoundException {
+        Serializable s;
+        FileInputStream fileIn = new FileInputStream(fileName);
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+        s = (Serializable) in.readObject();
+        in.close();
+        fileIn.close();
+        return s;
+    }
+
+
+    public static void saveCascade(ArrayList<StrongClassifier> classifiers, String fileName){
+        save(classifiers, fileName);
     }
 
     public static ArrayList<StrongClassifier> loadCascade(String fileName) throws IOException, ClassNotFoundException {
-        ArrayList<StrongClassifier> classifiers;
-        FileInputStream fileIn = new FileInputStream(fileName);
-        ObjectInputStream in = new ObjectInputStream(fileIn);
-        classifiers = (ArrayList<StrongClassifier>) in.readObject();
-        in.close();
-        fileIn.close();
-        return classifiers;
+        return (ArrayList<StrongClassifier>) load(fileName);
     }
 
-    public static void saveStrong(StrongClassifier classifiers, String fileName){
-        try {
-            FileOutputStream fileOut = new FileOutputStream(fileName);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(classifiers);
-            out.close();
-            fileOut.close();
-        } catch (IOException e) {
-            System.err.println("Save file could not be opened.");
-            e.printStackTrace();
-        }
+    public static void saveStrong(StrongClassifier strongClassifier, String fileName){
+        save(strongClassifier, fileName);
     }
 
     public static StrongClassifier loadStrong(String fileName) throws IOException, ClassNotFoundException {
-        StrongClassifier classifiers;
-        FileInputStream fileIn = new FileInputStream(fileName);
-        ObjectInputStream in = new ObjectInputStream(fileIn);
-        classifiers = (StrongClassifier) in.readObject();
-        in.close();
-        fileIn.close();
-        return classifiers;
+        return (StrongClassifier) load(fileName);
     }
 
 }

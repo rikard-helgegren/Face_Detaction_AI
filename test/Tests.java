@@ -17,7 +17,7 @@ public class Tests {
     public void testImageRead() {
         HalIntegralImage[] images = {};
         try {
-            images = FaceRecognition.readImagesFromDataBase(path); // Read images
+            images = Data.readImagesFromDataBase(path); // Read images
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -137,11 +137,11 @@ public class Tests {
         classifiers.add(a);
         classifiers.add(b);
 
-        FaceRecognition.saveCascade(classifiers, "test.classifiers");
+        Data.saveCascade(classifiers, "test.classifiers");
 
         ArrayList<StrongClassifier> loaded = new ArrayList<>();
         try {
-            loaded = FaceRecognition.loadCascade("test.classifiers");
+            loaded = Data.loadCascade("test.classifiers");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

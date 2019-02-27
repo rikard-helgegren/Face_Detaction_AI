@@ -51,10 +51,7 @@ public class FaceRecognition {
     }
 
     public static void main(String[] args) throws Exception {
-
         Data data = new Data();
-
-
 
         if (trainCascade) {
             System.out.println("Starting training of cascaded classifier.");
@@ -86,10 +83,7 @@ public class FaceRecognition {
             }
             testStrong(strongClassifier, data.testData);
         }
-
-
-        // Test strong classifier
-        //test(degenerateDecisionTree, trainingData);
+        
     }
 
     public static StrongClassifier trainStrongClassifier(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {

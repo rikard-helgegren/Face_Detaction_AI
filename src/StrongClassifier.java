@@ -82,7 +82,7 @@ public class StrongClassifier implements Serializable{
 
     @Override
     public String toString() {
-        String s = String.format("=== Strong Classifier. Size: %d. Threshold: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
+        String s = String.format("=== Strong Classifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
         for (Classifier c : weakClassifiers) {
             s += "====== " + c + "\n";
         }

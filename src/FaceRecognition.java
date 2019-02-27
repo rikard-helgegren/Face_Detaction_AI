@@ -11,7 +11,7 @@ import java.util.*;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final boolean trainCascade = false; // Should a cascade be trained? If not, a strong will be trained.
+    private static final boolean trainFullCascade = false; // Should a cascade be trained? If not, a strong will be trained.
     private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
     private static final double overallFalsePositiveRate = 0.3;
     public static final double DELTA = 0.00001;
@@ -56,7 +56,6 @@ public class FaceRecognition {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println("1");
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
         HalIntegralImage[] trainFaces = {};
@@ -64,21 +63,17 @@ public class FaceRecognition {
         HalIntegralImage[] testFaces = {};
         HalIntegralImage[] testNoFaces = {};
         try {
-            System.out.println("2");
             // Read images for training set
             trainFaces = readImagesFromDataBase("./res/source/data/train/face"); // Read face images
             trainNoFaces = readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
-            System.out.println("3");
             // Read images for test set
             testFaces = readImagesFromDataBase("./res/source/data/test/face");
             testNoFaces = readImagesFromDataBase("./res/source/data/test/non-face");
-            System.out.println("4");
             //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
         } catch (Exception e) {
             System.err.println("Data folder not found. Have you extracted data.zip correctly?");
             System.exit(1);
         }
-        System.out.println("5");
 
         // Re-store arrays of training data as a list and add face label.
         double weightFace = 1.0 / (2 * trainFaces.length);
@@ -91,18 +86,16 @@ public class FaceRecognition {
         for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
         allSamples.addAll(negativeSamples);
         allSamples.addAll(positiveSamples);
-        System.out.println("6");
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         ArrayList<LabeledIntegralImage> testData = new ArrayList<>(20000);
         for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, 1, 0));
         for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, 0, 0));
         Collections.shuffle(testData);
-        System.out.println("7");
 
 
 
-        if (trainCascade) {
+        if (trainFullCascade) {
             System.out.println("Starting training of cascaded classifier.");
             ArrayList<StrongClassifier> cascadedClassifier;
 
@@ -162,7 +155,7 @@ public class FaceRecognition {
         ArrayList<StrongClassifier> cascadedClassifier = new ArrayList<StrongClassifier>();
 
         double maxFalsePositiveRatePerLayer = 0.7;
-        double minDetectionRatePerLayer = 0.85;
+        double minDetectionRatePerLayer = 0.9;
         double prevFalsePositiveRate = 1;
         double curFalsePositiveRate = 1;
         double prevDetectionRate = 1;

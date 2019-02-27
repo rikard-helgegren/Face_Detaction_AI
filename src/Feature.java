@@ -77,10 +77,11 @@ public class Feature implements Serializable {
      * Note that x+w may not be larger than the width of the image.
      * Note that y+h may not be larger than the height of the image.
      *
-     * |‾‾‾‾‾‾‾‾|
-     * |    |   |
-     * |        |
-     * |________|
+     * |‾‾‾‾‾|‾‾‾‾‾|
+     * |     |     |
+     * |  +  |  -  |
+     * |     |     |
+     * |_____|_____|
      *
      * @param img the integral image to operate on
      * @param x coordinate for the upper left corner of the feature area.
@@ -102,6 +103,14 @@ public class Feature implements Serializable {
     /**
      * Calculates the difference between the rectangle sums of two rectangles located next to each other vertically.
      *
+     * |‾‾‾‾‾‾‾‾‾‾‾|
+     * |     +     |
+     * |___________|
+     * |           |
+     * |     -     |
+     * |___________|
+     *
+     *
      * @param img the integral image to operate on
      * @param x coordinate for the upper left corner of the feature area.
      * @param y coordinate for the upper left corner of the feature area.
@@ -117,6 +126,13 @@ public class Feature implements Serializable {
     
     /**
      * Calculates the difference between the rectangle sums of three rectangles located next to each other horizontally.
+     *
+     * |‾‾‾‾‾|‾‾‾‾‾|‾‾‾‾‾|
+     * |     |     |     |
+     * |  -  |  +  |  -  |
+     * |     |     |     |
+     * |_____|_____|_____|
+     *
      *
      * @param img the integral image to operate on
      * @param x coordinate for the upper left corner of the feature area.
@@ -134,6 +150,14 @@ public class Feature implements Serializable {
     
     /**
      * Calculates the difference between the rectangle sums of four rectangles located next to each other like a chess board..
+     *
+     * |‾‾‾‾‾|‾‾‾‾‾|
+     * |  +  |  -  |
+     * |_____|_____|
+     * |     |     |
+     * |  -  |  +  |
+     * |_____|_____|
+     *
      *
      * @param img the integral image to operate on
      * @param x coordinate for the upper left corner of the feature area.

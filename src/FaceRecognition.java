@@ -53,6 +53,36 @@ public class FaceRecognition {
     }
 
     public static void main(String[] args) throws Exception {
+
+        /*
+
+        File imageFolder = new File("./res/source/data/train/face");
+        HalIntegralImage[] images = new HalIntegralImage[imageFolder.listFiles().length];
+
+        File[] listFiles = imageFolder.listFiles();
+        for (int i = 0; i < listFiles.length; i++) {
+            File imgFile = listFiles[i];
+            BufferedImage bi = ImageIO.read(imgFile);
+            FastBitmap fb = new FastBitmap(bi);
+            try {
+                images[i] = new HalIntegralImage(fb);
+            } catch (Exception e) {
+                System.err.println("Could not read " + imgFile.getPath());
+                e.printStackTrace();
+                break;
+            }
+            //if ((i+1) % 1000 == 0) System.out.printf("%d/%d\n", i+1, imageFolder.listFiles().length);
+        }
+
+        Feature.calcHorizontalTwoRectFeature(images[49], 8, 0, 2, 6);
+
+        System.exit(1);
+
+         */
+
+
+
+
         System.out.println("1");
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.

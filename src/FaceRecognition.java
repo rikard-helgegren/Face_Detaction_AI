@@ -118,7 +118,7 @@ public class FaceRecognition {
             for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
 
 
-
+            //The training algorithm for building a cascaded detector
             while(curFalsePositiveRate>overallFalsePositiveRate) {
                 System.out.printf("Cascaded classifier. Performance: %s\n", evalCascade(cascadedClassifier, testData));
                 for(StrongClassifier c:cascadedClassifier){
@@ -206,6 +206,7 @@ public class FaceRecognition {
      * @throws Exception if something goes wrong
      */
     public static Classifier trainOneWeak(ArrayList<LabeledIntegralImage> allSamples) throws Exception {
+        System.out.println("Started training on weak classifier");
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         //Collections.shuffle(allFeatures);
@@ -239,6 +240,8 @@ public class FaceRecognition {
             for (LabeledIntegralImage img : allSamples) {
                 error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
             }
+
+            //System.out.println("Parity for this feature: "+parity);
             h.setError(error);
             classifiers.add(h);
             if (i % 2000 == 0) System.out.printf("Feature %d/%d\n", i, allFeatures.size());
@@ -417,12 +420,13 @@ public class FaceRecognition {
             }
             return 0;
         });
-
+        //TODO Sort this directly?
         //Go through the sorted training data and store the values from the feature j in featureValues.
         ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
         for (LabeledIntegralImage img : trainingData) {
             featureValues.add(j.calculateFeatureValue(img.img));
         }
+        //System.out.println("Testing feature: "+j);
 
         int bestThreshold = 0;
         int bestThresholdParity = 0;
@@ -432,21 +436,32 @@ public class FaceRecognition {
         //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
         //  to find the best threshold much faster.
         for (int i = 0; i < featureValues.size(); i += 100) {
+            //Integer threshold = featureValues.get(i);
             Integer threshold = featureValues.get(i);
+            //System.out.println("Threshold nr: "+i+" = "+threshold);
             double tPlus = 0;
             double tMinus = 0;
             double sPlus = 0;
             double sMinus = 0;
-            for (LabeledIntegralImage img : trainingData) {
+            //System.out.println("Looping through all trainingdata");
+            for (int k=0; k<trainingData.size(); k++) {
+                LabeledIntegralImage img = trainingData.get(k);
                 if (img.isFace == 1) {
                     tPlus += img.getWeight();
-                    if (img.getWeight() < threshold) {
+                    //if (img.getWeight() < threshold) {
+                    if (k < i) {
                         sPlus += img.getWeight();
+                        //System.out.println("isFace: It ("+img.getWeight()+") is below threshold: "+threshold);
+                    }else{
+                        //System.out.println("isFace: It is above threshold: "+threshold);
                     }
                 } else if (img.isFace == 0) {
                     tMinus += img.getWeight();
-                    if (img.getWeight() < threshold) {
+                    if (k < i) {
                         sMinus += img.getWeight();
+                        //System.out.println("It is below threshold: "+threshold);
+                    }else{
+                        //System.out.println("It is above threshold: "+threshold);
                     }
                 }
             }
@@ -455,9 +470,12 @@ public class FaceRecognition {
             if(sPlus + tMinus - sMinus < sMinus + tPlus - sPlus){
                 error = sPlus + tMinus - sMinus; //Generally: above positive, below negative.
                 parity = -1;
+                //System.out.println("sPlus + tMinus - sMinus is the smallest: "+(sPlus + tMinus - sMinus)+" instead of: "+(sMinus + tPlus - sPlus));
+            }else{
+                //System.out.println("sMinus + tPlus - sPlus is the smallest: "+(sMinus + tPlus - sPlus)+" instead of: "+(sPlus + tMinus - sMinus));
             }
             //double error = Math.min(sPlus + tMinus - sMinus, sMinus + tPlus - sPlus);
-
+            //System.out.println("Error for this threshold: "+error);
 
             if (error < lowestError) {
                 lowestError = error;

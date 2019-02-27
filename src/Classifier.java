@@ -60,6 +60,10 @@ public class Classifier implements Serializable {
      */
     public int canBeFace(HalIntegralImage img) throws Exception {
         if (parity != 1 && parity != -1) throw new Exception("Parity was not 1 or -1. It was: " + parity);
+
+        //System.out.println("My (weak classifier) threshold: "+threshold);
+        //System.out.println("The feature value of the image: "+feature.calculateFeatureValue(img));
+        //System.out.println("parity: "+parity);
         if (parity * feature.calculateFeatureValue(img) < parity * threshold) {
             return 1;
         }

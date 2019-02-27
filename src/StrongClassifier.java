@@ -16,7 +16,7 @@ public class StrongClassifier implements Serializable{
         //calcThreshold();
     }
 
-    private double getThreshold() {
+    public double getThreshold() {
         double threshold = 0;
         for(Classifier c:weakClassifiers){
             threshold+=c.getAlpha();
@@ -47,8 +47,8 @@ public class StrongClassifier implements Serializable{
         for(Classifier c:weakClassifiers){
             value+=c.getAlpha()*c.canBeFace(img);
         }
-        //FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
 
+        FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
         return value>=getThreshold()*thresholdMultiplier;
     }
 

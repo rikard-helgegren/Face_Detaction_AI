@@ -172,7 +172,7 @@ public class FaceRecognition {
                     strongClassifier.setThresholdMultiplier(1);
 
                     while(true) {
-                        System.out.printf("Evaluating threshold %.2f. ", cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier());
+                        System.out.printf("Evaluating threshold multiplier %.2f. With threshold: %.2f. ", cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier(), cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
                         PerformanceStats stats = evalCascade(cascadedClassifier, testData);
                         System.out.printf("Performance: %s. ", stats);
                         curFalsePositiveRate = stats.falsePositive;
@@ -185,7 +185,7 @@ public class FaceRecognition {
                         }
 
                         strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
-                        if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, threshold was 0.");
+                        if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
                     }
                     writer.close();
                 }
@@ -208,6 +208,9 @@ public class FaceRecognition {
         test(cascadedClassifier, testData);
         //test(degenerateDecisionTree, trainingData);
     }
+
+
+    
 
     public static ArrayList<LabeledIntegralImage> initAdaBoost(ArrayList<LabeledIntegralImage> positiveSamples, ArrayList<LabeledIntegralImage> negativeSamples) throws Exception {
         // Calculate initial weights.
@@ -263,13 +266,14 @@ public class FaceRecognition {
             ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
             int threshold = p.threshold;
             int parity = p.parity;
-
+            //System.out.println("T & P: "+threshold+", "+parity);
             // Actual step 2
             double error = 0;
             Classifier h = new Classifier(j, threshold, parity);
             for (LabeledIntegralImage img : allSamples) {
                 error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
             }
+            //System.out.println("Error for this feature: "+error);
 
             //System.out.println("Parity for this feature: "+parity);
             h.setError(error);
@@ -280,9 +284,9 @@ public class FaceRecognition {
         Classifier bestClassifier = classifiers.get(0);
         for (Classifier c : classifiers) {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
-            System.out.printf("%s. Err: %f\n", c, c.getError());
         }
 
+        System.out.println("Best classifier choosen:");
         // 4. Update weights
         System.out.println("Error: " + bestClassifier.getError());
         System.out.println("Beta: " + bestClassifier.getError() / (1 - bestClassifier.getError()));
@@ -290,6 +294,7 @@ public class FaceRecognition {
         //System.out.println("Beta is " + bestClassifier.getBeta());
         //System.out.println("Setting alpha to " + Math.log(1/bestClassifier.getBeta()));
         System.out.println("Alpha: " + Math.log(1.0/bestClassifier.getBeta()));
+        System.out.println();
         bestClassifier.setAlpha(Math.log(1.0/bestClassifier.getBeta()));
         //System.out.println("Testing Alpha:");
         //System.out.println(bestClassifier.getBeta());
@@ -393,6 +398,7 @@ public class FaceRecognition {
         double falsePositive = ((double)nrWrongIsNotFace) / (nrCorrectIsNotFace + nrWrongIsNotFace);
         double truePositive  = ((double)nrCorrectIsFace)  / (nrCorrectIsFace    + nrWrongIsFace);
         double falseNegative = ((double)nrWrongIsFace)    / (nrCorrectIsFace    + nrWrongIsFace);
+
         return new PerformanceStats(truePositive, falsePositive, falseNegative);
     }
 
@@ -456,6 +462,9 @@ public class FaceRecognition {
         for (LabeledIntegralImage img : trainingData) {
             featureValues.add(j.calculateFeatureValue(img.img));
         }
+
+        //System.out.println("Sorted list from feture: "+j+": First value"+featureValues.get(0)+", Last: "+featureValues.get(featureValues.size()-1));
+
         //System.out.println("Testing feature: "+j);
 
         int bestThreshold = 0;
@@ -515,6 +524,7 @@ public class FaceRecognition {
                 bestThresholdParity = parity;
             }
         }
+        //System.out.println("Best threshold for this one: "+bestThreshold);
         return new ThresholdParity(bestThreshold, bestThresholdParity);
     }
 

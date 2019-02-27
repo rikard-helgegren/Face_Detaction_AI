@@ -11,8 +11,8 @@ import java.util.*;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final boolean trainCascade = false; // Should a cascade be trained? If not, a strong will be trained.
-    private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
+    private static final boolean trainCascade = true; // Should a cascade be trained? If not, a strong will be trained.
+    private static final boolean loadFromFile = true; // Set this boolean to loadCascade or train.
     private static final double overallFalsePositiveRate = 0.3;
     public static final double DELTA = 0.00001;
     public static PrintWriter writer;
@@ -108,7 +108,7 @@ public class FaceRecognition {
 
             if (loadFromFile) {
                 // Load strong classifier from file
-                cascadedClassifier = loadCascade("save.cascade");
+                cascadedClassifier = loadCascade("cascade1.cascade");
             } else {
                 cascadedClassifier = trainCascadedClassifier(positiveSamples, negativeSamples, testData);
                 // Save cascaded classifier

@@ -1,9 +1,12 @@
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class StrongClassifier implements Serializable{
-    private ArrayList<Classifier> weakClassifiers;
+    private static final long serialVersionUID = 0; // Increase when changing something in this class
+    
+    private List<Classifier> weakClassifiers;
     //private double threshold;
     private double thresholdMultiplier = 1;
 
@@ -11,9 +14,13 @@ public class StrongClassifier implements Serializable{
         weakClassifiers = new ArrayList<>();
     }
 
-    public StrongClassifier(ArrayList<Classifier> weakClassifiers) throws Exception {
+    public StrongClassifier(List<Classifier> weakClassifiers) throws Exception {
         this.weakClassifiers = weakClassifiers;
         //calcThreshold();
+    }
+
+    public StrongClassifier(StrongClassifier strongClassifier, int size) throws Exception {
+        this(strongClassifier.weakClassifiers.subList(0, size));
     }
 
     public double getThreshold() {

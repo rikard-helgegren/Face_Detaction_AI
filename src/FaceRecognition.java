@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class FaceRecognition {
     private static final boolean trainCascade = false; // Should a cascade be trained? If not, a strong will be trained.
-    private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
+    private static final boolean loadFromFile = true; // Set this boolean to loadCascade or train.
     private static final double overallFalsePositiveRate = 0.3;
     public static final double DELTA = 0.00001;
     public static PrintWriter writer;
@@ -318,10 +318,11 @@ public class FaceRecognition {
         return bestClassifier;
     }
 
-    public static void testStrong(StrongClassifier strongClassifier, ArrayList<LabeledIntegralImage> testData) {
+    public static void testStrong(StrongClassifier strongClassifier, ArrayList<LabeledIntegralImage> testData) throws Exception {
         System.out.println("Testing Strong Classifier");
         System.out.println(strongClassifier);
 
+        strongClassifier = new StrongClassifier(strongClassifier, 1);
         PerformanceStats stats = null;
         try {
             stats = evalStrong(strongClassifier, testData);

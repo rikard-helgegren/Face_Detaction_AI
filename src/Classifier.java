@@ -2,6 +2,7 @@ import java.awt.*;
 import java.io.Serializable;
 
 public class Classifier implements Serializable {
+    private static final long serialVersionUID = 0; // Increase when changing something in this class
 
     private Feature feature;
     private double threshold;

@@ -3,6 +3,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Feature implements Serializable {
+    private static final long serialVersionUID = 0; // Increase when changing something in this class
 
     /**
      * Represents the 4 different types of feature.

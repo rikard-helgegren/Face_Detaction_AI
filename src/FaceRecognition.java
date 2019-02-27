@@ -193,10 +193,6 @@ public class FaceRecognition {
                 if(curFalsePositiveRate > overallFalsePositiveRate){
                     negativeSamples = filterData(cascadedClassifier, negativeSamples);
                 }
-
-
-                //degenerateDecisionTree.addAll(train(data, 1));
-                //data = filterData(degenerateDecisionTree, data);
             }
 
 
@@ -280,7 +276,7 @@ public class FaceRecognition {
         Classifier bestClassifier = classifiers.get(0);
         for (Classifier c : classifiers) {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
-            System.out.printf("%s. Err: %f\n", c, c.getError());
+            //System.out.printf("%s. Err: %f\n", c, c.getError());
         }
 
         // 4. Update weights
@@ -442,7 +438,7 @@ public class FaceRecognition {
         // Sort training data based on features
         trainingData.sort((a, b) -> {
             try {
-                // No attention given to order here. Might have to do that if things doesn't work.
+                // The order here matters.
                 return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
             } catch (Exception e) {
                 System.err.println("Features could not be sorted due to an error.");

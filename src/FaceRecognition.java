@@ -55,35 +55,6 @@ public class FaceRecognition {
 
     public static void main(String[] args) throws Exception {
 
-        /*
-
-        File imageFolder = new File("./res/source/data/train/face");
-        HalIntegralImage[] images = new HalIntegralImage[imageFolder.listFiles().length];
-
-        File[] listFiles = imageFolder.listFiles();
-        for (int i = 0; i < listFiles.length; i++) {
-            File imgFile = listFiles[i];
-            BufferedImage bi = ImageIO.read(imgFile);
-            FastBitmap fb = new FastBitmap(bi);
-            try {
-                images[i] = new HalIntegralImage(fb);
-            } catch (Exception e) {
-                System.err.println("Could not read " + imgFile.getPath());
-                e.printStackTrace();
-                break;
-            }
-            //if ((i+1) % 1000 == 0) System.out.printf("%d/%d\n", i+1, imageFolder.listFiles().length);
-        }
-
-        Feature.calcHorizontalTwoRectFeature(images[49], 8, 0, 2, 6);
-
-        System.exit(1);
-
-         */
-
-
-
-
         System.out.println("1");
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
@@ -108,14 +79,12 @@ public class FaceRecognition {
         }
         System.out.println("5");
 
-        // Calculate initial weights. TODO Verify that this is correct. I'm not sure.
-        double weightFace = 1.0 / (2 * trainFaces.length);
-        double weightNoFace = 1.0 / (2 * trainNoFaces.length);
+
 
         // Re-store arrays of training data as a list and add face label.
-        ArrayList<LabeledIntegralImage> trainingData = new ArrayList<>(5000);
-        for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, 1, weightFace));
-        for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, 0, weightNoFace));
+        //ArrayList<LabeledIntegralImage> trainingData = new ArrayList<>(5000);
+        //for (HalIntegralImage img : trainFaces) trainingData.add(new LabeledIntegralImage(img, 1, weightFace));
+        //for (HalIntegralImage img : trainNoFaces) trainingData.add(new LabeledIntegralImage(img, 0, weightNoFace));
         System.out.println("6");
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
@@ -125,90 +94,97 @@ public class FaceRecognition {
         Collections.shuffle(testData);
         System.out.println("7");
 
-        ArrayList<StrongClassifier> cascadedClassifier = new ArrayList<>();
+        ArrayList<StrongClassifier> cascadedClassifier;
 
         if (loadFromFile) {
             // Load strong classifier from file
             cascadedClassifier = load("save.classifiers");
         } else {
-            // Train strong classifier
-
-            cascadedClassifier = new ArrayList<StrongClassifier>();
-
-
-            double maxFalsePositiveRatePerLayer = 0.7;
-            double minDetectionRatePerLayer = 0.85;
-            double prevFalsePositiveRate = 1;
-            double curFalsePositiveRate = 1;
-            double prevDetectionRate = 1;
-            double curDetectionRate = 1;
-
-            ArrayList<LabeledIntegralImage> negativeSamples = new ArrayList<>();
-            ArrayList<LabeledIntegralImage> positiveSamples = new ArrayList<>();
-            for (HalIntegralImage img : trainNoFaces) negativeSamples.add(new LabeledIntegralImage(img, 0, weightNoFace));//TODO change maybe
-            for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
-
-
-            //The training algorithm for building a cascaded detector
-            while(curFalsePositiveRate>overallFalsePositiveRate) {
-                System.out.printf("Cascaded classifier. Performance: %s\n", evalCascade(cascadedClassifier, testData));
-                for(StrongClassifier c:cascadedClassifier){
-                    System.out.println(c);
-                }
-
-                ArrayList<LabeledIntegralImage> allSamples = initAdaBoost(positiveSamples, negativeSamples);
-                StrongClassifier strongClassifier = new StrongClassifier();
-                cascadedClassifier.add(strongClassifier);
-
-                prevDetectionRate = curDetectionRate;
-                prevFalsePositiveRate = curFalsePositiveRate;
-
-                while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
-                    System.out.printf("Current false positive rate is %.2f\n", curFalsePositiveRate);
-                    System.out.printf("Current detection rate rate is %.2f\n", curDetectionRate);
-                    System.out.println(strongClassifier);
-                    System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
-
-                    if (strongClassifier.getSize() == 0) {
-                        strongClassifier.addClassifier(trainOneWeak(allSamples));
-                        strongClassifier.addClassifier(trainOneWeak(allSamples));
-                    } else {
-                        strongClassifier.addClassifier(trainOneWeak(allSamples));
-                    }
-                    strongClassifier.setThresholdMultiplier(1);
-
-                    while(true) {
-                        System.out.printf("Evaluating threshold multiplier %.2f. With threshold: %.2f. ", cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier(), cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
-                        PerformanceStats stats = evalCascade(cascadedClassifier, testData);
-                        System.out.printf("Performance: %s. ", stats);
-                        curFalsePositiveRate = stats.falsePositive;
-                        curDetectionRate = stats.truePositive;
-                        if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) {
-                            System.out.printf("GOOD! Using this one. \n");
-                            break;
-                        } else {
-                            System.out.printf("\n");
-                        }
-
-                        strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
-                        if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
-                    }
-                    writer.close();
-                }
-
-                if(curFalsePositiveRate > overallFalsePositiveRate){
-                    negativeSamples = filterData(cascadedClassifier, negativeSamples);
-                }
-            }
-
-
-            // Save strong classifier
+            cascadedClassifier = trainCascadedClassifier(trainFaces,trainNoFaces, testData);
+            // Save cascaded classifier
             save(cascadedClassifier, "save.classifiers");
         }
 
         // Test strong classifier
         test(cascadedClassifier, testData);
         //test(degenerateDecisionTree, trainingData);
+    }
+
+
+    public static ArrayList<StrongClassifier> trainCascadedClassifier(HalIntegralImage[] trainFaces, HalIntegralImage[] trainNoFaces, ArrayList<LabeledIntegralImage> testData) throws Exception {
+
+        // Train cascaded classifier
+        ArrayList<StrongClassifier> cascadedClassifier = new ArrayList<StrongClassifier>();
+
+        double weightFace = 1.0 / (2 * trainFaces.length);
+        double weightNoFace = 1.0 / (2 * trainNoFaces.length);
+
+        double maxFalsePositiveRatePerLayer = 0.7;
+        double minDetectionRatePerLayer = 0.85;
+        double prevFalsePositiveRate = 1;
+        double curFalsePositiveRate = 1;
+        double prevDetectionRate = 1;
+        double curDetectionRate = 1;
+
+        ArrayList<LabeledIntegralImage> negativeSamples = new ArrayList<>();
+        ArrayList<LabeledIntegralImage> positiveSamples = new ArrayList<>();
+        for (HalIntegralImage img : trainNoFaces) negativeSamples.add(new LabeledIntegralImage(img, 0, weightNoFace));//TODO change maybe
+        for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
+
+
+        //The training algorithm for building a cascaded detector
+        while(curFalsePositiveRate>overallFalsePositiveRate) {
+            System.out.printf("Cascaded classifier. Performance: %s\n", evalCascade(cascadedClassifier, testData));
+            for(StrongClassifier c:cascadedClassifier){
+                System.out.println(c);
+            }
+
+            ArrayList<LabeledIntegralImage> allSamples = initAdaBoost(positiveSamples, negativeSamples);
+            StrongClassifier strongClassifier = new StrongClassifier();
+            cascadedClassifier.add(strongClassifier);
+
+            prevDetectionRate = curDetectionRate;
+            prevFalsePositiveRate = curFalsePositiveRate;
+
+            while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
+                System.out.printf("Current false positive rate is %.2f\n", curFalsePositiveRate);
+                System.out.printf("Current detection rate rate is %.2f\n", curDetectionRate);
+                System.out.println(strongClassifier);
+                System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
+
+                if (strongClassifier.getSize() == 0) {
+                    strongClassifier.addClassifier(trainOneWeak(allSamples));
+                    strongClassifier.addClassifier(trainOneWeak(allSamples));
+                } else {
+                    strongClassifier.addClassifier(trainOneWeak(allSamples));
+                }
+                strongClassifier.setThresholdMultiplier(1);
+
+                while(true) {
+                    System.out.printf("Evaluating threshold multiplier %.2f. With threshold: %.2f. ", cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier(), cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
+                    PerformanceStats stats = evalCascade(cascadedClassifier, testData);
+                    System.out.printf("Performance: %s. ", stats);
+                    curFalsePositiveRate = stats.falsePositive;
+                    curDetectionRate = stats.truePositive;
+                    if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) {
+                        System.out.printf("GOOD! Using this one. \n");
+                        break;
+                    } else {
+                        System.out.printf("\n");
+                    }
+
+                    strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
+                    if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
+                }
+                writer.close();
+            }
+
+            if(curFalsePositiveRate > overallFalsePositiveRate){
+                negativeSamples = filterData(cascadedClassifier, negativeSamples);
+            }
+        }
+
+        return cascadedClassifier;
     }
 
 

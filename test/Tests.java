@@ -1,5 +1,4 @@
 import Catalano.Imaging.FastBitmap;
-import Catalano.Imaging.Tools.IntegralImage;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -138,11 +137,11 @@ public class Tests {
         classifiers.add(a);
         classifiers.add(b);
 
-        FaceRecognition.save(classifiers, "test.classifiers");
+        FaceRecognition.saveCascade(classifiers, "test.classifiers");
 
         ArrayList<StrongClassifier> loaded = new ArrayList<>();
         try {
-            loaded = FaceRecognition.load("test.classifiers");
+            loaded = FaceRecognition.loadCascade("test.classifiers");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

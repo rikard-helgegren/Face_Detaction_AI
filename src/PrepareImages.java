@@ -49,7 +49,7 @@ public class PrepareImages {
 
                     BufferedImage bufferedImage = fb.toBufferedImage();
 
-                    // Save FastBitmap as image. Can't save as pgm for some reason. Might not want to.
+                    // Save FastBitmap as image. Can't saveCascade as pgm for some reason. Might not want to.
                     ImageIO.write(bufferedImage, "png",
                             new File(String.format("./res/generated/att-faces-java/%03d.png",imageNr++))
                     );

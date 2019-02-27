@@ -427,6 +427,33 @@ public class FaceRecognition {
         return images;
     }
 
+    public static ThresholdParity calcAvgThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
+        trainingData.sort((a, b) -> {
+            try {
+                // The order here matters.
+                return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+            } catch (Exception e) {
+                System.err.println("Features could not be sorted due to an error.");
+                e.printStackTrace();
+            }
+            return 0;
+        });
+        //TODO Sort this directly?
+        //Go through the sorted training data and store the values from the feature j in featureValues.
+        ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
+        int featureValueSum = 0;
+        for (LabeledIntegralImage img : trainingData) {
+            int fv = j.calculateFeatureValue(img.img);
+            featureValues.add(fv);
+            featureValueSum += fv;
+        }
+
+        double threshold = Math.round((double) featureValueSum / trainingData.size());
+        int parity = (threshold > 0) ? -1 : 1; // If threshold > 0, parity = -1.
+        return new ThresholdParity((int) threshold, parity);
+
+    }
+
     /**
      * Calculates the best threshold for a single weak classifier.
      * @param trainingData the training data used in adaboost.

@@ -1,0 +1,50 @@
+First full cascaded classifier
+
+
+
+
+
+1
+2
+3
+4
+5
+6
+7
+Testing decision tree
+	=== Strong Classifier. Size: 6. Threshold: 0.23.
+====== [Feature: x: 0 y: 0 w: 2 h: 2 type: HORIZONTAL. Threshold: -252.0. Parity: 1. Error: 0.5000000000000718 Beta: 1.0. Alpha: 0.0.]
+====== [Feature: x: 8 y: 2 w: 3 h: 6 type: VERTICAL. Threshold: 2.0. Parity: -1. Error: 0.2545807032183617 Beta: 0.3415268484697386. Alpha: 1.074328983823735.]
+====== [Feature: x: 4 y: 10 w: 14 h: 2 type: FOUR. Threshold: 5.0. Parity: -1. Error: 0.2792721711602467 Beta: 0.3874863158951784. Alpha: 0.9480747446311774.]
+====== [Feature: x: 8 y: 12 w: 8 h: 5 type: HORIZONTAL. Threshold: 10.0. Parity: -1. Error: 0.28674160857616643 Beta: 0.4020164529768264. Alpha: 0.9112622633975849.]
+====== [Feature: x: 4 y: 4 w: 12 h: 4 type: THREE. Threshold: 141.0. Parity: -1. Error: 0.3215613130766492 Beta: 0.4739725479614031. Alpha: 0.7466058746574815.]
+====== [Feature: x: 0 y: 8 w: 16 h: 10 type: FOUR. Threshold: 20.0. Parity: -1. Error: 0.30503153963936547 Beta: 0.43891421990730034. Alpha: 0.8234512838442254.]
+
+	=== Strong Classifier. Size: 12. Threshold: 0.29.
+====== [Feature: x: 6 y: 2 w: 3 h: 2 type: THREE. Threshold: -506.0. Parity: -1. Error: 0.49884259259259317 Beta: 0.9953810623556606. Alpha: 0.004629637898739544.]
+====== [Feature: x: 8 y: 4 w: 8 h: 3 type: HORIZONTAL. Threshold: 12.0. Parity: -1. Error: 0.27315822036742005 Beta: 0.37581524345711403. Alpha: 0.9786576301401733.]
+====== [Feature: x: 0 y: 6 w: 8 h: 6 type: FOUR. Threshold: 6.0. Parity: -1. Error: 0.32079094345702264 Beta: 0.47230074506040454. Alpha: 0.7501393245661616.]
+====== [Feature: x: 4 y: 10 w: 12 h: 2 type: VERTICAL. Threshold: 5.0. Parity: -1. Error: 0.3098140627048781 Beta: 0.448884925008842. Alpha: 0.8009887158279962.]
+====== [Feature: x: 2 y: 8 w: 8 h: 10 type: FOUR. Threshold: 11.0. Parity: -1. Error: 0.33614619048790384 Beta: 0.506355745303257. Alpha: 0.6805158027623249.]
+====== [Feature: x: 14 y: 0 w: 4 h: 8 type: FOUR. Threshold: 32.0. Parity: -1. Error: 0.3645343479536855 Beta: 0.5736491764422182. Alpha: 0.5557372603830636.]
+====== [Feature: x: 0 y: 10 w: 4 h: 2 type: HORIZONTAL. Threshold: 3.0. Parity: -1. Error: 0.334578946843236 Beta: 0.5028078766909918. Alpha: 0.6875471367344304.]
+====== [Feature: x: 6 y: 10 w: 12 h: 2 type: FOUR. Threshold: 4.0. Parity: -1. Error: 0.38098329694382344 Beta: 0.6154652936873154. Alpha: 0.4853767221329612.]
+====== [Feature: x: 10 y: 14 w: 2 h: 3 type: HORIZONTAL. Threshold: 2.0. Parity: -1. Error: 0.371354531313132 Beta: 0.5907217180596682. Alpha: 0.5264102386956483.]
+====== [Feature: x: 16 y: 16 w: 2 h: 2 type: VERTICAL. Threshold: 1.0. Parity: -1. Error: 0.36660745749684714 Beta: 0.5787997693310737. Alpha: 0.546798682754477.]
+====== [Feature: x: 4 y: 4 w: 12 h: 12 type: THREE. Threshold: 525.0. Parity: -1. Error: 0.38073104194833957 Beta: 0.6148072448943556. Alpha: 0.4864464832388601.]
+====== [Feature: x: 4 y: 8 w: 6 h: 6 type: HORIZONTAL. Threshold: 8.0. Parity: 1. Error: 0.2802895562708113 Beta: 0.3894476712307903. Alpha: 0.9430257712699793.]
+
+	=== Strong Classifier. Size: 6. Threshold: 0.34.
+====== [Feature: x: 6 y: 10 w: 4 h: 2 type: VERTICAL. Threshold: 3.0. Parity: -1. Error: 0.30547165037733487 Beta: 0.4398260352414651. Alpha: 0.8213760047021321.]
+====== [Feature: x: 0 y: 8 w: 8 h: 2 type: FOUR. Threshold: 8.0. Parity: -1. Error: 0.32962888514557587 Beta: 0.4917110505531807. Alpha: 0.7098640306390726.]
+====== [Feature: x: 2 y: 10 w: 10 h: 6 type: FOUR. Threshold: 20.0. Parity: -1. Error: 0.3312733166235699 Beta: 0.49537924066519456. Alpha: 0.7024316669930246.]
+====== [Feature: x: 8 y: 16 w: 6 h: 2 type: HORIZONTAL. Threshold: 8.0. Parity: -1. Error: 0.3453563257605574 Beta: 0.5275485571013703. Alpha: 0.6395143664913783.]
+====== [Feature: x: 4 y: 10 w: 12 h: 2 type: THREE. Threshold: 44.0. Parity: -1. Error: 0.38382918822017587 Beta: 0.6229265990569661. Alpha: 0.4733265856639761.]
+====== [Feature: x: 2 y: 12 w: 15 h: 6 type: VERTICAL. Threshold: 10.0. Parity: 1. Error: 0.30255945596066314 Beta: 0.4338139767561294. Alpha: 0.8351394617535556.]
+
+RESULTS
+When the image is     a face. Correct: 304. Wrong: 168. True positive: 64.4 %. False negative: 35.6 %
+When the image is not a face. Correct: 16749. Wrong: 6824. True negative: 71.1 %. False positive: 28.9 %
+Total number of correct guesses: 17053. Wrong: 6992
+
+Process finished with exit code 0

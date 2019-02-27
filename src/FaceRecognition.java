@@ -108,7 +108,7 @@ public class FaceRecognition {
 
             if (loadFromFile) {
                 // Load strong classifier from file
-                cascadedClassifier = loadCascade("save.cascade");
+                cascadedClassifier = loadCascade("cascade1.cascade");
             } else {
                 cascadedClassifier = trainCascadedClassifier(positiveSamples, negativeSamples, testData);
                 // Save cascaded classifier

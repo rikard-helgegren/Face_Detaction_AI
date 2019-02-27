@@ -17,4 +17,5 @@ public class LabeledIntegralImage {
 	public double getWeight() {
 		return weight;
 	}
+
 }

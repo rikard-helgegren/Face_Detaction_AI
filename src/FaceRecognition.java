@@ -83,7 +83,7 @@ public class FaceRecognition {
             }
             testStrong(strongClassifier, data.testData);
         }
-        
+
     }
 
     public static StrongClassifier trainStrongClassifier(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {
@@ -200,13 +200,14 @@ public class FaceRecognition {
      * @return a degenerate decision tree representing the strong classifier.
      * @throws Exception if something goes wrong
      */
-    // Takes 16s without sorting in calcThreshold
-    // Takes 107s with sorting in calcThreshold
+    // Takes 16s without sorting and recalculation of featureValues in calcThreshold.
+    // Takes 107s with sorting and recalculation.
+    // Takes 59s with sorting but without recalculation. (Current)
     public static Classifier trainOneWeak(ArrayList<LabeledIntegralImage> allSamples) throws Exception {
         long t0 = System.currentTimeMillis();
         //System.out.println("Started training on weak classifier");
         // Generate all possible features
-        ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
+        //ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         //Collections.shuffle(allFeatures);
 
         int size = 1;
@@ -225,9 +226,9 @@ public class FaceRecognition {
         }
 
         // 2. Train a classifier for every feature. Each is trained on all trainingData
-        ArrayList<Classifier> classifiers = new ArrayList<>(allFeatures.size());
-        for (int i = 0; i < allFeatures.size(); i++) {
-            Feature j = allFeatures.get(i);
+        ArrayList<Classifier> classifiers = new ArrayList<>(Feature.allFeatures.size());
+        for (int i = 0; i < Feature.allFeatures.size(); i++) {
+            Feature j = Feature.allFeatures.get(i);
             ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
             int threshold = p.threshold;
             int parity = p.parity;
@@ -243,7 +244,7 @@ public class FaceRecognition {
             //System.out.println("Parity for this feature: "+parity);
             h.setError(error);
             classifiers.add(h);
-            if (i % 2000 == 0) System.out.printf("Feature %d/%d\n", i, allFeatures.size());
+            if (i % 2000 == 0) System.out.printf("Feature %d/%d\n", i, Feature.allFeatures.size());
         }
         // 3. Choose the classifier with the lowest error
         Classifier bestClassifier = classifiers.get(0);
@@ -410,7 +411,7 @@ public class FaceRecognition {
         trainingData.sort((a, b) -> {
             try {
                 // The order here matters.
-                return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+                return a.img.getFeatureValue(j) - b.img.getFeatureValue(j);
             } catch (Exception e) {
                 System.err.println("Features could not be sorted due to an error.");
                 e.printStackTrace();
@@ -422,7 +423,7 @@ public class FaceRecognition {
         ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
         int featureValueSum = 0;
         for (LabeledIntegralImage img : trainingData) {
-            int fv = j.calculateFeatureValue(img.img);
+            int fv = img.img.getFeatureValue(j);
             featureValues.add(fv);
             featureValueSum += fv;
         }
@@ -447,18 +448,18 @@ public class FaceRecognition {
         trainingData.sort((a, b) -> {
             try {
                 // The order here matters.
-                return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+                //return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+                return a.img.getFeatureValue(j) - b.img.getFeatureValue(j);
             } catch (Exception e) {
                 System.err.println("Features could not be sorted due to an error.");
                 e.printStackTrace();
             }
             return 0;
         });
-        //TODO Sort this directly?
         //Go through the sorted training data and store the values from the feature j in featureValues.
         ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
         for (LabeledIntegralImage img : trainingData) {
-            featureValues.add(j.calculateFeatureValue(img.img));
+            featureValues.add(img.img.getFeatureValue(j));
         }
 
         //System.out.println("Sorted list from feture: "+j+": First value"+featureValues.get(0)+", Last: "+featureValues.get(featureValues.size()-1));
@@ -474,8 +475,8 @@ public class FaceRecognition {
         //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
         //  to find the best threshold much faster.
         for (int i = 0; i < featureValues.size(); i += 100) {
-            //Integer threshold = featureValues.get(i);
             Integer threshold = featureValues.get(i);
+            //Integer threshold = trainingData.get(i).getFeatureValue(j);
             //System.out.println("Threshold nr: "+i+" = "+threshold);
             double tPlus = 0;
             double tMinus = 0;

@@ -1,9 +1,14 @@
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Feature implements Serializable {
     private static final long serialVersionUID = 0; // Increase when changing something in this class
+
+    // TODO Currently, dimensions has to be set here to keep generateAllFeatures private.
+    //  It would be nice to set dimensions depending on input data.
+    public static ArrayList<Feature> allFeatures = generateAllFeatures(19, 19);
 
     /**
      * Represents the 4 different types of feature.
@@ -15,6 +20,9 @@ public class Feature implements Serializable {
     private int y;
     private int w;
     private int h;
+
+    private int id; // Matches the index in each of the LabeledIntegralImage's arrays.
+    private static int ID = 0;
 
     /**
      * Constructs a feature with the given values.
@@ -30,6 +38,18 @@ public class Feature implements Serializable {
         this.y = y;
         this.w = w;
         this.h = h;
+        this.id = ID++;
+    }
+
+    public static void calculateFeatureValues(List<LabeledIntegralImage> images) throws Exception {
+        for (LabeledIntegralImage img : images) {
+            int[] featureValues = new int[Feature.allFeatures.size()];
+            for (int i = 0; i < Feature.allFeatures.size(); i++) {
+                Feature f = Feature.allFeatures.get(i);
+                featureValues[i] = f.calculateFeatureValue(img.img);
+            }
+            img.img.setFeatureValues(featureValues);
+        }
     }
 
     /**
@@ -54,7 +74,8 @@ public class Feature implements Serializable {
      * @param imageHeight
      * @return
      */
-    public static ArrayList<Feature> generateAllFeatures(int imageWidth, int imageHeight) {
+    private static ArrayList<Feature> generateAllFeatures(int imageWidth, int imageHeight) {
+        ID = 0; // Reset ID in case this method is called multiple times.
         ArrayList<Feature> allFeatures = new ArrayList<>(160000);
         for (int x = 0; x < imageWidth; x+=2){           ///------------------------------TODO increased x and y faster
             for (int y = 0; y < imageHeight; y+=2) {
@@ -209,4 +230,7 @@ public class Feature implements Serializable {
         return false;
     }
 
+    public int getId() {
+        return id;
+    }
 }

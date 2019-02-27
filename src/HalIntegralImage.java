@@ -11,6 +11,8 @@ public class HalIntegralImage {
 
     // First coordinate is Y, second is X.
     public int[][] data;
+    private int[] featureValues;
+
 
     public HalIntegralImage(BufferedImage bi) throws Exception {
         this(new FastBitmap(bi));
@@ -86,5 +88,24 @@ public class HalIntegralImage {
 
     public int getWidth() {
         return data[0].length;
+    }
+
+    public void setFeatureValues(int[] featureValues) {
+        this.featureValues = featureValues;
+    }
+
+    /**
+     * Gets the image feature value. This method will return a precalculated value if it exists.
+     * If not, it will calculate the value from scratch.
+     * To pre-calculate, run Feature.calculateFeatureValues on your dataset.
+     * @param f
+     * @return
+     * @throws Exception
+     */
+    public int getFeatureValue(Feature f) throws Exception {
+        if (featureValues != null) {
+            return featureValues[f.getId()];
+        }
+        return f.calculateFeatureValue(this);
     }
 }

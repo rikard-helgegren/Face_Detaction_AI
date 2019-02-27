@@ -65,7 +65,7 @@ public class Classifier implements Serializable {
         //System.out.println("My (weak classifier) threshold: "+threshold);
         //System.out.println("The feature value of the image: "+feature.calculateFeatureValue(img));
         //System.out.println("parity: "+parity);
-        if (parity * feature.calculateFeatureValue(img) < parity * threshold) {
+        if (parity * img.getFeatureValue(feature) < parity * threshold) {
             return 1;
         }
         return 0;

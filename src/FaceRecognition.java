@@ -94,13 +94,21 @@ public class FaceRecognition {
         Collections.shuffle(testData);
         System.out.println("7");
 
+        double weightFace = 1.0 / (2 * trainFaces.length);
+        double weightNoFace = 1.0 / (2 * trainNoFaces.length);
+
+        ArrayList<LabeledIntegralImage> negativeSamples = new ArrayList<>();
+        ArrayList<LabeledIntegralImage> positiveSamples = new ArrayList<>();
+        for (HalIntegralImage img : trainNoFaces) negativeSamples.add(new LabeledIntegralImage(img, 0, weightNoFace));//TODO change maybe
+        for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
+
         ArrayList<StrongClassifier> cascadedClassifier;
 
         if (loadFromFile) {
             // Load strong classifier from file
             cascadedClassifier = load("save.classifiers");
         } else {
-            cascadedClassifier = trainCascadedClassifier(trainFaces,trainNoFaces, testData);
+            cascadedClassifier = trainCascadedClassifier(positiveSamples, negativeSamples, testData);
             // Save cascaded classifier
             save(cascadedClassifier, "save.classifiers");
         }
@@ -110,14 +118,21 @@ public class FaceRecognition {
         //test(degenerateDecisionTree, trainingData);
     }
 
+    public static StrongClassifier trainStrongClassifier(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {
+        StrongClassifier strongClassifier = new StrongClassifier();
+        for (int i = 0; i < size; i++) {
+            strongClassifier.addClassifier(trainOneWeak(trainingData));
+        }
+        return strongClassifier;
+    }
 
-    public static ArrayList<StrongClassifier> trainCascadedClassifier(HalIntegralImage[] trainFaces, HalIntegralImage[] trainNoFaces, ArrayList<LabeledIntegralImage> testData) throws Exception {
+    public static ArrayList<StrongClassifier> trainCascadedClassifier(
+            ArrayList<LabeledIntegralImage> positiveSamples,
+            ArrayList<LabeledIntegralImage> negativeSamples,
+            ArrayList<LabeledIntegralImage> testData) throws Exception {
 
         // Train cascaded classifier
         ArrayList<StrongClassifier> cascadedClassifier = new ArrayList<StrongClassifier>();
-
-        double weightFace = 1.0 / (2 * trainFaces.length);
-        double weightNoFace = 1.0 / (2 * trainNoFaces.length);
 
         double maxFalsePositiveRatePerLayer = 0.7;
         double minDetectionRatePerLayer = 0.85;
@@ -125,12 +140,6 @@ public class FaceRecognition {
         double curFalsePositiveRate = 1;
         double prevDetectionRate = 1;
         double curDetectionRate = 1;
-
-        ArrayList<LabeledIntegralImage> negativeSamples = new ArrayList<>();
-        ArrayList<LabeledIntegralImage> positiveSamples = new ArrayList<>();
-        for (HalIntegralImage img : trainNoFaces) negativeSamples.add(new LabeledIntegralImage(img, 0, weightNoFace));//TODO change maybe
-        for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
-
 
         //The training algorithm for building a cascaded detector
         while(curFalsePositiveRate>overallFalsePositiveRate) {

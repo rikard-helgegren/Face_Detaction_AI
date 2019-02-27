@@ -1,7 +1,3 @@
-import Catalano.Imaging.FastBitmap;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 
@@ -56,49 +52,7 @@ public class FaceRecognition {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println("1");
-        // Read images from file system amd calculate integralImages.
-        // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
-        HalIntegralImage[] trainFaces = {};
-        HalIntegralImage[] trainNoFaces = {};
-        HalIntegralImage[] testFaces = {};
-        HalIntegralImage[] testNoFaces = {};
-        try {
-            System.out.println("2");
-            // Read images for training set
-            trainFaces = readImagesFromDataBase("./res/source/data/train/face"); // Read face images
-            trainNoFaces = readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
-            System.out.println("3");
-            // Read images for test set
-            testFaces = readImagesFromDataBase("./res/source/data/test/face");
-            testNoFaces = readImagesFromDataBase("./res/source/data/test/non-face");
-            System.out.println("4");
-            //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
-        } catch (Exception e) {
-            System.err.println("Data folder not found. Have you extracted data.zip correctly?");
-            System.exit(1);
-        }
-        System.out.println("5");
-
-        // Re-store arrays of training data as a list and add face label.
-        double weightFace = 1.0 / (2 * trainFaces.length);
-        double weightNoFace = 1.0 / (2 * trainNoFaces.length);
-
-        ArrayList<LabeledIntegralImage> negativeSamples = new ArrayList<>();
-        ArrayList<LabeledIntegralImage> positiveSamples = new ArrayList<>();
-        ArrayList<LabeledIntegralImage> allSamples = new ArrayList<>();
-        for (HalIntegralImage img : trainNoFaces) negativeSamples.add(new LabeledIntegralImage(img, 0, weightNoFace));//TODO change maybe
-        for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
-        allSamples.addAll(negativeSamples);
-        allSamples.addAll(positiveSamples);
-        System.out.println("6");
-
-        // Re-store arrays of test data as list and add face label. Test data weights will not be used.
-        ArrayList<LabeledIntegralImage> testData = new ArrayList<>(20000);
-        for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, 1, 0));
-        for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, 0, 0));
-        Collections.shuffle(testData);
-        System.out.println("7");
+        Data data = new Data();
 
 
 
@@ -108,29 +62,29 @@ public class FaceRecognition {
 
             if (loadFromFile) {
                 // Load strong classifier from file
-                cascadedClassifier = loadCascade("cascade1.cascade");
+                cascadedClassifier = Data.loadCascade("cascade1.cascade");
             } else {
-                cascadedClassifier = trainCascadedClassifier(positiveSamples, negativeSamples, testData);
+                cascadedClassifier = trainCascadedClassifier(data.positiveSamples, data.negativeSamples, data.testData);
                 // Save cascaded classifier
-                saveCascade(cascadedClassifier, "save.cascade");
+                Data.saveCascade(cascadedClassifier, "save.cascade");
             }
-            test(cascadedClassifier, testData);
+            test(cascadedClassifier, data.testData);
         } else {
             System.out.println("Starting training of strong classifier.");
             StrongClassifier strongClassifier;
             if (loadFromFile) {
                 // Load strong classifier from file
-                strongClassifier = loadStrong("save.strong");
+                strongClassifier = Data.loadStrong("save.strong");
             } else {
-                strongClassifier = trainStrongClassifier(allSamples, 1);
+                strongClassifier = trainStrongClassifier(data.allSamples, 1);
                 for (int i = 0; i < 36; i++) {
-                    testStrong(strongClassifier, testData);
-                    strongClassifier = trainStrongClassifier(allSamples, strongClassifier, 1);
+                    testStrong(strongClassifier, data.testData);
+                    strongClassifier = trainStrongClassifier(data.allSamples, strongClassifier, 1);
                 }
                 // Save cascaded classifier
-                saveStrong(strongClassifier, "save.strong");
+                Data.saveStrong(strongClassifier, "save.strong");
             }
-            testStrong(strongClassifier, testData);
+            testStrong(strongClassifier, data.testData);
         }
 
 
@@ -216,7 +170,7 @@ public class FaceRecognition {
             }
 
             if(curFalsePositiveRate > overallFalsePositiveRate){
-                negativeSamples = filterData(cascadedClassifier, negativeSamples);
+                negativeSamples = Data.filter(cascadedClassifier, negativeSamples);
             }
         }
 
@@ -252,7 +206,10 @@ public class FaceRecognition {
      * @return a degenerate decision tree representing the strong classifier.
      * @throws Exception if something goes wrong
      */
+    // Takes 16s without sorting in calcThreshold
+    // Takes 107s with sorting in calcThreshold
     public static Classifier trainOneWeak(ArrayList<LabeledIntegralImage> allSamples) throws Exception {
+        long t0 = System.currentTimeMillis();
         //System.out.println("Started training on weak classifier");
         // Generate all possible features
         ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
@@ -324,6 +281,7 @@ public class FaceRecognition {
         //System.out.println("Best classifiers feature: ");
         //System.out.println(bestClassifier);
 
+        System.out.printf("Trained one weak classifier in %ds\n", (System.currentTimeMillis() - t0) / 1000);
         return bestClassifier;
     }
 
@@ -389,22 +347,6 @@ public class FaceRecognition {
         System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
     }
 
-    /**
-     * Removes the data that does not pass the strong classifier.
-     * @param cascadedClassifier
-     * @param data
-     * @return an array of images that the strong classifier thinks could be faces
-     */
-    public static ArrayList<LabeledIntegralImage> filterData(ArrayList<StrongClassifier> cascadedClassifier, ArrayList<LabeledIntegralImage> data) throws Exception {
-        ArrayList<LabeledIntegralImage> maybeFaces = new ArrayList<>(data.size()/2);
-        for (LabeledIntegralImage d : data) {
-            if (isFace(cascadedClassifier, d.img)) {
-                maybeFaces.add(d);
-            }
-        }
-        return maybeFaces;
-    }
-
     public static PerformanceStats evalStrong(StrongClassifier strongClassifier, ArrayList<LabeledIntegralImage> testData) throws Exception {
         int nrCorrectIsFace = 0;
         int nrWrongIsFace = 0;
@@ -468,32 +410,6 @@ public class FaceRecognition {
         }
 
         return true;
-    }
-
-    /**
-     * Reads the images from
-     * @param path a path to a folder containing only images. Images should have correct size and other properties.
-     * @throws IOException
-     */
-    public static HalIntegralImage[] readImagesFromDataBase(String path) throws Exception {
-        File imageFolder = new File(path);
-        HalIntegralImage[] images = new HalIntegralImage[imageFolder.listFiles().length];
-
-        File[] listFiles = imageFolder.listFiles();
-        for (int i = 0; i < listFiles.length; i++) {
-            File imgFile = listFiles[i];
-            BufferedImage bi = ImageIO.read(imgFile);
-            FastBitmap fb = new FastBitmap(bi);
-            try {
-                images[i] = new HalIntegralImage(fb);
-            } catch (Exception e) {
-                System.err.println("Could not read " + imgFile.getPath());
-                e.printStackTrace();
-                break;
-            }
-            //if ((i+1) % 1000 == 0) System.out.printf("%d/%d\n", i+1, imageFolder.listFiles().length);
-        }
-        return images;
     }
 
     public static ThresholdParity calcAvgThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
@@ -618,44 +534,5 @@ public class FaceRecognition {
         return new ThresholdParity(bestThreshold, bestThresholdParity);
     }
 
-    public static void save(Serializable s, String fileName) {
-        try {
-            FileOutputStream fileOut = new FileOutputStream(fileName);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(s);
-            out.close();
-            fileOut.close();
-        } catch (IOException e) {
-            System.err.println("Save file could not be opened.");
-            e.printStackTrace();
-        }
-    }
-
-    public static Serializable load(String fileName) throws IOException, ClassNotFoundException {
-        Serializable s;
-        FileInputStream fileIn = new FileInputStream(fileName);
-        ObjectInputStream in = new ObjectInputStream(fileIn);
-        s = (Serializable) in.readObject();
-        in.close();
-        fileIn.close();
-        return s;
-    }
-
-
-    public static void saveCascade(ArrayList<StrongClassifier> classifiers, String fileName){
-        save(classifiers, fileName);
-    }
-
-    public static ArrayList<StrongClassifier> loadCascade(String fileName) throws IOException, ClassNotFoundException {
-        return (ArrayList<StrongClassifier>) load(fileName);
-    }
-
-    public static void saveStrong(StrongClassifier strongClassifier, String fileName){
-        save(strongClassifier, fileName);
-    }
-
-    public static StrongClassifier loadStrong(String fileName) throws IOException, ClassNotFoundException {
-        return (StrongClassifier) load(fileName);
-    }
 
 }

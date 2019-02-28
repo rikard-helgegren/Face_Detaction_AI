@@ -159,4 +159,34 @@ public class Tests {
         HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)));
         return img;
     }
+
+
+    @Test
+    public void testBestThresholdAndParity() throws Exception {
+        HalIntegralImage black = readImage(path + "black-25px.png");
+        LabeledIntegralImage black1 = new LabeledIntegralImage(black, 0, 0);
+        HalIntegralImage white = readImage(path + "white-25px.png");
+        LabeledIntegralImage white1 = new LabeledIntegralImage(white, 0, 0);
+        HalIntegralImage face = readImage(path + "000.png");
+        LabeledIntegralImage face1 = new LabeledIntegralImage(face, 1, 0);
+        HalIntegralImage blackTop10 = readImage(path + "blackTop10-25px.png");
+        LabeledIntegralImage blackTop101 = new LabeledIntegralImage(black, 1, 0);
+        HalIntegralImage blackLeft10 = readImage(path + "blackLeft10-25px.png");
+        LabeledIntegralImage blackLeft101 = new LabeledIntegralImage(black, 1, 0);
+
+        ArrayList<LabeledIntegralImage> trainingData = new ArrayList();
+        trainingData.add(black1);
+        trainingData.add(white1);
+        trainingData.add(face1);
+        trainingData.add(blackTop101);
+        trainingData.add(blackLeft101);
+
+        Feature rect = new Feature(Feature.Type.HORIZONTAL, 0,0,2,2);
+
+
+
+
+
+        System.out.println("hi " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect));
+    }
 }

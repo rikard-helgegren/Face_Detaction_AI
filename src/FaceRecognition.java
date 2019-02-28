@@ -521,6 +521,7 @@ public class FaceRecognition {
             featureValues.add(img.img.getFeatureValue(j));
         }
 
+        //System.out.println("Sorted features: " + featureValues);
         //System.out.println("Sorted list from feature: "+j+": First value"+featureValues.get(0)+", Last: "+featureValues.get(featureValues.size()-1));
 
         //System.out.println("Testing feature: "+j);

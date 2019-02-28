@@ -74,7 +74,7 @@ public class FaceRecognition {
                 // Load strong classifier from file
                 strongClassifier = Data.loadStrong("save.strong");
             } else {
-                strongClassifier = trainTestStrongClassifier(data.allSamples, 1, data.testData);
+                strongClassifier = trainTestStrongClassifier(data.allSamples, 10, data.testData);
                 // Save cascaded classifier
                 Data.saveStrong(strongClassifier, "save.strong");
             }
@@ -98,12 +98,12 @@ public class FaceRecognition {
         strongClassifier.setThresholdMultiplier(0.5); // Threshold is default 0.5 in AdaBoost
 
         for (int i = 0; i < size; i++) {
-            System.out.printf("Training weak classifier %d/%d.\n", strongClassifier.getSize() + i + 1, size);
+            System.out.printf("Training weak classifier %d/%d.\n", i + 1, size);
             strongClassifier = trainStrongClassifier(trainingData, strongClassifier, 1);
             testStrong(strongClassifier, testData);
         }
 
-        return trainStrongClassifier(trainingData, strongClassifier, size);
+        return strongClassifier;
     }
 
     /**

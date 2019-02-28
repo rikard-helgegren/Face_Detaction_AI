@@ -187,17 +187,17 @@ public class Tests {
 
         Feature rect = new Feature(Feature.Type.HORIZONTAL, 6,8,2,2);
         FaceRecognition.ThresholdParity rectTP = FaceRecognition.calcBestThresholdAndParity(trainingData, rect);
-        System.out.println("threshold " + rectTP.threshold + "; Parity " + rectTP.parity);
+        //System.out.println("threshold " + rectTP.threshold + "; Parity " + rectTP.parity);
         assertTrue(0 <= rectTP.threshold && rectTP.threshold <= 65, "Expected in [0, 65]. Was: " + rectTP.threshold);
 
         Feature rect2 = new Feature(Feature.Type.VERTICAL, 6,8,2,2);
         FaceRecognition.ThresholdParity rect2TP = FaceRecognition.calcBestThresholdAndParity(trainingData, rect2);
-        System.out.println("threshold " + rect2TP.threshold + "; Parity " + rect2TP.parity);
+        //System.out.println("threshold " + rect2TP.threshold + "; Parity " + rect2TP.parity);
         assertTrue(-69 <= rectTP.threshold && rectTP.threshold <= 0, "Expected in [-69, 0]. Was: " + rect2TP.threshold);
 
         Feature rect3 = new Feature(Feature.Type.THREE, 6,8,3,2);
         FaceRecognition.ThresholdParity rect3TP = FaceRecognition.calcBestThresholdAndParity(trainingData, rect3);
-        System.out.println("threshold " + rect3TP.threshold + "; Parity " + rect3TP.parity);
+        //System.out.println("threshold " + rect3TP.threshold + "; Parity " + rect3TP.parity);
         assertTrue(-338 <= rect3TP.threshold && rect3TP.threshold <= -2, "Expected in [-338, -2]. Was: " + rect3TP.threshold);
 
     }

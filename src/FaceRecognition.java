@@ -443,7 +443,8 @@ public class FaceRecognition {
      */
     public static ThresholdParity calcBestThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
 
-        // ------------------------------ TODO don't calculate many times
+        // DONE Feature values are no longer calculated every time.
+        // TODO If possible, move sorting so it does not happen every time.
         // Sort training data based on features
         trainingData.sort((a, b) -> {
             try {
@@ -462,10 +463,9 @@ public class FaceRecognition {
             featureValues.add(img.img.getFeatureValue(j));
         }
 
-        //System.out.println("Sorted list from feture: "+j+": First value"+featureValues.get(0)+", Last: "+featureValues.get(featureValues.size()-1));
+        //System.out.println("Sorted list from feature: "+j+": First value"+featureValues.get(0)+", Last: "+featureValues.get(featureValues.size()-1));
 
         //System.out.println("Testing feature: "+j);
-        // ----------------------------------
 
         int bestThreshold = 0;
         int bestThresholdParity = 0;

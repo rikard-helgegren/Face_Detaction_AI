@@ -74,11 +74,7 @@ public class FaceRecognition {
                 // Load strong classifier from file
                 strongClassifier = Data.loadStrong("save.strong");
             } else {
-                strongClassifier = trainStrongClassifier(data.allSamples, 1);
-                for (int i = 0; i < 36; i++) {
-                    testStrong(strongClassifier, data.testData);
-                    strongClassifier = trainStrongClassifier(data.allSamples, strongClassifier, 1);
-                }
+                strongClassifier = trainTestStrongClassifier(data.allSamples, 1, data.testData);
                 // Save cascaded classifier
                 Data.saveStrong(strongClassifier, "save.strong");
             }
@@ -87,16 +83,40 @@ public class FaceRecognition {
 
     }
 
-    public static StrongClassifier trainStrongClassifier(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {
-        StrongClassifier strongClassifier = new StrongClassifier();
-        strongClassifier.setThresholdMultiplier(0.5);
+    /**
+     * Trains a strong classifier and tests it, just for status purposes, between each weak classifier.
+     * @param trainingData
+     * @param size
+     * @param testData
+     * @return
+     * @throws Exception
+     */
+    public static StrongClassifier trainTestStrongClassifier(ArrayList<LabeledIntegralImage> trainingData, int size,
+                                                             ArrayList<LabeledIntegralImage> testData) throws Exception {
+
+        StrongClassifier strongClassifier = new StrongClassifier(); // Init
+        strongClassifier.setThresholdMultiplier(0.5); // Threshold is default 0.5 in AdaBoost
+
+        for (int i = 0; i < size; i++) {
+            System.out.printf("Training weak classifier %d/%d.\n", strongClassifier.getSize() + i + 1, size);
+            strongClassifier = trainStrongClassifier(trainingData, strongClassifier, 1);
+            testStrong(strongClassifier, testData);
+        }
+
         return trainStrongClassifier(trainingData, strongClassifier, size);
     }
 
+    /**
+     * Trains more weak classifiers into a strong classifier.
+     * @param trainingData the training data. Usually, you want weights to not change between calls on same classifier.
+     * @param strongClassifier the strong classifier to train into. Can be an empty one. Will be modified in-place.
+     * @param extraSize how many weak classifiers to train now.
+     * @return a strong classifier with extraSize more weak classifiers than the input one had.
+     * @throws Exception
+     */
     public static StrongClassifier trainStrongClassifier(
             ArrayList<LabeledIntegralImage> trainingData, StrongClassifier strongClassifier, int extraSize) throws Exception {
         for (int i = 0; i < extraSize; i++) {
-            System.out.printf("Training weak classifier %d/%d.\n", strongClassifier.getSize() + i + 1, strongClassifier.getSize() + extraSize);
             strongClassifier.addClassifier(trainOneWeak(trainingData));
         }
         return strongClassifier;

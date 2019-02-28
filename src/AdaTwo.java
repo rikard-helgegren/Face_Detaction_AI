@@ -39,6 +39,5 @@ public class AdaTwo extends Thread {
             e.printStackTrace();
             System.exit(1);
         }
-        System.out.println("Done");
     }
 }

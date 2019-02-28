@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final boolean trainCascade = false; // Should a cascade be trained? If not, a strong will be trained.
+    private static final boolean trainFullCascade = false; // Should a cascade be trained? If not, a strong will be trained.
     private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
     private static final double overallFalsePositiveRate = 0.3;
     public static final double DELTA = 0.00001;
@@ -54,7 +54,7 @@ public class FaceRecognition {
     public static void main(String[] args) throws Exception {
         Data data = new Data();
 
-        if (trainCascade) {
+        if (trainFullCascade) {
             System.out.println("Starting training of cascaded classifier.");
             ArrayList<StrongClassifier> cascadedClassifier;
 
@@ -111,7 +111,7 @@ public class FaceRecognition {
         ArrayList<StrongClassifier> cascadedClassifier = new ArrayList<StrongClassifier>();
 
         double maxFalsePositiveRatePerLayer = 0.7;
-        double minDetectionRatePerLayer = 0.85;
+        double minDetectionRatePerLayer = 0.9;
         double prevFalsePositiveRate = 1;
         double curFalsePositiveRate = 1;
         double prevDetectionRate = 1;

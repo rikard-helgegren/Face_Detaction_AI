@@ -39,7 +39,7 @@ public class HalIntegralImage {
             int rowSum = 0;
             for (int x = 0; x < fb.getWidth(); x++) {
                 //System.out.printf("\t%s, %s\n", x, y);
-                rowSum += fb.getGray(y, x); //Shouldn't the coordinates be the other way around
+                rowSum += fb.getGray(x, y);
                 int aboveSum = 0; // Default to 0 for first row, when y is 0.
                 if (y > 0) aboveSum = integral[y-1][x];
                 integral[y][x] = rowSum + aboveSum;

@@ -63,14 +63,16 @@ public class Tests {
         //System.out.println(Arrays.deepToString(blackTop10.getInternalData()));
         assertEquals(1, blackTop10.getInternalData()[0][0]);
         assertEquals(10, blackTop10.getInternalData()[9][0]);
-        assertEquals(265, blackTop10.getInternalData()[10][0]); // Should expected not be 264? Hm...
+        assertEquals(11, blackTop10.getInternalData()[10][0]);
+        assertEquals(265, blackTop10.getInternalData()[0][10]);// Should expected not be 264? Hm...
 
         // Test image with where leftmost 10 columns are black, rightmost 15 columns are white.
         //System.out.println("== Black left 10 ==");
         //System.out.println(Arrays.deepToString(blackTop10.getInternalData()));
         assertEquals(1, blackLeft10.getInternalData()[0][0]);
         assertEquals(10, blackLeft10.getInternalData()[0][9]);
-        assertEquals(265, blackLeft10.getInternalData()[0][10]); // Should expected not be 264? Hm...
+        assertEquals(11, blackLeft10.getInternalData()[0][10]);
+        assertEquals(265, blackLeft10.getInternalData()[10][0]);// Should expected not be 264? Hm...
 
         // Test that dimensions are correct.
         assertEquals(92, face92x112.getWidth());

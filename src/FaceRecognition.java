@@ -321,7 +321,7 @@ public class FaceRecognition {
         for (int i = 0; i < partitions-1; i++) {
             int end = start + Feature.allFeatures.size() / partitions;
             threads.add(new AdaTwo(Feature.allFeatures.subList(start, end), classifiers, (List<LabeledIntegralImage>) allSamples.clone()));
-            start = end + 1;
+            start = end;
         }
         // Create the last thread. Special case since it may have a slightly different length than the others.
         threads.add(new AdaTwo(Feature.allFeatures.subList(start, Feature.allFeatures.size()-1), classifiers, (List<LabeledIntegralImage>) allSamples.clone()));

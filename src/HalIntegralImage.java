@@ -12,14 +12,16 @@ public class HalIntegralImage {
     // First coordinate is Y, second is X.
     public int[][] data;
     private int[] featureValues;
+    String name;
 
 
-    public HalIntegralImage(BufferedImage bi) throws Exception {
-        this(new FastBitmap(bi));
+    public HalIntegralImage(BufferedImage bi, String name) throws Exception {
+        this(new FastBitmap(bi), name);
     }
 
-    public HalIntegralImage(FastBitmap fb) throws Exception {
+    public HalIntegralImage(FastBitmap fb, String name) throws Exception {
         if (!fb.isGrayscale()) throw new Exception("Image must be grayscale.");
+        this.name = name;
         data = toIntegralData(fb);
     }
 
@@ -47,6 +49,10 @@ public class HalIntegralImage {
             }
         }
         return integral;
+    }
+
+    public String getName() {
+        return name;
     }
 
     /**

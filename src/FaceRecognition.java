@@ -287,6 +287,15 @@ public class FaceRecognition {
         return bestClassifier;
     }
 
+    public static boolean isSpecial(Feature f){
+        return f.getType() == Feature.Type.VERTICAL && f.getX()==0 && f.getY()==0 && f.getW() == 18 && f.getH() == 12;
+    }
+
+    public static boolean isSpecial2(Feature f){
+        return f.getType() == Feature.Type.HORIZONTAL && f.getX()==4 && f.getY()==4 && f.getW() == 4 && f.getH() == 14;
+    }
+
+
     public static Queue<Classifier> adaBoostStepTwo(List<LabeledIntegralImage> allSamples) throws Exception {
         Queue<Classifier> classifiers = new LinkedList<>();
         for (int i = 0; i < Feature.allFeatures.size(); i++) {

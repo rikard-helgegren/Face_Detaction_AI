@@ -156,7 +156,7 @@ public class Tests {
 
     private HalIntegralImage readImage(String path) throws Exception {
         File file = new File(path);
-        HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)));
+        HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), "asdf");
         return img;
     }
 
@@ -188,5 +188,14 @@ public class Tests {
 
 
         System.out.println("hi " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect));
+    }
+
+
+    @Test
+    public void testGetRectangleSum() throws Exception {
+        HalIntegralImage img = readImage("./res/source/data/train/non-face/B20_03379.png");
+        System.out.println(img.getRectangleSum(0,0,18,6));
+        System.out.println(img.getRectangleSum(0,5,18,11));
+        assertEquals(1,1);
     }
 }

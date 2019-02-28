@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 // Target: 70% true positive, 105 false positive
 /**
@@ -23,7 +24,7 @@ public class FaceRecognition {
         }
     }
 
-    private static class ThresholdParity{
+    public static class ThresholdParity{
         public int threshold;
         public int parity;
 
@@ -202,7 +203,8 @@ public class FaceRecognition {
      */
     // Takes 16s without sorting and recalculation of featureValues in calcThreshold.
     // Takes 107s with sorting and recalculation.
-    // Takes 59s with sorting but without recalculation. (Current)
+    // Takes 59s with sorting but without recalculation.
+    // Takes 13s with sorting but without recalculation and with 8 threads. (Current)
     public static Classifier trainOneWeak(ArrayList<LabeledIntegralImage> allSamples) throws Exception {
         long t0 = System.currentTimeMillis();
         //System.out.println("Started training on weak classifier");
@@ -226,28 +228,12 @@ public class FaceRecognition {
         }
 
         // 2. Train a classifier for every feature. Each is trained on all trainingData
-        ArrayList<Classifier> classifiers = new ArrayList<>(Feature.allFeatures.size());
-        for (int i = 0; i < Feature.allFeatures.size(); i++) {
-            Feature j = Feature.allFeatures.get(i);
-            ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
-            int threshold = p.threshold;
-            int parity = p.parity;
-            //System.out.println("T & P: "+threshold+", "+parity);
-            // Actual step 2
-            double error = 0;
-            Classifier h = new Classifier(j, threshold, parity);
-            for (LabeledIntegralImage img : allSamples) {
-                error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
-            }
-            //System.out.println("Error for this feature: "+error);
+        //Queue<Classifier> classifiers = adaBoostStepTwo(allSamples);
+        Queue<Classifier> classifiers = adaBoostStepTwoThreaded(allSamples, 8);
 
-            //System.out.println("Parity for this feature: "+parity);
-            h.setError(error);
-            classifiers.add(h);
-            if (i % 2000 == 0) System.out.printf("Feature %d/%d\n", i, Feature.allFeatures.size());
-        }
         // 3. Choose the classifier with the lowest error
-        Classifier bestClassifier = classifiers.get(0);
+        //Classifier bestClassifier = classifiers.get(0);
+        Classifier bestClassifier = classifiers.poll();
         for (Classifier c : classifiers) {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
         }
@@ -278,6 +264,58 @@ public class FaceRecognition {
 
         System.out.printf("Trained one weak classifier in %ds\n", (System.currentTimeMillis() - t0) / 1000);
         return bestClassifier;
+    }
+
+    public static Queue<Classifier> adaBoostStepTwo(List<LabeledIntegralImage> allSamples) throws Exception {
+        Queue<Classifier> classifiers = new LinkedList<>();
+        for (int i = 0; i < Feature.allFeatures.size(); i++) {
+            Feature j = Feature.allFeatures.get(i);
+            ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
+            int threshold = p.threshold;
+            int parity = p.parity;
+            //System.out.println("T & P: "+threshold+", "+parity);
+            // Actual step 2
+            double error = 0;
+            Classifier h = new Classifier(j, threshold, parity);
+            for (LabeledIntegralImage img : allSamples) {
+                error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+            }
+            //System.out.println("Error for this feature: "+error);
+
+            //System.out.println("Parity for this feature: "+parity);
+            h.setError(error);
+            classifiers.add(h);
+            if (i % 2000 == 0) System.out.printf("Feature %d/%d\n", i, Feature.allFeatures.size());
+        }
+        return classifiers;
+    }
+
+    public static Queue<Classifier> adaBoostStepTwoThreaded(ArrayList<LabeledIntegralImage> allSamples, int cores) throws InterruptedException {
+        // Multithreaded version of step 2
+        ConcurrentLinkedQueue<Classifier> classifiers = new ConcurrentLinkedQueue<>(); // List of classifiers
+        ArrayList<Thread> threads = new ArrayList<>(); // List of all threads
+        int partitions = cores; // How many partitions to divide allFeatures into. This is the same as number of threads.
+
+        // Partition data and create all but the last thread.
+        int start = 0;
+        for (int i = 0; i < partitions-1; i++) {
+            int end = start + Feature.allFeatures.size() / partitions;
+            threads.add(new AdaTwo(Feature.allFeatures.subList(start, end), classifiers, (List<LabeledIntegralImage>) allSamples.clone()));
+            start = end + 1;
+        }
+        // Create the last thread. Special case since it may have a slightly different length than the others.
+        threads.add(new AdaTwo(Feature.allFeatures.subList(start, Feature.allFeatures.size()-1), classifiers, (List<LabeledIntegralImage>) allSamples.clone()));
+
+        // Start all threads
+        for (Thread t : threads) {
+            t.start();
+        }
+
+        // Wait for all threads to finish.
+        for (Thread t : threads) {
+            t.join();
+        }
+        return classifiers;
     }
 
     public static void testStrong(StrongClassifier strongClassifier, ArrayList<LabeledIntegralImage> testData) throws Exception {
@@ -441,7 +479,7 @@ public class FaceRecognition {
      * @return
      * @throws Exception if calculateFeatureValue throws an exception
      */
-    public static ThresholdParity calcBestThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
+    public static ThresholdParity calcBestThresholdAndParity(List<LabeledIntegralImage> trainingData, Feature j) throws Exception {
 
         // DONE Feature values are no longer calculated every time.
         // TODO If possible, move sorting so it does not happen every time.

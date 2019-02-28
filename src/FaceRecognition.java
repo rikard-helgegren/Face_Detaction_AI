@@ -512,7 +512,7 @@ public class FaceRecognition {
         //  However, it should be fine to take big jumps in i. This SIGNIFICANTLY reduces running time.
         //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
         //  to find the best threshold much faster.
-        for (int i = 0; i < featureValues.size(); i += 10) {
+        for (int i = 0; i < featureValues.size(); i += 100) {
             Integer threshold = featureValues.get(i);
             //Integer threshold = trainingData.get(i).getFeatureValue(j);
             //System.out.println("Threshold nr: "+i+" = "+threshold);

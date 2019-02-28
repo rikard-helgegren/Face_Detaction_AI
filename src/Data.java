@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class Data {
@@ -57,6 +58,10 @@ public class Data {
         for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, 1, 0));
         for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, 0, 0));
         System.out.println("7");
+
+        // Pre-calculate all feature values
+        Feature.calculateFeatureValues(allSamples);
+
     }
 
     /**

@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 // Target: 70% true positive, 105 false positive
 /**
@@ -23,7 +24,7 @@ public class FaceRecognition {
         }
     }
 
-    private static class ThresholdParity{
+    public static class ThresholdParity{
         public int threshold;
         public int parity;
 
@@ -53,8 +54,7 @@ public class FaceRecognition {
     public static void main(String[] args) throws Exception {
 
         Data data = new Data();
-
-
+        
         if (trainFullCascade) {
             System.out.println("Starting training of cascaded classifier.");
             ArrayList<StrongClassifier> cascadedClassifier;
@@ -75,32 +75,49 @@ public class FaceRecognition {
                 // Load strong classifier from file
                 strongClassifier = Data.loadStrong("save.strong");
             } else {
-                strongClassifier = trainStrongClassifier(data.allSamples, 1);
-                for (int i = 0; i < 36; i++) {
-                    testStrong(strongClassifier, data.testData);
-                    strongClassifier = trainStrongClassifier(data.allSamples, strongClassifier, 1);
-                }
+                strongClassifier = trainTestStrongClassifier(data.allSamples, 10, data.testData);
                 // Save cascaded classifier
                 Data.saveStrong(strongClassifier, "save.strong");
             }
             testStrong(strongClassifier, data.testData);
         }
 
-
-        // Test strong classifier
-        //test(degenerateDecisionTree, trainingData);
     }
 
-    public static StrongClassifier trainStrongClassifier(ArrayList<LabeledIntegralImage> trainingData, int size) throws Exception {
-        StrongClassifier strongClassifier = new StrongClassifier();
-        strongClassifier.setThresholdMultiplier(0.5);
-        return trainStrongClassifier(trainingData, strongClassifier, size);
+    /**
+     * Trains a strong classifier and tests it, just for status purposes, between each weak classifier.
+     * @param trainingData
+     * @param size
+     * @param testData
+     * @return
+     * @throws Exception
+     */
+    public static StrongClassifier trainTestStrongClassifier(ArrayList<LabeledIntegralImage> trainingData, int size,
+                                                             ArrayList<LabeledIntegralImage> testData) throws Exception {
+
+        StrongClassifier strongClassifier = new StrongClassifier(); // Init
+        strongClassifier.setThresholdMultiplier(0.5); // Threshold is default 0.5 in AdaBoost
+
+        for (int i = 0; i < size; i++) {
+            System.out.printf("Training weak classifier %d/%d.\n", i + 1, size);
+            strongClassifier = trainStrongClassifier(trainingData, strongClassifier, 1);
+            testStrong(strongClassifier, testData);
+        }
+
+        return strongClassifier;
     }
 
+    /**
+     * Trains more weak classifiers into a strong classifier.
+     * @param trainingData the training data. Usually, you want weights to not change between calls on same classifier.
+     * @param strongClassifier the strong classifier to train into. Can be an empty one. Will be modified in-place.
+     * @param extraSize how many weak classifiers to train now.
+     * @return a strong classifier with extraSize more weak classifiers than the input one had.
+     * @throws Exception
+     */
     public static StrongClassifier trainStrongClassifier(
             ArrayList<LabeledIntegralImage> trainingData, StrongClassifier strongClassifier, int extraSize) throws Exception {
         for (int i = 0; i < extraSize; i++) {
-            System.out.printf("Training weak classifier %d/%d.\n", strongClassifier.getSize() + i + 1, strongClassifier.getSize() + extraSize);
             strongClassifier.addClassifier(trainOneWeak(trainingData));
         }
         return strongClassifier;
@@ -205,13 +222,15 @@ public class FaceRecognition {
      * @return a degenerate decision tree representing the strong classifier.
      * @throws Exception if something goes wrong
      */
-    // Takes 16s without sorting in calcThreshold
-    // Takes 107s with sorting in calcThreshold
+    // Takes 16s without sorting and recalculation of featureValues in calcThreshold.
+    // Takes 107s with sorting and recalculation.
+    // Takes 59s with sorting but without recalculation.
+    // Takes 13s with sorting but without recalculation and with 8 threads. (Current)
     public static Classifier trainOneWeak(ArrayList<LabeledIntegralImage> allSamples) throws Exception {
         long t0 = System.currentTimeMillis();
         //System.out.println("Started training on weak classifier");
         // Generate all possible features
-        ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
+        //ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
         //Collections.shuffle(allFeatures);
 
         int size = 1;
@@ -230,28 +249,12 @@ public class FaceRecognition {
         }
 
         // 2. Train a classifier for every feature. Each is trained on all trainingData
-        ArrayList<Classifier> classifiers = new ArrayList<>(allFeatures.size());
-        for (int i = 0; i < allFeatures.size(); i++) {
-            Feature j = allFeatures.get(i);
-            ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
-            int threshold = p.threshold;
-            int parity = p.parity;
-            //System.out.println("T & P: "+threshold+", "+parity);
-            // Actual step 2
-            double error = 0;
-            Classifier h = new Classifier(j, threshold, parity);
-            for (LabeledIntegralImage img : allSamples) {
-                error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
-            }
-            //System.out.println("Error for this feature: "+error);
+        //Queue<Classifier> classifiers = adaBoostStepTwo(allSamples); // Single thread
+        Queue<Classifier> classifiers = adaBoostStepTwoThreaded(allSamples, 8); // Multi-thread
 
-            //System.out.println("Parity for this feature: "+parity);
-            h.setError(error);
-            classifiers.add(h);
-            if (i % 2000 == 0) System.out.printf("Feature %d/%d\n", i, allFeatures.size());
-        }
         // 3. Choose the classifier with the lowest error
-        Classifier bestClassifier = classifiers.get(0);
+        //Classifier bestClassifier = classifiers.get(0);
+        Classifier bestClassifier = classifiers.poll();
         for (Classifier c : classifiers) {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
         }
@@ -282,6 +285,58 @@ public class FaceRecognition {
 
         System.out.printf("Trained one weak classifier in %ds\n", (System.currentTimeMillis() - t0) / 1000);
         return bestClassifier;
+    }
+
+    public static Queue<Classifier> adaBoostStepTwo(List<LabeledIntegralImage> allSamples) throws Exception {
+        Queue<Classifier> classifiers = new LinkedList<>();
+        for (int i = 0; i < Feature.allFeatures.size(); i++) {
+            Feature j = Feature.allFeatures.get(i);
+            ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
+            int threshold = p.threshold;
+            int parity = p.parity;
+            //System.out.println("T & P: "+threshold+", "+parity);
+            // Actual step 2
+            double error = 0;
+            Classifier h = new Classifier(j, threshold, parity);
+            for (LabeledIntegralImage img : allSamples) {
+                error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+            }
+            //System.out.println("Error for this feature: "+error);
+
+            //System.out.println("Parity for this feature: "+parity);
+            h.setError(error);
+            classifiers.add(h);
+            if (i % 2000 == 0) System.out.printf("Feature %d/%d\n", i, Feature.allFeatures.size());
+        }
+        return classifiers;
+    }
+
+    public static Queue<Classifier> adaBoostStepTwoThreaded(ArrayList<LabeledIntegralImage> allSamples, int cores) throws InterruptedException {
+        // Multithreaded version of step 2
+        ConcurrentLinkedQueue<Classifier> classifiers = new ConcurrentLinkedQueue<>(); // List of classifiers
+        ArrayList<Thread> threads = new ArrayList<>(); // List of all threads
+        int partitions = cores; // How many partitions to divide allFeatures into. This is the same as number of threads.
+
+        // Partition data and create all but the last thread.
+        int start = 0;
+        for (int i = 0; i < partitions-1; i++) {
+            int end = start + Feature.allFeatures.size() / partitions;
+            threads.add(new AdaTwo(Feature.allFeatures.subList(start, end), classifiers, (List<LabeledIntegralImage>) allSamples.clone()));
+            start = end + 1;
+        }
+        // Create the last thread. Special case since it may have a slightly different length than the others.
+        threads.add(new AdaTwo(Feature.allFeatures.subList(start, Feature.allFeatures.size()-1), classifiers, (List<LabeledIntegralImage>) allSamples.clone()));
+
+        // Start all threads
+        for (Thread t : threads) {
+            t.start();
+        }
+
+        // Wait for all threads to finish.
+        for (Thread t : threads) {
+            t.join();
+        }
+        return classifiers;
     }
 
     public static void testStrong(StrongClassifier strongClassifier, ArrayList<LabeledIntegralImage> testData) throws Exception {
@@ -415,7 +470,7 @@ public class FaceRecognition {
         trainingData.sort((a, b) -> {
             try {
                 // The order here matters.
-                return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+                return a.img.getFeatureValue(j) - b.img.getFeatureValue(j);
             } catch (Exception e) {
                 System.err.println("Features could not be sorted due to an error.");
                 e.printStackTrace();
@@ -427,7 +482,7 @@ public class FaceRecognition {
         ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
         int featureValueSum = 0;
         for (LabeledIntegralImage img : trainingData) {
-            int fv = j.calculateFeatureValue(img.img);
+            int fv = img.img.getFeatureValue(j);
             featureValues.add(fv);
             featureValueSum += fv;
         }
@@ -445,31 +500,31 @@ public class FaceRecognition {
      * @return
      * @throws Exception if calculateFeatureValue throws an exception
      */
-    public static ThresholdParity calcBestThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
+    public static ThresholdParity calcBestThresholdAndParity(List<LabeledIntegralImage> trainingData, Feature j) throws Exception {
 
-        // ------------------------------ TODO don't calculate many times
+        // DONE Feature values are no longer calculated every time.
+        // TODO If possible, move sorting so it does not happen every time.
         // Sort training data based on features
         trainingData.sort((a, b) -> {
             try {
                 // The order here matters.
-                return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+                //return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+                return a.img.getFeatureValue(j) - b.img.getFeatureValue(j);
             } catch (Exception e) {
                 System.err.println("Features could not be sorted due to an error.");
                 e.printStackTrace();
             }
             return 0;
         });
-        //TODO Sort this directly?
         //Go through the sorted training data and store the values from the feature j in featureValues.
         ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
         for (LabeledIntegralImage img : trainingData) {
-            featureValues.add(j.calculateFeatureValue(img.img));
+            featureValues.add(img.img.getFeatureValue(j));
         }
 
-        //System.out.println("Sorted list from feture: "+j+": First value"+featureValues.get(0)+", Last: "+featureValues.get(featureValues.size()-1));
+        //System.out.println("Sorted list from feature: "+j+": First value"+featureValues.get(0)+", Last: "+featureValues.get(featureValues.size()-1));
 
         //System.out.println("Testing feature: "+j);
-        // ----------------------------------
 
         int bestThreshold = 0;
         int bestThresholdParity = 0;
@@ -479,8 +534,8 @@ public class FaceRecognition {
         //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
         //  to find the best threshold much faster.
         for (int i = 0; i < featureValues.size(); i += 100) {
-            //Integer threshold = featureValues.get(i);
             Integer threshold = featureValues.get(i);
+            //Integer threshold = trainingData.get(i).getFeatureValue(j);
             //System.out.println("Threshold nr: "+i+" = "+threshold);
             double tPlus = 0;
             double tMinus = 0;

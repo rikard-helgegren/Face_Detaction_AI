@@ -47,15 +47,15 @@ At the top of `FaceRecognition.java` is a boolean variable `loadFromFile` that a
    * For three rectangles (the nose feature). Dummy function in `Feature.calcThreeRectFeature()`.
    * For four rectangles (the checkerboard feature). Dummy function in `Feature.calcFourRectFeature()`.
 * Calculate __parity__ value in Adaboost single-classifier training.
+* Multithreaded step 2 in adaboost.
 
 ## Things that are TODO
 * Make single classifier training faster. Right now it calculates about 10 features a second, out of 39150. Some leads:
    * Optimize feature calculation. Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).
-   * `calcBestThreshold()` is the place where adaboost supposedly spends most time. See comment in that function for discussion.
 * Test and improve AdaBoost and cascade classifier.
 * Report performance for 36 feature strong classifier.
 * Hand check S+T+ part of adaboost.
 * Move calculating featurevalues so that it is done once.
 * Use 10 jumps instead.
-
-
+* Write test for that regular and multithreaded step2 adaboost get the same result? It seems to be the same, but would be good to have test confirming this.
+* Clean up and comment code.

@@ -228,8 +228,8 @@ public class FaceRecognition {
         }
 
         // 2. Train a classifier for every feature. Each is trained on all trainingData
-        //Queue<Classifier> classifiers = adaBoostStepTwo(allSamples);
-        Queue<Classifier> classifiers = adaBoostStepTwoThreaded(allSamples, 8);
+        //Queue<Classifier> classifiers = adaBoostStepTwo(allSamples); // Single thread
+        Queue<Classifier> classifiers = adaBoostStepTwoThreaded(allSamples, 8); // Multi-thread
 
         // 3. Choose the classifier with the lowest error
         //Classifier bestClassifier = classifiers.get(0);
@@ -512,7 +512,7 @@ public class FaceRecognition {
         //  However, it should be fine to take big jumps in i. This SIGNIFICANTLY reduces running time.
         //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
         //  to find the best threshold much faster.
-        for (int i = 0; i < featureValues.size(); i += 100) {
+        for (int i = 0; i < featureValues.size(); i += 10) {
             Integer threshold = featureValues.get(i);
             //Integer threshold = trainingData.get(i).getFeatureValue(j);
             //System.out.println("Threshold nr: "+i+" = "+threshold);

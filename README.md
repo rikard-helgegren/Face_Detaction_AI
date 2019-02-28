@@ -58,3 +58,4 @@ At the top of `FaceRecognition.java` is a boolean variable `loadFromFile` that a
 * Move calculating featurevalues so that it is done once.
 * Use 10 jumps instead.
 * Write test for that regular and multithreaded step2 adaboost get the same result? It seems to be the same, but would be good to have test confirming this.
+* Clean up and comment code.

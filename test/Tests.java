@@ -164,29 +164,35 @@ public class Tests {
     @Test
     public void testBestThresholdAndParity() throws Exception {
         HalIntegralImage black = readImage(path + "black-25px.png");
-        LabeledIntegralImage black1 = new LabeledIntegralImage(black, 0, 0);
+        LabeledIntegralImage black1 = new LabeledIntegralImage(black, 0, 1);
         HalIntegralImage white = readImage(path + "white-25px.png");
-        LabeledIntegralImage white1 = new LabeledIntegralImage(white, 0, 0);
+        LabeledIntegralImage white1 = new LabeledIntegralImage(white, 0, 1);
         HalIntegralImage face = readImage(path + "000.png");
-        LabeledIntegralImage face1 = new LabeledIntegralImage(face, 1, 0);
+        LabeledIntegralImage face1 = new LabeledIntegralImage(face, 1, 1);
         HalIntegralImage blackTop10 = readImage(path + "blackTop10-25px.png");
-        LabeledIntegralImage blackTop101 = new LabeledIntegralImage(black, 1, 0);
+        LabeledIntegralImage blackTop101 = new LabeledIntegralImage(black, 0, 1);
         HalIntegralImage blackLeft10 = readImage(path + "blackLeft10-25px.png");
-        LabeledIntegralImage blackLeft101 = new LabeledIntegralImage(black, 1, 0);
+        LabeledIntegralImage blackLeft101 = new LabeledIntegralImage(black, 1, 1);
 
         ArrayList<LabeledIntegralImage> trainingData = new ArrayList();
         trainingData.add(black1);
-        trainingData.add(white1);
+        //trainingData.add(white1);
         trainingData.add(face1);
-        trainingData.add(blackTop101);
-        trainingData.add(blackLeft101);
-
-        Feature rect = new Feature(Feature.Type.HORIZONTAL, 0,0,2,2);
+        //trainingData.add(blackTop101);
+        // trainingData.add(blackLeft101);
 
 
+        Feature rect = new Feature(Feature.Type.HORIZONTAL, 6,8,2,2);
+        System.out.println("threshold " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect).threshold + "; Parity " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect).parity);
+        //should be less than 0?
 
+        Feature rect2 = new Feature(Feature.Type.VERTICAL, 6,8,2,2);
+        System.out.println("threshold " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect2).threshold + "; Parity " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect).parity);
+        //should be greater than 0
 
+        Feature rect3 = new Feature(Feature.Type.THREE, 6,8,3,2);
+        System.out.println("threshold " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect3).threshold + "; Parity " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect).parity);
+        //shoould be less than 2
 
-        System.out.println("hi " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect));
     }
 }

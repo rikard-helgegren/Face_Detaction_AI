@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Tests {
 
-    private String path = "./test-res/";
+    private String path = "./code/test-res/";
 
     @Test
     public void testImageRead() {
@@ -190,12 +190,46 @@ public class Tests {
         System.out.println("hi " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect));
     }
 
+    public static void printFastBitmap(FastBitmap fb){
+        int widthHeight = 19;
+        byte[] rgbData = fb.getGrayData();
+
+        for(int h=0;h<widthHeight;h++) {
+            for (int w = 0; w < widthHeight; w++) {
+                System.out.print(rgbData[h*widthHeight+w] + ", ");
+            }
+            System.out.println();
+        }
+    }
+
+    public static void printIntegralImage(int[][] img){
+
+        for(int h = 0;h<img.length;h++){
+            for(int w = 0;w<img[0].length;w++){
+                System.out.print(img[h][w]+", ");
+            }
+            System.out.println();
+        }
+    }
 
     @Test
     public void testGetRectangleSum() throws Exception {
-        HalIntegralImage img = readImage("./res/source/data/train/non-face/B20_03379.png");
-        System.out.println(img.getRectangleSum(0,0,18,6));
-        System.out.println(img.getRectangleSum(0,5,18,11));
+
+        File file = new File("./code/res/source/data/train/non-face/B20_03379.png");
+        HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), file.getName());
+
+        System.out.println(img.getRectangleSum(0,0,18,4));
+        System.out.println(img.getRectangleSum(0,0,4,18));
+
+
+        System.out.println("FB:");
+        printFastBitmap(new FastBitmap(ImageIO.read(file)));
+        System.out.println();
+        System.out.println();
+        System.out.println("II:");
+        printIntegralImage(img.getInternalData());
+
+
         assertEquals(1,1);
     }
 }

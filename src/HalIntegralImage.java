@@ -25,7 +25,7 @@ public class HalIntegralImage {
         data = toIntegralData(fb);
     }
 
-    private int[][] toIntegralData(FastBitmap fb) {
+    public static int[][] toIntegralData(FastBitmap fb) {
         int[][] integral = new int[fb.getHeight()][fb.getWidth()];
         //System.out.printf("Dimension: %s, %s\n", fb.getWidth(), fb.getHeight());
 

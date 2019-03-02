@@ -190,23 +190,22 @@ public class Tests {
         System.out.println("hi " + FaceRecognition.calcBestThresholdAndParity(trainingData, rect));
     }
 
-    public static void printFastBitmap(FastBitmap fb){
-        int widthHeight = 19;
-        byte[] rgbData = fb.getGrayData();
+    public static void printIntegralImage(int[][] img) {
 
-        for(int h=0;h<widthHeight;h++) {
-            for (int w = 0; w < widthHeight; w++) {
-                System.out.print(rgbData[h*widthHeight+w] + ", ");
+        for (int h = 0; h < img.length; h++) {
+            for (int w = 0; w < img[0].length; w++) {
+                System.out.print(img[h][w] + ", ");
             }
             System.out.println();
         }
     }
 
-    public static void printIntegralImage(int[][] img){
+    public static void printImageValues(FastBitmap fb){
+        int widthHeight = 19;
 
-        for(int h = 0;h<img.length;h++){
-            for(int w = 0;w<img[0].length;w++){
-                System.out.print(img[h][w]+", ");
+        for(int h=0;h<widthHeight;h++) {
+            for (int w = 0; w < widthHeight; w++) {
+                System.out.print(fb.getGray(h, w) + ", ");
             }
             System.out.println();
         }
@@ -221,9 +220,10 @@ public class Tests {
         System.out.println(img.getRectangleSum(0,0,18,4));
         System.out.println(img.getRectangleSum(0,0,4,18));
 
+        
+        System.out.println("GRAY:");
+        printImageValues(new FastBitmap(ImageIO.read(file)));
 
-        System.out.println("FB:");
-        printFastBitmap(new FastBitmap(ImageIO.read(file)));
         System.out.println();
         System.out.println();
         System.out.println("II:");

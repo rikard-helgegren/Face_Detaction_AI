@@ -44,7 +44,7 @@ public class FaceRecognition {
                 // Load strong classifier from file
                 cascadedClassifier = Data.loadCascade("cascade1.cascade");
             } else {
-                cascadedClassifier = trainCascadedClassifier(data.positiveSamples, data.negativeSamples, data.testData);
+                cascadedClassifier = trainCascadedClassifier(data.positiveSamples, data.negativeSamples, data.validationData);
                 // Save cascaded classifier
                 Data.saveCascade(cascadedClassifier, "save.cascade");
             }
@@ -111,7 +111,7 @@ public class FaceRecognition {
     private static List<StrongClassifier> trainCascadedClassifier(
             List<LabeledIntegralImage> positiveSamples,
             List<LabeledIntegralImage> negativeSamples,
-            List<LabeledIntegralImage> testData) throws Exception {
+            List<LabeledIntegralImage> validationData) throws Exception {
 
         // Train cascaded classifier
         List<StrongClassifier> cascadedClassifier = new ArrayList<>();
@@ -125,7 +125,7 @@ public class FaceRecognition {
 
         //The training algorithm for building a cascaded detector
         while(curFalsePositiveRate>overallFalsePositiveRate) {
-            System.out.printf("Cascaded classifier. Performance: %s\n", evalCascade(cascadedClassifier, testData));
+            System.out.printf("Cascaded classifier. Performance: %s\n", evalCascade(cascadedClassifier, validationData));
             for(StrongClassifier c:cascadedClassifier){
                 System.out.println(c);
             }
@@ -153,7 +153,7 @@ public class FaceRecognition {
 
                 while(true) {
                     System.out.printf("Evaluating threshold multiplier %.2f. With threshold: %.2f. ", cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier(), cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
-                    PerformanceStats stats = evalCascade(cascadedClassifier, testData);
+                    PerformanceStats stats = evalCascade(cascadedClassifier, validationData);
                     System.out.printf("Performance: %s. ", stats);
                     curFalsePositiveRate = stats.falsePositive;
                     curDetectionRate = stats.truePositive;

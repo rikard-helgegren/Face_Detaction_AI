@@ -15,6 +15,7 @@ public class Data {
     public List<LabeledIntegralImage> allSamples;
 
     public List<LabeledIntegralImage> testData;
+    public List<LabeledIntegralImage> validationData;
 
     public Data() throws Exception {
         // Read images from file system amd calculate integralImages.
@@ -51,9 +52,12 @@ public class Data {
         Collections.shuffle(allNonFaces);
 
         negativeSamples = new ArrayList<>(allNonFaces.subList(0, 4000));
-        positiveSamples = new ArrayList<>(allFaces.subList(0, 2400));
+        positiveSamples = new ArrayList<>(allFaces.subList(0, 2000));
 
-        testData = new ArrayList<>(allNonFaces.subList(4000, 19000));
+        validationData = new ArrayList<>(allNonFaces.subList(4000, 6000));
+        validationData.addAll(allFaces.subList(2000, 2400));
+
+        testData = new ArrayList<>(allNonFaces.subList(6000, 19000));
         testData.addAll(allFaces.subList(2400, 2900));
 
         allSamples = new ArrayList<>();

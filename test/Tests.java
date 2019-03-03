@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Tests {
 
-    private String path = "./code/test-res/";
+    private String path = "./test-res/";
 
     @Test
     public void testImageRead() {
@@ -214,7 +214,7 @@ public class Tests {
     @Test
     public void testGetRectangleSum() throws Exception {
 
-        File file = new File("./code/res/source/data/train/non-face/B20_03379.png");
+        File file = new File("./res/source/data/train/non-face/B20_03379.png");
         HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), file.getName());
 
         System.out.println(img.getRectangleSum(0,0,18,4));

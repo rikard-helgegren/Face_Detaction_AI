@@ -30,6 +30,8 @@ public class AdaTwo extends Thread {
                 boolean isSpec2 = false;
                 if(FaceRecognition.isSpecial2(j)){
                     isSpec2 = true;
+                    System.out.println();
+                    System.out.println();
                     System.out.println("Special feature 2: ");
                 }*/
 

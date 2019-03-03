@@ -247,5 +247,9 @@ public class Tests {
         assertTrue(img.getRectangleSum(0,0,18,4)>img.getRectangleSum(0,0,4,18),
                 "The test failed on the image test-res/B20_03379.png. " +
                         "The top should be brighter than the left side but isn't");
+        assertEquals(img.getRectangleSum(0,0,18,4),14525,
+                "Rectangle sum for the top 4 pixels of the image test-res/B20_03379.png is wrong.");
+        assertEquals(img.getRectangleSum(0,0,4,18), 1415,
+                "Rectangle sum for the leftmost 4 pixels of the image test-res/B20_03379.png is wrong.");
     }
 }

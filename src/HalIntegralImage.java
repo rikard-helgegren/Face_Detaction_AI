@@ -12,15 +12,14 @@ public class HalIntegralImage {
     // First coordinate is Y, second is X.
     public int[][] data;
     private int[] featureValues;
-    String name;
+    private String name;
 
-    public HalIntegralImage(BufferedImage bi, String name) throws Exception {
-        this(new FastBitmap(bi), name);
+    public HalIntegralImage(BufferedImage bi) throws Exception {
+        this(new FastBitmap(bi));
     }
 
     public HalIntegralImage(FastBitmap fb, String name) throws Exception {
         if (!fb.isGrayscale()) throw new Exception("Image must be grayscale.");
-        this.name = name;
         data = toIntegralData(fb);
     }
 
@@ -28,7 +27,7 @@ public class HalIntegralImage {
         this(fb, "");
     }
 
-    public static int[][] toIntegralData(FastBitmap fb) {
+    private int[][] toIntegralData(FastBitmap fb) {
         int[][] integral = new int[fb.getHeight()][fb.getWidth()];
         //System.out.printf("Dimension: %s, %s\n", fb.getWidth(), fb.getHeight());
 
@@ -54,10 +53,6 @@ public class HalIntegralImage {
         return integral;
     }
 
-    public String getName() {
-        return name;
-    }
-
     /**
      * Calculate sum of pixels in the specified rectangle.
      * Both coordinate sets are inclusive.
@@ -79,10 +74,10 @@ public class HalIntegralImage {
         }
         if ( x2 < x1 || y2 < y1) throw new Exception("Coordinates are given in the wrong order.");
 
-        int corner = (x1 == 0 || y1 == 0) ? 0 : data[y1-1][x1-1]; // If x1 or y1 is 0, there is no corner piece.
-        int left = (x1 == 0) ? 0 : data[y2][x1-1]; // If x1 is 0, there is no left piece
-        int top = (y1 == 0) ? 0: data[y1-1][x2]; // If y1 is 0, there is no top piece
-        int main = data[y2][x2]; // There is always a main piece
+        int corner = (x1 == 0 || y1 == 0) ? 0 : data[x1-1][y1-1]; // If x1 or y1 is 0, there is no corner piece.
+        int left = (x1 == 0) ? 0 : data[x1-1][y2]; // If x1 is 0, there is no left piece
+        int top = (y1 == 0) ? 0: data[x2][y1-1]; // If y1 is 0, there is no top piece
+        int main = data[x2][y2]; // There is always a main piece
 
         return main + corner - left - top;
     }
@@ -116,5 +111,9 @@ public class HalIntegralImage {
             return featureValues[f.getId()];
         }
         return f.calculateFeatureValue(this);
+    }
+
+    public String getName() {
+        return name;
     }
 }

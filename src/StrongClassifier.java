@@ -3,7 +3,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StrongClassifier implements Serializable{
+public class StrongClassifier extends FaceDetector implements Serializable {
     private static final long serialVersionUID = 0; // Increase when changing something in this class
 
     private List<Classifier> weakClassifiers;
@@ -52,7 +52,8 @@ public class StrongClassifier implements Serializable{
 
         double value = 0;
         for(Classifier c:weakClassifiers){
-            value+=c.getAlpha()*c.canBeFace(img);
+            int isFace = (c.canBeFace(img)) ? 1 : 0;
+            value+=c.getAlpha()*isFace;
         }
 
         //FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
@@ -61,6 +62,10 @@ public class StrongClassifier implements Serializable{
 
     public int getSize() {
         return weakClassifiers.size();
+    }
+
+    public Classifier getLastTrained() {
+        return weakClassifiers.get(weakClassifiers.size()-1);
     }
 
     @Override

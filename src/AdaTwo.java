@@ -41,7 +41,9 @@ public class AdaTwo extends Thread {
                 double error = 0;
                 Classifier h = new Classifier(j, threshold, parity);
                 for (LabeledIntegralImage img : allSamples) {
-                    error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+                    int canBeFace = (h.canBeFace(img.img)) ? 1 : 0;
+                    int isFace = (img.isFace) ? 1 : 0;
+                    error += img.getWeight() * Math.abs(canBeFace - isFace); // Throws exception
 
                     //if(isSpec || isSpec2) System.out.printf("Feature value is: %d on image %s. IsFace: %d\n",img.img.getFeatureValue(j), img.img.getName(), img.isFace);
                 }

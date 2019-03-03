@@ -172,15 +172,15 @@ public class Tests {
     @Test
     public void testBestThresholdAndParity() throws Exception {
         HalIntegralImage black = readImage(path + "black-25px.png");
-        LabeledIntegralImage black1 = new LabeledIntegralImage(black, 0, 1);
+        LabeledIntegralImage black1 = new LabeledIntegralImage(black, false, 1);
         HalIntegralImage white = readImage(path + "white-25px.png");
-        LabeledIntegralImage white1 = new LabeledIntegralImage(white, 0, 1);
+        LabeledIntegralImage white1 = new LabeledIntegralImage(white, false, 1);
         HalIntegralImage face = readImage(path + "000.png");
-        LabeledIntegralImage face1 = new LabeledIntegralImage(face, 1, 1);
+        LabeledIntegralImage face1 = new LabeledIntegralImage(face, true, 1);
         HalIntegralImage blackTop10 = readImage(path + "blackTop10-25px.png");
-        LabeledIntegralImage blackTop101 = new LabeledIntegralImage(black, 0, 1);
+        LabeledIntegralImage blackTop101 = new LabeledIntegralImage(black, false, 1);
         HalIntegralImage blackLeft10 = readImage(path + "blackLeft10-25px.png");
-        LabeledIntegralImage blackLeft101 = new LabeledIntegralImage(black, 1, 1);
+        LabeledIntegralImage blackLeft101 = new LabeledIntegralImage(black, true, 1);
 
         ArrayList<LabeledIntegralImage> trainingData = new ArrayList();
         trainingData.add(black1);

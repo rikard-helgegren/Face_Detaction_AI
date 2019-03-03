@@ -1,7 +1,7 @@
-import java.awt.*;
 import java.io.Serializable;
+import java.util.List;
 
-public class Classifier implements Serializable {
+public class Classifier extends FaceDetector implements Serializable {
     private static final long serialVersionUID = 0; // Increase when changing something in this class
 
     private Feature feature;
@@ -10,6 +10,7 @@ public class Classifier implements Serializable {
     private double error;
     private double beta;
     private double alpha;
+    private PerformanceStats testPerformance;
 
     /**
      * Constructs a classifier that uses the the given type of feature with the given values.
@@ -59,24 +60,33 @@ public class Classifier implements Serializable {
      * @return 1 if this classifier thinks the image might be a face and 0 otherwise.
      * @throws Exception
      */
-    public int canBeFace(HalIntegralImage img) throws Exception {
+    public boolean canBeFace(HalIntegralImage img) throws Exception {
         if (parity != 1 && parity != -1) throw new Exception("Parity was not 1 or -1. It was: " + parity);
 
         //System.out.println("My (weak classifier) threshold: "+threshold);
         //System.out.println("The feature value of the image: "+feature.calculateFeatureValue(img));
         //System.out.println("parity: "+parity);
-        if (parity * img.getFeatureValue(feature) < parity * threshold) {
-            return 1;
-        }
-        return 0;
+        return parity * img.getFeatureValue(feature) < parity * threshold;
     }
 
     public Feature getFeature() {
         return feature;
     }
 
+    @Override
+    public PerformanceStats eval(List<LabeledIntegralImage> testData) throws Exception {
+        PerformanceStats stats = super.eval(testData);
+        testPerformance = stats;
+        return stats;
+    }
+
     public String toString(){
-        return "[" + feature.toString()+". Threshold: "+threshold+". Parity: "+parity+". Error: "+error+" Beta: "+beta+". Alpha: "+ alpha+".]";
+        String s = String.format("[ Feature %s, threshold %.3f, parity %d, error %.3f, beta %.3f, alpha %.3f. ",
+                feature, threshold, parity, error, beta, alpha);
+        if (testPerformance != null) {
+            s += String.format("Test performance was %s ", testPerformance);
+        }
+        return s + "]";
     }
 
     @Override

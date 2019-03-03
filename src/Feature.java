@@ -77,8 +77,8 @@ public class Feature implements Serializable {
     private static ArrayList<Feature> generateAllFeatures(int imageWidth, int imageHeight) {
         ID = 0; // Reset ID in case this method is called multiple times.
         ArrayList<Feature> allFeatures = new ArrayList<>(10000);
-        for (int x = 0; x < imageWidth; x+=1){           ///------------------------------TODO increased x and y faster
-            for (int y = 0; y < imageHeight; y+=1) {
+        for (int x = 0; x < imageWidth; x+=2){           ///------------------------------TODO increased x and y faster
+            for (int y = 0; y < imageHeight; y+=2) {
                 for (int w = 2; w < imageWidth - x; w+=1) {
                     for (int h = 2; h < imageHeight - y; h += 1){
                         if (w % 2 == 0) allFeatures.add(new Feature(Feature.Type.HORIZONTAL, x, y, w, h));
@@ -217,7 +217,7 @@ public class Feature implements Serializable {
     }
 
     public String toString(){
-        return "Feature: [x: "+getX()+" y: "+getY()+" w: "+getW()+" h: "+getH()+ " type: "+getType()+"]";
+        return "[x: "+getX()+" y: "+getY()+" w: "+getW()+" h: "+getH()+ " type: "+getType()+"]";
     }
 
     @Override

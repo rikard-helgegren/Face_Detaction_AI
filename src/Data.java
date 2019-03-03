@@ -43,15 +43,15 @@ public class Data {
         negativeSamples = new ArrayList<>();
         positiveSamples = new ArrayList<>();
         allSamples = new ArrayList<>();
-        for (HalIntegralImage img : trainNoFaces) negativeSamples.add(new LabeledIntegralImage(img, 0, weightNoFace));//TODO change maybe
-        for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
+        for (HalIntegralImage img : trainNoFaces) negativeSamples.add(new LabeledIntegralImage(img, false, weightNoFace));
+        for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, true, weightFace));
         allSamples.addAll(negativeSamples);
         allSamples.addAll(positiveSamples);
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         testData = new ArrayList<>(20000);
-        for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, 1, 0));
-        for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, 0, 0));
+        for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, true, 0));
+        for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, false, 0));
 
         // Pre-calculate all feature values
         System.out.println("Pre-calculating feature values for training data...");

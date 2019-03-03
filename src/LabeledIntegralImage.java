@@ -1,9 +1,9 @@
 public class LabeledIntegralImage {
-	public int isFace; // 1 for true, 0 for false
+	public boolean isFace;
 	public HalIntegralImage img;
 	private double weight;
 
-	public LabeledIntegralImage(HalIntegralImage img, int isFace, double weight) throws Exception {
+	public LabeledIntegralImage(HalIntegralImage img, boolean isFace, double weight) throws Exception {
 		this.isFace = isFace;
 		this.img = img;
 		setWeight(weight);

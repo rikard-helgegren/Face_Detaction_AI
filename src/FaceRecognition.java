@@ -32,23 +32,6 @@ public class FaceRecognition {
         }
     }
 
-    private static class PerformanceStats {
-        public double truePositive;
-        public double falsePositive;
-        public double falseNegative;
-
-        public PerformanceStats(double truePositive, double falsePositive, double falseNegative){
-            this.truePositive = truePositive;
-            this.falsePositive = falsePositive;
-            this.falseNegative = falseNegative;
-        }
-
-        @Override
-        public String toString(){
-            return String.format("%.2f detection rate, %.2f falsePositive", truePositive, falsePositive);
-        }
-    }
-
     public static void main(String[] args) throws Exception {
 
         Data data = new Data();
@@ -99,6 +82,7 @@ public class FaceRecognition {
         for (int i = 0; i < size; i++) {
             System.out.printf("Training weak classifier %d/%d.\n", i + 1, size);
             strongClassifier = trainStrongClassifier(trainingData, strongClassifier, 1);
+            strongClassifier.getLastTrained().eval(testData);
             testStrong(strongClassifier, testData);
         }
 
@@ -306,7 +290,9 @@ public class FaceRecognition {
             double error = 0;
             Classifier h = new Classifier(j, threshold, parity);
             for (LabeledIntegralImage img : allSamples) {
-                error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
+                int canBeFace = (h.canBeFace(img.img)) ? 1 : 0;
+                int isFace = (img.isFace) ? 1 : 0;
+                error += img.getWeight() * Math.abs(canBeFace - isFace); // Throws exception
             }
             //System.out.println("Error for this feature: "+error);
 
@@ -359,7 +345,7 @@ public class FaceRecognition {
         //strongClassifier = new StrongClassifier(strongClassifier, 1);
         PerformanceStats stats = null;
         try {
-            stats = evalStrong(strongClassifier, testData);
+            stats = strongClassifier.eval(testData);
         } catch (Exception e) {
             System.out.println("The evaluation of the strong classifier failed.");
             e.printStackTrace();
@@ -386,14 +372,14 @@ public class FaceRecognition {
         int nrCorrectIsNotFace = 0;
         int nrWrongIsNotFace = 0;
         for(LabeledIntegralImage i:testData){
-            if(i.isFace==1){
+            if(i.isFace){
                 if(isFace(degenerateDecisionTree,i.img)){
                     nrCorrectIsFace++;
                 }else{
                     nrWrongIsFace++;
                 }
             }
-            if(i.isFace==0){
+            if(!i.isFace){
                 if(!isFace(degenerateDecisionTree,i.img)){
                     nrCorrectIsNotFace++;
                 }else{
@@ -414,48 +400,20 @@ public class FaceRecognition {
         System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
     }
 
-    private static PerformanceStats evalStrong(StrongClassifier strongClassifier, ArrayList<LabeledIntegralImage> testData) throws Exception {
-        int nrCorrectIsFace = 0;
-        int nrWrongIsFace = 0;
-        int nrCorrectIsNotFace = 0;
-        int nrWrongIsNotFace = 0;
-        for(LabeledIntegralImage i:testData){
-            if(i.isFace==1){
-                if(strongClassifier.canBeFace(i.img)){
-                    nrCorrectIsFace++;
-                }else{
-                    nrWrongIsFace++;
-                }
-            }
-            if(i.isFace==0){
-                if(!strongClassifier.canBeFace(i.img)){
-                    nrCorrectIsNotFace++;
-                }else{
-                    nrWrongIsNotFace++;
-                }
-            }
-        }
-        double falsePositive = ((double)nrWrongIsNotFace) / (nrCorrectIsNotFace + nrWrongIsNotFace);
-        double truePositive  = ((double)nrCorrectIsFace)  / (nrCorrectIsFace    + nrWrongIsFace);
-        double falseNegative = ((double)nrWrongIsFace)    / (nrCorrectIsFace    + nrWrongIsFace);
-
-        return new PerformanceStats(truePositive, falsePositive, falseNegative);
-    }
-
     private static PerformanceStats evalCascade(ArrayList<StrongClassifier> decisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
         int nrCorrectIsFace = 0;
         int nrWrongIsFace = 0;
         int nrCorrectIsNotFace = 0;
         int nrWrongIsNotFace = 0;
         for(LabeledIntegralImage i:testData){
-            if(i.isFace==1){
+            if(i.isFace){
                 if(isFace(decisionTree,i.img)){
                     nrCorrectIsFace++;
                 }else{
                     nrWrongIsFace++;
                 }
             }
-            if(i.isFace==0){
+            if(!i.isFace){
                 if(!isFace(decisionTree,i.img)){
                     nrCorrectIsNotFace++;
                 }else{
@@ -559,7 +517,7 @@ public class FaceRecognition {
             // TODO Check calculations here by hand
             for (int k=0; k<trainingData.size(); k++) {
                 LabeledIntegralImage img = trainingData.get(k);
-                if (img.isFace == 1) {
+                if (img.isFace) {
                     tPlus += img.getWeight();
                     //if (img.getWeight() < threshold) {
                     if (k < i) {
@@ -568,7 +526,7 @@ public class FaceRecognition {
                     }else{
                         //System.out.println("isFace: It is above threshold: "+threshold);
                     }
-                } else if (img.isFace == 0) {
+                } else if (!img.isFace) {
                     tMinus += img.getWeight();
                     if (k < i) {
                         sMinus += img.getWeight();

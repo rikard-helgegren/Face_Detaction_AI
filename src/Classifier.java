@@ -10,7 +10,8 @@ public class Classifier extends FaceDetector implements Serializable {
     private double error;
     private double beta;
     private double alpha;
-    private PerformanceStats testPerformance;
+    public PerformanceStats testPerformance;
+    public PerformanceStats trainPerformance;
 
     /**
      * Constructs a classifier that uses the the given type of feature with the given values.
@@ -73,16 +74,12 @@ public class Classifier extends FaceDetector implements Serializable {
         return feature;
     }
 
-    @Override
-    public PerformanceStats eval(List<LabeledIntegralImage> testData) throws Exception {
-        PerformanceStats stats = super.eval(testData);
-        testPerformance = stats;
-        return stats;
-    }
-
     public String toString(){
         String s = String.format("[ %s, threshold %6d, parity %2d, error %.3f, beta %.3f, alpha %.3f. ",
                 feature, threshold, parity, error, beta, alpha);
+        if (trainPerformance != null) {
+            s += String.format("Train: %s. ", trainPerformance);
+        }
         if (testPerformance != null) {
             s += String.format("Test: %s. ", testPerformance);
         }

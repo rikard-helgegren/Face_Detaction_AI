@@ -81,8 +81,11 @@ public class FaceRecognition {
 
         for (int i = 0; i < size; i++) {
             System.out.printf("Training weak classifier %d/%d.\n", i + 1, size);
-            strongClassifier = trainStrongClassifier(trainingData, strongClassifier, 1);
-            strongClassifier.getLastTrained().eval(testData);
+            Classifier c = trainOneWeak(trainingData);
+            c.trainPerformance = c.eval(trainingData);
+            c.testPerformance = c.eval(testData);
+            strongClassifier.addClassifier(c);
+
             testStrong(strongClassifier, testData);
         }
 

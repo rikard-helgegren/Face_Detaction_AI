@@ -40,18 +40,34 @@ public class Data {
         double weightFace = 1.0 / (2 * trainFaces.length);
         double weightNoFace = 1.0 / (2 * trainNoFaces.length);
 
+        int faceSplitIndex = 5 * trainFaces.length / 6;
+        int noFaceSplitIndex = 5 * trainNoFaces.length / 6;
+        System.out.printf("Splitting faces at %d and non-faces at %d\n", faceSplitIndex, noFaceSplitIndex);
+
         negativeSamples = new ArrayList<>();
         positiveSamples = new ArrayList<>();
         allSamples = new ArrayList<>();
-        for (HalIntegralImage img : trainNoFaces) negativeSamples.add(new LabeledIntegralImage(img, false, weightNoFace));
-        for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, true, weightFace));
+        for (int i = 0; i < noFaceSplitIndex; i++) {
+            HalIntegralImage img = trainNoFaces[i];
+            negativeSamples.add(new LabeledIntegralImage(img, false, weightNoFace));
+        }
+        for (int i = 0; i < faceSplitIndex; i++) {
+            HalIntegralImage img = trainFaces[i];
+            positiveSamples.add(new LabeledIntegralImage(img, true, weightFace));
+        }
         allSamples.addAll(negativeSamples);
         allSamples.addAll(positiveSamples);
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         testData = new ArrayList<>(20000);
-        for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, true, 0));
-        for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, false, 0));
+        for (int i = noFaceSplitIndex; i < trainNoFaces.length; i++) {
+            HalIntegralImage img = trainNoFaces[i];
+            testData.add(new LabeledIntegralImage(img, false, 0));
+        }
+        for (int i = faceSplitIndex; i < trainFaces.length; i++) {
+            HalIntegralImage img = trainFaces[i];
+            testData.add(new LabeledIntegralImage(img, true, 0));
+        }
 
         // Pre-calculate all feature values
         System.out.println("Pre-calculating feature values for training data...");

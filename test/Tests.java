@@ -214,13 +214,13 @@ public class Tests {
     @Test
     public void testGetRectangleSum() throws Exception {
 
-        File file = new File("./code/res/source/data/train/non-face/B20_03379.png");
+        File file = new File("./res/source/data/train/non-face/B20_03379.png");
         HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), file.getName());
 
-        System.out.println(img.getRectangleSum(0,0,18,4));
+        System.out.println(img.getRectangleSum(0,0,18,4)); //Should be larger
         System.out.println(img.getRectangleSum(0,0,4,18));
 
-        
+
         System.out.println("GRAY:");
         printImageValues(new FastBitmap(ImageIO.read(file)));
 

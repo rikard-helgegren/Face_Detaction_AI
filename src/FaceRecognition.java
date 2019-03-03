@@ -8,20 +8,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    private static final boolean trainFullCascade = false; // Should a cascade be trained? If not, a strong will be trained.
+    // Should an entire cascade be trained? If not, a strong classifier will be trained.
+    private static final boolean trainFullCascade = true;
     private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
-    private static final double overallFalsePositiveRate = 0.3;
+    //The overall false positive rate the cascaded classifier should reach.
+    private static final double overallFalsePositiveRate = 0.1;
     public static final double DELTA = 0.00001;
-    public static PrintWriter writer;
 
-    static {
-        try {
-            writer = new PrintWriter("the-file-name.txt", "UTF-8");
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
+    //A class used to store a threshold-parity pair
     public static class ThresholdParity{
         public int threshold;
         public int parity;
@@ -33,7 +27,7 @@ public class FaceRecognition {
     }
 
     public static void main(String[] args) throws Exception {
-
+        
         Data data = new Data();
         
         if (trainFullCascade) {
@@ -117,7 +111,7 @@ public class FaceRecognition {
         List<StrongClassifier> cascadedClassifier = new ArrayList<>();
 
         double maxFalsePositiveRatePerLayer = 0.7;
-        double minDetectionRatePerLayer = 0.9;
+        double minDetectionRatePerLayer = 0.95;
         double prevFalsePositiveRate = 1;
         double curFalsePositiveRate = 1;
         double prevDetectionRate = 1;
@@ -152,8 +146,11 @@ public class FaceRecognition {
                 strongClassifier.setThresholdMultiplier(1);
 
                 while(true) {
-                    System.out.printf("Evaluating threshold multiplier %.2f. With threshold: %.2f. ", cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier(), cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
+                    //System.out.printf("Evaluating threshold multiplier %.2f. With threshold: %.2f. ",
+                    //        cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier(),
+                    //        cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
                     PerformanceStats stats = evalCascade(cascadedClassifier, validationData);
+
                     System.out.printf("Performance: %s. ", stats);
                     curFalsePositiveRate = stats.falsePositive;
                     curDetectionRate = stats.truePositive;
@@ -167,7 +164,6 @@ public class FaceRecognition {
                     strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
                     if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
                 }
-                writer.close();
             }
 
             if(curFalsePositiveRate > overallFalsePositiveRate){
@@ -270,14 +266,6 @@ public class FaceRecognition {
 
         System.out.printf("Trained one weak classifier in %ds\n", (System.currentTimeMillis() - t0) / 1000);
         return bestClassifier;
-    }
-
-    public static boolean isSpecial(Feature f){
-        return f.getType() == Feature.Type.VERTICAL && f.getX()==0 && f.getY()==0 && f.getW() == 18 && f.getH() == 12;
-    }
-
-    public static boolean isSpecial2(Feature f){
-        return f.getType() == Feature.Type.HORIZONTAL && f.getX()==4 && f.getY()==4 && f.getW() == 4 && f.getH() == 14;
     }
 
 

@@ -14,7 +14,6 @@ public class HalIntegralImage {
     private int[] featureValues;
     String name;
 
-
     public HalIntegralImage(BufferedImage bi, String name) throws Exception {
         this(new FastBitmap(bi), name);
     }
@@ -23,6 +22,10 @@ public class HalIntegralImage {
         if (!fb.isGrayscale()) throw new Exception("Image must be grayscale.");
         this.name = name;
         data = toIntegralData(fb);
+    }
+
+    public HalIntegralImage(FastBitmap fb) throws Exception {
+        this(fb, "");
     }
 
     public static int[][] toIntegralData(FastBitmap fb) {

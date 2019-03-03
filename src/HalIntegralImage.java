@@ -9,25 +9,28 @@ import java.awt.image.BufferedImage;
  */
 public class HalIntegralImage {
 
-    // First coordinate is X, second is Y.
+    // First coordinate is Y, second is X.
     public int[][] data;
+    public FastBitmap fastBitmap;
     private int[] featureValues;
     private String name;
 
-    public HalIntegralImage(BufferedImage bi) throws Exception {
-        this(new FastBitmap(bi));
+    public HalIntegralImage(BufferedImage bi, String name) throws Exception {
+        this(new FastBitmap(bi), name);
     }
 
     public HalIntegralImage(FastBitmap fb, String name) throws Exception {
         if (!fb.isGrayscale()) throw new Exception("Image must be grayscale.");
+        this.name = name;
         data = toIntegralData(fb);
+        fastBitmap = fb;
     }
 
     public HalIntegralImage(FastBitmap fb) throws Exception {
         this(fb, "");
     }
 
-    private int[][] toIntegralData(FastBitmap fb) {
+    public static int[][] toIntegralData(FastBitmap fb) {
         int[][] integral = new int[fb.getHeight()][fb.getWidth()];
         //System.out.printf("Dimension: %s, %s\n", fb.getWidth(), fb.getHeight());
 
@@ -43,7 +46,7 @@ public class HalIntegralImage {
             int rowSum = 0;
             for (int x = 0; x < fb.getWidth(); x++) {
                 //System.out.printf("\t%s, %s\n", x, y);
-                rowSum += fb.getGray(x, y);
+                rowSum += fb.getGray(y, x); //Shouldn't the coordinates be the other way around
                 int aboveSum = 0; // Default to 0 for first row, when y is 0.
                 if (y > 0) aboveSum = integral[y-1][x];
                 integral[y][x] = rowSum + aboveSum;
@@ -51,6 +54,10 @@ public class HalIntegralImage {
             }
         }
         return integral;
+    }
+
+    public String getName() {
+        return name;
     }
 
     /**
@@ -74,10 +81,10 @@ public class HalIntegralImage {
         }
         if ( x2 < x1 || y2 < y1) throw new Exception("Coordinates are given in the wrong order.");
 
-        int corner = (x1 == 0 || y1 == 0) ? 0 : data[x1-1][y1-1]; // If x1 or y1 is 0, there is no corner piece.
-        int left = (x1 == 0) ? 0 : data[x1-1][y2]; // If x1 is 0, there is no left piece
-        int top = (y1 == 0) ? 0: data[x2][y1-1]; // If y1 is 0, there is no top piece
-        int main = data[x2][y2]; // There is always a main piece
+        int corner = (x1 == 0 || y1 == 0) ? 0 : data[y1-1][x1-1]; // If x1 or y1 is 0, there is no corner piece.
+        int left = (x1 == 0) ? 0 : data[y2][x1-1]; // If x1 is 0, there is no left piece
+        int top = (y1 == 0) ? 0: data[y1-1][x2]; // If y1 is 0, there is no top piece
+        int main = data[y2][x2]; // There is always a main piece
 
         return main + corner - left - top;
     }
@@ -111,9 +118,5 @@ public class HalIntegralImage {
             return featureValues[f.getId()];
         }
         return f.calculateFeatureValue(this);
-    }
-
-    public String getName() {
-        return name;
     }
 }

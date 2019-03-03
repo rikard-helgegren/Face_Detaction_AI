@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Tests {
 
@@ -213,16 +214,10 @@ public class Tests {
 
     @Test
     public void testGetRectangleSum() throws Exception {
-
-
         File file = new File("./test-res/B20_03379.png");
-
         HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), file.getName());
 
-        System.out.println(img.getRectangleSum(0,0,18,4)); //Should be larger
-        System.out.println(img.getRectangleSum(0,0,4,18));
-
-
+        /*
         System.out.println("GRAY:");
         printImageValues(new FastBitmap(ImageIO.read(file)));
 
@@ -230,8 +225,10 @@ public class Tests {
         System.out.println();
         System.out.println("II:");
         printIntegralImage(img.getInternalData());
+        */
 
-
-        assertEquals(1,1);
+        assertTrue(img.getRectangleSum(0,0,18,4)>img.getRectangleSum(0,0,4,18),
+                "The test failed on the image test-res/B20_03379.png. " +
+                        "The top should be brighter than the left side but isn't");
     }
 }

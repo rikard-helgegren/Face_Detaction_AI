@@ -5,7 +5,7 @@ public class Classifier extends FaceDetector implements Serializable {
     private static final long serialVersionUID = 0; // Increase when changing something in this class
 
     private Feature feature;
-    private double threshold;
+    private int threshold;
     private int parity; // should be +1 or -1
     private double error;
     private double beta;
@@ -81,10 +81,10 @@ public class Classifier extends FaceDetector implements Serializable {
     }
 
     public String toString(){
-        String s = String.format("[ Feature %s, threshold %.3f, parity %d, error %.3f, beta %.3f, alpha %.3f. ",
+        String s = String.format("[ %s, threshold %6d, parity %2d, error %.3f, beta %.3f, alpha %.3f. ",
                 feature, threshold, parity, error, beta, alpha);
         if (testPerformance != null) {
-            s += String.format("Test performance was %s ", testPerformance);
+            s += String.format("Test: %s. ", testPerformance);
         }
         return s + "]";
     }

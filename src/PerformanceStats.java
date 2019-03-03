@@ -11,6 +11,6 @@ public class PerformanceStats {
 
     @Override
     public String toString(){
-        return String.format("%.2f detection rate, %.2f falsePositive", truePositive, falsePositive);
+        return String.format("DetRate %.2f, FalsePos %.2f", truePositive, falsePositive);
     }
 }

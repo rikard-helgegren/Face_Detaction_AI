@@ -62,11 +62,11 @@ public class Tests {
         // Test image where top 10 rows are black, bottom 15 rows are white.
         //System.out.println("== Black top 10 ==");
         //System.out.println(Arrays.deepToString(blackTop10.getInternalData()));
-        printImageValues(blackTop10.fastBitmap);
+        //printImageValues(blackTop10.fastBitmap);
         assertEquals(1, blackTop10.fastBitmap.getGray(9, 0)); // FastBitmap uses coordinates in wrong order
         assertEquals(255, blackTop10.fastBitmap.getGray(10, 0));
-        System.out.println("---------------");
-        printIntegralImage(blackTop10.getInternalData());
+        //System.out.println("---------------");
+        //printIntegralImage(blackTop10.getInternalData());
         assertEquals(1, blackTop10.getInternalData()[0][0]);
         assertEquals(10, blackTop10.getInternalData()[9][0]);
         assertEquals(265, blackTop10.getInternalData()[10][0]);

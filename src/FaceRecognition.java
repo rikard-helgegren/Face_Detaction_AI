@@ -17,9 +17,7 @@ public class FaceRecognition {
     static {
         try {
             writer = new PrintWriter("the-file-name.txt", "UTF-8");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
@@ -75,7 +73,7 @@ public class FaceRecognition {
                 // Load strong classifier from file
                 strongClassifier = Data.loadStrong("save.strong");
             } else {
-                strongClassifier = trainTestStrongClassifier(data.allSamples, 10, data.testData);
+                strongClassifier = trainTestStrongClassifier(data.allSamples, 100, data.testData);
                 // Save cascaded classifier
                 Data.saveStrong(strongClassifier, "save.strong");
             }
@@ -115,7 +113,7 @@ public class FaceRecognition {
      * @return a strong classifier with extraSize more weak classifiers than the input one had.
      * @throws Exception
      */
-    public static StrongClassifier trainStrongClassifier(
+    private static StrongClassifier trainStrongClassifier(
             ArrayList<LabeledIntegralImage> trainingData, StrongClassifier strongClassifier, int extraSize) throws Exception {
         for (int i = 0; i < extraSize; i++) {
             strongClassifier.addClassifier(trainOneWeak(trainingData));
@@ -123,7 +121,7 @@ public class FaceRecognition {
         return strongClassifier;
     }
 
-    public static ArrayList<StrongClassifier> trainCascadedClassifier(
+    private static ArrayList<StrongClassifier> trainCascadedClassifier(
             ArrayList<LabeledIntegralImage> positiveSamples,
             ArrayList<LabeledIntegralImage> negativeSamples,
             ArrayList<LabeledIntegralImage> testData) throws Exception {
@@ -196,7 +194,7 @@ public class FaceRecognition {
 
     
 
-    public static ArrayList<LabeledIntegralImage> initAdaBoost(ArrayList<LabeledIntegralImage> positiveSamples, ArrayList<LabeledIntegralImage> negativeSamples) throws Exception {
+    private static ArrayList<LabeledIntegralImage> initAdaBoost(ArrayList<LabeledIntegralImage> positiveSamples, ArrayList<LabeledIntegralImage> negativeSamples) throws Exception {
         // Calculate initial weights.
         double weightFace = 1.0 / (2 * positiveSamples.size());
         double weightNoFace = 1.0 / (2 * negativeSamples.size());
@@ -226,7 +224,7 @@ public class FaceRecognition {
     // Takes 107s with sorting and recalculation.
     // Takes 59s with sorting but without recalculation.
     // Takes 13s with sorting but without recalculation and with 8 threads. (Current)
-    public static Classifier trainOneWeak(ArrayList<LabeledIntegralImage> allSamples) throws Exception {
+    private static Classifier trainOneWeak(ArrayList<LabeledIntegralImage> allSamples) throws Exception {
         long t0 = System.currentTimeMillis();
         //System.out.println("Started training on weak classifier");
         // Generate all possible features
@@ -320,11 +318,17 @@ public class FaceRecognition {
         return classifiers;
     }
 
-    public static Queue<Classifier> adaBoostStepTwoThreaded(ArrayList<LabeledIntegralImage> allSamples, int cores) throws InterruptedException {
+    /**
+     * Performs step 2 of adaboost using a multithreaded approach.
+     * @param allSamples
+     * @param partitions how many partitions to divide all samples into. One thread will be started for each partition.
+     * @return
+     * @throws InterruptedException
+     */
+    private static Queue<Classifier> adaBoostStepTwoThreaded(ArrayList<LabeledIntegralImage> allSamples, int partitions) throws InterruptedException {
         // Multithreaded version of step 2
         ConcurrentLinkedQueue<Classifier> classifiers = new ConcurrentLinkedQueue<>(); // List of classifiers
         ArrayList<Thread> threads = new ArrayList<>(); // List of all threads
-        int partitions = cores; // How many partitions to divide allFeatures into. This is the same as number of threads.
 
         // Partition data and create all but the last thread.
         int start = 0;
@@ -410,7 +414,7 @@ public class FaceRecognition {
         System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
     }
 
-    public static PerformanceStats evalStrong(StrongClassifier strongClassifier, ArrayList<LabeledIntegralImage> testData) throws Exception {
+    private static PerformanceStats evalStrong(StrongClassifier strongClassifier, ArrayList<LabeledIntegralImage> testData) throws Exception {
         int nrCorrectIsFace = 0;
         int nrWrongIsFace = 0;
         int nrCorrectIsNotFace = 0;
@@ -438,7 +442,7 @@ public class FaceRecognition {
         return new PerformanceStats(truePositive, falsePositive, falseNegative);
     }
 
-    public static PerformanceStats evalCascade(ArrayList<StrongClassifier> decisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
+    private static PerformanceStats evalCascade(ArrayList<StrongClassifier> decisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
         int nrCorrectIsFace = 0;
         int nrWrongIsFace = 0;
         int nrCorrectIsNotFace = 0;

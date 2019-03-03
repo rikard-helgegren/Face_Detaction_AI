@@ -43,7 +43,7 @@ public class AdaTwo extends Thread {
                 for (LabeledIntegralImage img : allSamples) {
                     error += img.getWeight() * Math.abs(h.canBeFace(img.img) - img.isFace); // Throws exception
 
-                    if(isSpec || isSpec2) System.out.printf("Feature value is: %d on image %s. IsFace: %d\n",img.img.getFeatureValue(j), img.img.getName(), img.isFace);
+                    //if(isSpec || isSpec2) System.out.printf("Feature value is: %d on image %s. IsFace: %d\n",img.img.getFeatureValue(j), img.img.getName(), img.isFace);
                 }
                 if(isSpec || isSpec2) System.out.println("Total error for feature: "+error);
                 //System.out.println("Error for this feature: "+error);

@@ -76,7 +76,7 @@ public class Classifier implements Serializable {
     }
 
     public String toString(){
-        return "[Feature: "+feature.toString()+". Threshold: "+threshold+". Parity: "+parity+". Error: "+error+" Beta: "+beta+". Alpha: "+ alpha+".]";
+        return "[" + feature.toString()+". Threshold: "+threshold+". Parity: "+parity+". Error: "+error+" Beta: "+beta+". Alpha: "+ alpha+".]";
     }
 
     @Override

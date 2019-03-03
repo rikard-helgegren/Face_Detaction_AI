@@ -217,7 +217,7 @@ public class Feature implements Serializable {
     }
 
     public String toString(){
-        return "x: "+getX()+" y: "+getY()+" w: "+getW()+" h: "+getH()+ " type: "+getType();
+        return "Feature: [x: "+getX()+" y: "+getY()+" w: "+getW()+" h: "+getH()+ " type: "+getType()+"]";
     }
 
     @Override

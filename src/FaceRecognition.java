@@ -52,8 +52,9 @@ public class FaceRecognition {
     }
 
     public static void main(String[] args) throws Exception {
-        Data data = new Data();
 
+        Data data = new Data();
+        
         if (trainFullCascade) {
             System.out.println("Starting training of cascaded classifier.");
             ArrayList<StrongClassifier> cascadedClassifier;
@@ -285,6 +286,15 @@ public class FaceRecognition {
         System.out.printf("Trained one weak classifier in %ds\n", (System.currentTimeMillis() - t0) / 1000);
         return bestClassifier;
     }
+
+    public static boolean isSpecial(Feature f){
+        return f.getType() == Feature.Type.VERTICAL && f.getX()==0 && f.getY()==0 && f.getW() == 18 && f.getH() == 12;
+    }
+
+    public static boolean isSpecial2(Feature f){
+        return f.getType() == Feature.Type.HORIZONTAL && f.getX()==4 && f.getY()==4 && f.getW() == 4 && f.getH() == 14;
+    }
+
 
     public static Queue<Classifier> adaBoostStepTwo(List<LabeledIntegralImage> allSamples) throws Exception {
         Queue<Classifier> classifiers = new LinkedList<>();

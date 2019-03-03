@@ -16,7 +16,6 @@ public class Data {
     public ArrayList<LabeledIntegralImage> testData;
 
     public Data() throws Exception {
-        System.out.println("1");
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
         HalIntegralImage[] trainFaces = {};
@@ -24,21 +23,18 @@ public class Data {
         HalIntegralImage[] testFaces = {};
         HalIntegralImage[] testNoFaces = {};
         try {
-            System.out.println("2");
             // Read images for training set
             trainFaces = Data.readImagesFromDataBase("./res/source/data/train/face"); // Read face images
             trainNoFaces = Data.readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
-            System.out.println("3");
             // Read images for test set
             testFaces = Data.readImagesFromDataBase("./res/source/data/test/face");
             testNoFaces = Data.readImagesFromDataBase("./res/source/data/test/non-face");
-            System.out.println("4");
+
             //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
         } catch (Exception e) {
             System.err.println("Data folder not found. Have you extracted data.zip correctly?");
             System.exit(1);
         }
-        System.out.println("5");
 
         // Re-store arrays of training data as a list and add face label.
         double weightFace = 1.0 / (2 * trainFaces.length);
@@ -51,13 +47,11 @@ public class Data {
         for (HalIntegralImage img : trainFaces) positiveSamples.add(new LabeledIntegralImage(img, 1, weightFace));
         allSamples.addAll(negativeSamples);
         allSamples.addAll(positiveSamples);
-        System.out.println("6");
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         testData = new ArrayList<>(20000);
         for (HalIntegralImage img : testFaces) testData.add(new LabeledIntegralImage(img, 1, 0));
         for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, 0, 0));
-        System.out.println("7");
 
         // Pre-calculate all feature values
         Feature.calculateFeatureValues(allSamples);
@@ -79,7 +73,7 @@ public class Data {
             BufferedImage bi = ImageIO.read(imgFile);
             FastBitmap fb = new FastBitmap(bi);
             try {
-                images[i] = new HalIntegralImage(fb);
+                images[i] = new HalIntegralImage(fb, imgFile.getName());
             } catch (Exception e) {
                 System.err.println("Could not read " + imgFile.getPath());
                 e.printStackTrace();

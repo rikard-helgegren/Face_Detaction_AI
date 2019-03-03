@@ -159,7 +159,7 @@ public class Tests {
 
     private HalIntegralImage readImage(String path) throws Exception {
         File file = new File(path);
-        HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)));
+        HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), "asdf");
         return img;
     }
 
@@ -200,5 +200,46 @@ public class Tests {
         //System.out.println("threshold " + rect3TP.threshold + "; Parity " + rect3TP.parity);
         assertTrue(-338 <= rect3TP.threshold && rect3TP.threshold <= -2, "Expected in [-338, -2]. Was: " + rect3TP.threshold);
 
+    }
+
+    public static void printIntegralImage(int[][] img) {
+
+        for (int h = 0; h < img.length; h++) {
+            for (int w = 0; w < img[0].length; w++) {
+                System.out.print(img[h][w] + ", ");
+            }
+            System.out.println();
+        }
+    }
+
+    public static void printImageValues(FastBitmap fb){
+        int widthHeight = 19;
+
+        for(int h=0;h<widthHeight;h++) {
+            for (int w = 0; w < widthHeight; w++) {
+                System.out.print(fb.getGray(h, w) + ", ");
+            }
+            System.out.println();
+        }
+    }
+
+    @Test
+    public void testGetRectangleSum() throws Exception {
+        File file = new File("./test-res/B20_03379.png");
+        HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), file.getName());
+
+        /*
+        System.out.println("GRAY:");
+        printImageValues(new FastBitmap(ImageIO.read(file)));
+
+        System.out.println();
+        System.out.println();
+        System.out.println("II:");
+        printIntegralImage(img.getInternalData());
+        */
+
+        assertTrue(img.getRectangleSum(0,0,18,4)>img.getRectangleSum(0,0,4,18),
+                "The test failed on the image test-res/B20_03379.png. " +
+                        "The top should be brighter than the left side but isn't");
     }
 }

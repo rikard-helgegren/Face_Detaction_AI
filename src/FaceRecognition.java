@@ -73,7 +73,7 @@ public class FaceRecognition {
                 // Load strong classifier from file
                 strongClassifier = Data.loadStrong("save.strong");
             } else {
-                strongClassifier = trainTestStrongClassifier(data.allSamples, 100, data.testData);
+                strongClassifier = trainTestStrongClassifier(data.allSamples, 200, data.testData);
                 // Save cascaded classifier
                 Data.saveStrong(strongClassifier, "save.strong");
             }

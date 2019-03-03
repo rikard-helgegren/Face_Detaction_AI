@@ -54,7 +54,10 @@ public class Data {
         for (HalIntegralImage img : testNoFaces) testData.add(new LabeledIntegralImage(img, 0, 0));
 
         // Pre-calculate all feature values
+        System.out.println("Pre-calculating feature values for training data...");
         Feature.calculateFeatureValues(allSamples);
+        //System.out.println("Pre-calculating feature values for test data...");
+        //Feature.calculateFeatureValues(testData);
 
     }
 

@@ -11,7 +11,7 @@ public class HalIntegralImage {
 
     // First coordinate is Y, second is X.
     public int[][] data;
-    public FastBitmap fastBitmap;
+    //public FastBitmap fastBitmap;
     private int[] featureValues;
     private String name;
 
@@ -23,7 +23,7 @@ public class HalIntegralImage {
         if (!fb.isGrayscale()) throw new Exception("Image must be grayscale.");
         this.name = name;
         data = toIntegralData(fb);
-        fastBitmap = fb;
+        //fastBitmap = fb;
     }
 
     public HalIntegralImage(FastBitmap fb) throws Exception {

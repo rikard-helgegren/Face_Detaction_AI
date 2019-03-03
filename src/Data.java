@@ -6,68 +6,87 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class Data {
 
-    public ArrayList<LabeledIntegralImage> negativeSamples;
-    public ArrayList<LabeledIntegralImage> positiveSamples;
-    public ArrayList<LabeledIntegralImage> allSamples;
+    public List<LabeledIntegralImage> negativeSamples;
+    public List<LabeledIntegralImage> positiveSamples;
+    public List<LabeledIntegralImage> allSamples;
 
-    public ArrayList<LabeledIntegralImage> testData;
+    public List<LabeledIntegralImage> testData;
 
     public Data() throws Exception {
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
         HalIntegralImage[] trainFaces = {};
-        HalIntegralImage[] trainNoFaces = {};
+        HalIntegralImage[] trainNonFaces = {};
         HalIntegralImage[] testFaces = {};
-        HalIntegralImage[] testNoFaces = {};
+        HalIntegralImage[] testNonFaces = {};
         try {
             // Read images for training set
             trainFaces = Data.readImagesFromDataBase("./res/source/data/train/face"); // Read face images
-            trainNoFaces = Data.readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
+            trainNonFaces = Data.readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
             // Read images for test set
             testFaces = Data.readImagesFromDataBase("./res/source/data/test/face");
-            testNoFaces = Data.readImagesFromDataBase("./res/source/data/test/non-face");
+            testNonFaces = Data.readImagesFromDataBase("./res/source/data/test/non-face");
 
             //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
         } catch (Exception e) {
             System.err.println("Data folder not found. Have you extracted data.zip correctly?");
             System.exit(1);
         }
-
         // Re-store arrays of training data as a list and add face label.
-        double weightFace = 1.0 / (2 * trainFaces.length);
-        double weightNoFace = 1.0 / (2 * trainNoFaces.length);
+        double weightFace = 1.0 / (2 * (trainFaces.length + testFaces.length));
+        double weightNoFace = 1.0 / (2 * (trainNonFaces.length + testNonFaces.length));
 
+        List<LabeledIntegralImage> allFaces = new ArrayList<>();
+        for (HalIntegralImage img : trainFaces) allFaces.add(new LabeledIntegralImage(img, true, weightFace));
+        for (HalIntegralImage img : testFaces) allFaces.add(new LabeledIntegralImage(img, true, weightFace));
+        Collections.shuffle(allFaces);
+
+        List<LabeledIntegralImage> allNonFaces = new ArrayList<>();
+        for (HalIntegralImage img : trainNonFaces) allNonFaces.add(new LabeledIntegralImage(img, false, weightNoFace));
+        for (HalIntegralImage img : testNonFaces) allNonFaces.add(new LabeledIntegralImage(img, false, weightNoFace));
+        Collections.shuffle(allNonFaces);
+
+        negativeSamples = new ArrayList<>(allNonFaces.subList(0, 4000));
+        positiveSamples = new ArrayList<>(allFaces.subList(0, 2400));
+
+        testData = new ArrayList<>(allNonFaces.subList(4000, 19000));
+        testData.addAll(allFaces.subList(2400, 2900));
+
+        allSamples = new ArrayList<>();
+        allSamples.addAll(negativeSamples);
+        allSamples.addAll(positiveSamples);
+
+        /*
         int faceSplitIndex = 5 * trainFaces.length / 6;
-        int noFaceSplitIndex = 5 * trainNoFaces.length / 6;
+        int noFaceSplitIndex = 5 * trainNonFaces.length / 6;
         System.out.printf("Splitting faces at %d and non-faces at %d\n", faceSplitIndex, noFaceSplitIndex);
 
         negativeSamples = new ArrayList<>();
         positiveSamples = new ArrayList<>();
         allSamples = new ArrayList<>();
         for (int i = 0; i < noFaceSplitIndex; i++) {
-            HalIntegralImage img = trainNoFaces[i];
+            HalIntegralImage img = trainNonFaces[i];
             negativeSamples.add(new LabeledIntegralImage(img, false, weightNoFace));
         }
         for (int i = 0; i < faceSplitIndex; i++) {
             HalIntegralImage img = trainFaces[i];
             positiveSamples.add(new LabeledIntegralImage(img, true, weightFace));
         }
-        allSamples.addAll(negativeSamples);
-        allSamples.addAll(positiveSamples);
 
         // Re-store arrays of test data as list and add face label. Test data weights will not be used.
         testData = new ArrayList<>(20000);
-        for (int i = noFaceSplitIndex; i < trainNoFaces.length; i++) {
-            HalIntegralImage img = trainNoFaces[i];
+        for (int i = noFaceSplitIndex; i < trainNonFaces.length; i++) {
+            HalIntegralImage img = trainNonFaces[i];
             testData.add(new LabeledIntegralImage(img, false, 0));
         }
         for (int i = faceSplitIndex; i < trainFaces.length; i++) {
             HalIntegralImage img = trainFaces[i];
             testData.add(new LabeledIntegralImage(img, true, 0));
-        }
+        }*/
 
         // Pre-calculate all feature values
         System.out.println("Pre-calculating feature values for training data...");
@@ -109,7 +128,7 @@ public class Data {
      * @param data
      * @return an array of images that the strong classifier thinks could be faces
      */
-    public static ArrayList<LabeledIntegralImage> filter(ArrayList<StrongClassifier> cascadedClassifier, ArrayList<LabeledIntegralImage> data) throws Exception {
+    public static ArrayList<LabeledIntegralImage> filter(List<StrongClassifier> cascadedClassifier, List<LabeledIntegralImage> data) throws Exception {
         ArrayList<LabeledIntegralImage> maybeFaces = new ArrayList<>(data.size()/2);
         for (LabeledIntegralImage d : data) {
             if (FaceRecognition.isFace(cascadedClassifier, d.img)) {
@@ -142,12 +161,13 @@ public class Data {
         return s;
     }
 
-    public static void saveCascade(ArrayList<StrongClassifier> classifiers, String fileName){
-        save(classifiers, fileName);
+    public static void saveCascade(List<StrongClassifier> classifiers, String fileName){
+        ArrayList<StrongClassifier> cs = (ArrayList<StrongClassifier>) classifiers;
+        save(cs, fileName);
     }
 
-    public static ArrayList<StrongClassifier> loadCascade(String fileName) throws IOException, ClassNotFoundException {
-        return (ArrayList<StrongClassifier>) load(fileName);
+    public static List<StrongClassifier> loadCascade(String fileName) throws IOException, ClassNotFoundException {
+        return (List<StrongClassifier>) load(fileName);
     }
 
     public static void saveStrong(StrongClassifier strongClassifier, String fileName){

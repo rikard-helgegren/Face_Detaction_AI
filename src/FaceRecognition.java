@@ -38,7 +38,7 @@ public class FaceRecognition {
         
         if (trainFullCascade) {
             System.out.println("Starting training of cascaded classifier.");
-            ArrayList<StrongClassifier> cascadedClassifier;
+            List<StrongClassifier> cascadedClassifier;
 
             if (loadFromFile) {
                 // Load strong classifier from file
@@ -73,8 +73,8 @@ public class FaceRecognition {
      * @return
      * @throws Exception
      */
-    public static StrongClassifier trainTestStrongClassifier(ArrayList<LabeledIntegralImage> trainingData, int size,
-                                                             ArrayList<LabeledIntegralImage> testData) throws Exception {
+    public static StrongClassifier trainTestStrongClassifier(List<LabeledIntegralImage> trainingData, int size,
+                                                             List<LabeledIntegralImage> testData) throws Exception {
 
         StrongClassifier strongClassifier = new StrongClassifier(); // Init
         strongClassifier.setThresholdMultiplier(0.5); // Threshold is default 0.5 in AdaBoost
@@ -101,20 +101,20 @@ public class FaceRecognition {
      * @throws Exception
      */
     private static StrongClassifier trainStrongClassifier(
-            ArrayList<LabeledIntegralImage> trainingData, StrongClassifier strongClassifier, int extraSize) throws Exception {
+            List<LabeledIntegralImage> trainingData, StrongClassifier strongClassifier, int extraSize) throws Exception {
         for (int i = 0; i < extraSize; i++) {
             strongClassifier.addClassifier(trainOneWeak(trainingData));
         }
         return strongClassifier;
     }
 
-    private static ArrayList<StrongClassifier> trainCascadedClassifier(
-            ArrayList<LabeledIntegralImage> positiveSamples,
-            ArrayList<LabeledIntegralImage> negativeSamples,
-            ArrayList<LabeledIntegralImage> testData) throws Exception {
+    private static List<StrongClassifier> trainCascadedClassifier(
+            List<LabeledIntegralImage> positiveSamples,
+            List<LabeledIntegralImage> negativeSamples,
+            List<LabeledIntegralImage> testData) throws Exception {
 
         // Train cascaded classifier
-        ArrayList<StrongClassifier> cascadedClassifier = new ArrayList<StrongClassifier>();
+        List<StrongClassifier> cascadedClassifier = new ArrayList<>();
 
         double maxFalsePositiveRatePerLayer = 0.7;
         double minDetectionRatePerLayer = 0.9;
@@ -181,7 +181,7 @@ public class FaceRecognition {
 
     
 
-    private static ArrayList<LabeledIntegralImage> initAdaBoost(ArrayList<LabeledIntegralImage> positiveSamples, ArrayList<LabeledIntegralImage> negativeSamples) throws Exception {
+    private static ArrayList<LabeledIntegralImage> initAdaBoost(List<LabeledIntegralImage> positiveSamples, List<LabeledIntegralImage> negativeSamples) throws Exception {
         // Calculate initial weights.
         double weightFace = 1.0 / (2 * positiveSamples.size());
         double weightNoFace = 1.0 / (2 * negativeSamples.size());
@@ -211,7 +211,7 @@ public class FaceRecognition {
     // Takes 107s with sorting and recalculation.
     // Takes 59s with sorting but without recalculation.
     // Takes 13s with sorting but without recalculation and with 8 threads. (Current)
-    private static Classifier trainOneWeak(ArrayList<LabeledIntegralImage> allSamples) throws Exception {
+    private static Classifier trainOneWeak(List<LabeledIntegralImage> allSamples) throws Exception {
         long t0 = System.currentTimeMillis();
         //System.out.println("Started training on weak classifier");
         // Generate all possible features
@@ -314,20 +314,20 @@ public class FaceRecognition {
      * @return
      * @throws InterruptedException
      */
-    private static Queue<Classifier> adaBoostStepTwoThreaded(ArrayList<LabeledIntegralImage> allSamples, int partitions) throws InterruptedException {
+    private static Queue<Classifier> adaBoostStepTwoThreaded(List<LabeledIntegralImage> allSamples, int partitions) throws InterruptedException {
         // Multithreaded version of step 2
         ConcurrentLinkedQueue<Classifier> classifiers = new ConcurrentLinkedQueue<>(); // List of classifiers
-        ArrayList<Thread> threads = new ArrayList<>(); // List of all threads
+        List<Thread> threads = new ArrayList<>(); // List of all threads
 
         // Partition data and create all but the last thread.
         int start = 0;
         for (int i = 0; i < partitions-1; i++) {
             int end = start + Feature.allFeatures.size() / partitions;
-            threads.add(new AdaTwo(Feature.allFeatures.subList(start, end), classifiers, (List<LabeledIntegralImage>) allSamples.clone()));
+            threads.add(new AdaTwo(Feature.allFeatures.subList(start, end), classifiers, new ArrayList<>(allSamples)));
             start = end;
         }
         // Create the last thread. Special case since it may have a slightly different length than the others.
-        threads.add(new AdaTwo(Feature.allFeatures.subList(start, Feature.allFeatures.size()-1), classifiers, (List<LabeledIntegralImage>) allSamples.clone()));
+        threads.add(new AdaTwo(Feature.allFeatures.subList(start, Feature.allFeatures.size()-1), classifiers, new ArrayList<>(allSamples)));
 
         // Start all threads
         for (Thread t : threads) {
@@ -341,7 +341,7 @@ public class FaceRecognition {
         return classifiers;
     }
 
-    public static void testStrong(StrongClassifier strongClassifier, ArrayList<LabeledIntegralImage> testData) throws Exception {
+    public static void testStrong(StrongClassifier strongClassifier, List<LabeledIntegralImage> testData) throws Exception {
         System.out.println("Testing Strong Classifier");
         System.out.println(strongClassifier);
 
@@ -364,7 +364,7 @@ public class FaceRecognition {
      * @param testData
      * @throws Exception
      */
-    public static void test(ArrayList<StrongClassifier> degenerateDecisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
+    public static void test(List<StrongClassifier> degenerateDecisionTree, List<LabeledIntegralImage> testData) throws Exception {
         System.out.println("Testing Cascade Classifier");
         for(StrongClassifier c : degenerateDecisionTree) {
             System.out.println("\t" + c);
@@ -403,7 +403,7 @@ public class FaceRecognition {
         System.out.printf("Total number of correct guesses: %d. Wrong: %d\n", nrCorrectIsFace+nrCorrectIsNotFace,nrWrongIsFace+nrWrongIsNotFace);
     }
 
-    private static PerformanceStats evalCascade(ArrayList<StrongClassifier> decisionTree, ArrayList<LabeledIntegralImage> testData) throws Exception {
+    private static PerformanceStats evalCascade(List<StrongClassifier> decisionTree, List<LabeledIntegralImage> testData) throws Exception {
         int nrCorrectIsFace = 0;
         int nrWrongIsFace = 0;
         int nrCorrectIsNotFace = 0;
@@ -431,7 +431,7 @@ public class FaceRecognition {
         return new PerformanceStats(truePositive, falsePositive, falseNegative);
     }
 
-    public static boolean isFace(ArrayList<StrongClassifier> strongClassifiers, HalIntegralImage i) throws Exception{
+    public static boolean isFace(List<StrongClassifier> strongClassifiers, HalIntegralImage i) throws Exception{
         //How it looks like you should do according to computerphile
         for(StrongClassifier c : strongClassifiers){
             if(!c.canBeFace(i)) return false;
@@ -440,7 +440,7 @@ public class FaceRecognition {
         return true;
     }
 
-    public static ThresholdParity calcAvgThresholdAndParity(ArrayList<LabeledIntegralImage> trainingData, Feature j) throws Exception {
+    public static ThresholdParity calcAvgThresholdAndParity(List<LabeledIntegralImage> trainingData, Feature j) throws Exception {
         trainingData.sort((a, b) -> {
             try {
                 // The order here matters.

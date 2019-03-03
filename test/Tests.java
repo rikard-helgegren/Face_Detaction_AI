@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -147,7 +148,7 @@ public class Tests {
 
         Data.saveCascade(classifiers, "test.classifiers");
 
-        ArrayList<StrongClassifier> loaded = new ArrayList<>();
+        List<StrongClassifier> loaded = new ArrayList<>();
         try {
             loaded = Data.loadCascade("test.classifiers");
         } catch (IOException e) {

@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
  */
 public class HalIntegralImage {
 
-    // First coordinate is Y, second is X.
+    // First coordinate is X, second is Y.
     public int[][] data;
     private int[] featureValues;
     private String name;

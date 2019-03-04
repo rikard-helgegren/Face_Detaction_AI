@@ -9,10 +9,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class FaceRecognition {
     // Should an entire cascade be trained? If not, a strong classifier will be trained.
-    private static final boolean trainFullCascade = true;
+    private static final boolean trainFullCascade = false;
     private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
     //The overall false positive rate the cascaded classifier should reach.
-    private static final double overallFalsePositiveRate = 0.02;
+    private static final double overallFalsePositiveRate = 0.05;
     public static final double DELTA = 0.00001;
 
     //A class used to store a threshold-parity pair
@@ -36,7 +36,7 @@ public class FaceRecognition {
 
             if (loadFromFile) {
                 // Load strong classifier from file
-                cascadedClassifier = Data.loadCascade("cascade1.cascade");
+                cascadedClassifier = Data.loadCascade("save.cascade");
             } else {
                 cascadedClassifier = trainCascadedClassifier(data.positiveSamples, data.negativeSamples, data.validationData);
                 // Save cascaded classifier
@@ -110,7 +110,7 @@ public class FaceRecognition {
         // Train cascaded classifier
         List<StrongClassifier> cascadedClassifier = new ArrayList<>();
 
-        double maxFalsePositiveRatePerLayer = 0.7;
+        double maxFalsePositiveRatePerLayer = 0.6;
         double minDetectionRatePerLayer = 0.99;
         double prevFalsePositiveRate = 1;
         double curFalsePositiveRate = 1;
@@ -151,18 +151,18 @@ public class FaceRecognition {
                     //        cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
                     PerformanceStats stats = evalCascade(cascadedClassifier, validationData);
 
-                    System.out.printf("Performance: %s. ", stats);
+                    //System.out.printf("Performance: %s. ", stats);
                     curFalsePositiveRate = stats.falsePositive;
                     curDetectionRate = stats.truePositive;
                     if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) {
-                        System.out.printf("GOOD! Using this one. \n");
+                        //System.out.printf("GOOD! Using this one. \n");
                         break;
                     } else {
-                        System.out.printf("\n");
+                        //System.out.printf("\n");
                     }
 
                     strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
-                    if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
+                    //if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
                 }
             }
 
@@ -353,9 +353,14 @@ public class FaceRecognition {
      * @throws Exception
      */
     public static void test(List<StrongClassifier> degenerateDecisionTree, List<LabeledIntegralImage> testData) throws Exception {
-        System.out.println("Testing Cascade Classifier");
+        int strongAmount = degenerateDecisionTree.size();
+        int totalWeak = 0;
+        for (StrongClassifier s : degenerateDecisionTree) {
+            totalWeak += s.getSize();
+        }
+        System.out.printf("Cascade Classifier. %d strong, total %d weak.\n", strongAmount, totalWeak);
         for(StrongClassifier c : degenerateDecisionTree) {
-            System.out.println("\t" + c);
+            System.out.println(c);
         }
 
         int nrCorrectIsFace = 0;

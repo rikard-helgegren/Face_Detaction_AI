@@ -12,7 +12,7 @@ public class FaceRecognition {
     private static final boolean trainFullCascade = true;
     private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
     //The overall false positive rate the cascaded classifier should reach.
-    private static final double overallFalsePositiveRate = 0.1;
+    private static final double overallFalsePositiveRate = 0.02;
     public static final double DELTA = 0.00001;
 
     //A class used to store a threshold-parity pair
@@ -111,7 +111,7 @@ public class FaceRecognition {
         List<StrongClassifier> cascadedClassifier = new ArrayList<>();
 
         double maxFalsePositiveRatePerLayer = 0.7;
-        double minDetectionRatePerLayer = 0.95;
+        double minDetectionRatePerLayer = 0.99;
         double prevFalsePositiveRate = 1;
         double curFalsePositiveRate = 1;
         double prevDetectionRate = 1;

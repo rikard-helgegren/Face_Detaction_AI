@@ -15,6 +15,9 @@ public class Tests {
 
     private String path = "./test-res/";
 
+    //The coordinates for all references to an integral images and their expected values have been increased by one
+    //to correct for the now larger integral image.
+
     @Test
     public void testImageRead() {
         HalIntegralImage[] images = {};
@@ -38,8 +41,8 @@ public class Tests {
 
         // Test black
         //System.out.println("== BLACK ==");
-        assertEquals(25, black.getHeight());
-        assertEquals(25, black.getWidth());
+        assertEquals(26, black.getHeight());
+        assertEquals(26, black.getWidth());
         //System.out.println(Arrays.deepToString(blackFB.toMatrixGrayAsInt())); // Expecting this to be all 0. Is all 1.
         //System.out.println(Arrays.deepToString(black.getInternalData())); // Consistent with above except first line is 0.
         assertEquals(1, black.getRectangleSum(0, 0, 0, 0));
@@ -48,12 +51,12 @@ public class Tests {
         assertEquals(9, black.getRectangleSum(0, 0, 2, 2));
         assertEquals(9, black.getRectangleSum(1, 1, 3, 3));
         assertEquals(25, black.getRectangleSum(0, 0, 4, 4));
-        assertEquals(black.getInternalData()[24][24], black.getRectangleSum(0, 0, 24, 24));
+        assertEquals(black.getInternalData()[25][25], black.getRectangleSum(0, 0, 24, 24));
 
         //Test white
         //System.out.println("== WHITE ==");
         //System.out.println(Arrays.deepToString(white.getInternalData())); // Consistent with above except first line is 0.
-        assertEquals(254, white.getInternalData()[0][0]);
+        assertEquals(254, white.getInternalData()[1][1]);
 
         //Test face
         //System.out.println("== FACE ==");
@@ -68,22 +71,22 @@ public class Tests {
         //assertEquals(255, blackTop10.fastBitmap.getGray(10, 0));
         //System.out.println("---------------");
         //printIntegralImage(blackTop10.getInternalData());
-        assertEquals(1, blackTop10.getInternalData()[0][0]);
-        assertEquals(10, blackTop10.getInternalData()[9][0]);
-        assertEquals(265, blackTop10.getInternalData()[10][0]);
-        assertEquals(11, blackTop10.getInternalData()[0][10]);
+        assertEquals(1, blackTop10.getInternalData()[1][1]);
+        assertEquals(10, blackTop10.getInternalData()[10][1]);
+        assertEquals(265, blackTop10.getInternalData()[11][1]);
+        assertEquals(11, blackTop10.getInternalData()[1][11]);
 
         // Test image with where leftmost 10 columns are black, rightmost 15 columns are white.
         //System.out.println("== Black left 10 ==");
         //System.out.println(Arrays.deepToString(blackTop10.getInternalData()));
-        assertEquals(1, blackLeft10.getInternalData()[0][0]);
-        assertEquals(10, blackLeft10.getInternalData()[9][0]);
-        assertEquals(11, blackLeft10.getInternalData()[10][0]);
-        assertEquals(265, blackLeft10.getInternalData()[0][10]);
+        assertEquals(1, blackLeft10.getInternalData()[1][1]);
+        assertEquals(10, blackLeft10.getInternalData()[10][1]);
+        assertEquals(11, blackLeft10.getInternalData()[11][1]);
+        assertEquals(265, blackLeft10.getInternalData()[1][11]);
 
         // Test that dimensions are correct.
-        assertEquals(92, face92x112.getWidth());
-        assertEquals(112, face92x112.getHeight());
+        assertEquals(93, face92x112.getWidth());
+        assertEquals(113, face92x112.getHeight());
     }
 
     // Tests so that feature calculation is correct
@@ -234,7 +237,7 @@ public class Tests {
         File file = new File("./test-res/B20_03379.png");
         HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), file.getName());
 
-        /*
+
         System.out.println("GRAY:");
         printImageValues(new FastBitmap(ImageIO.read(file)));
 
@@ -242,7 +245,7 @@ public class Tests {
         System.out.println();
         System.out.println("II:");
         printIntegralImage(img.getInternalData());
-        */
+
 
         assertTrue(img.getRectangleSum(0,0,18,4)>img.getRectangleSum(0,0,4,18),
                 "The test failed on the image test-res/B20_03379.png. " +

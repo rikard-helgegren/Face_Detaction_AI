@@ -151,18 +151,18 @@ public class FaceRecognition {
                     //        cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
                     PerformanceStats stats = evalCascade(cascadedClassifier, validationData);
 
-                    System.out.printf("Performance: %s. ", stats);
+                    //System.out.printf("Performance: %s. ", stats);
                     curFalsePositiveRate = stats.falsePositive;
                     curDetectionRate = stats.truePositive;
                     if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) {
-                        System.out.printf("GOOD! Using this one. \n");
+                        //System.out.printf("GOOD! Using this one. \n");
                         break;
                     } else {
-                        System.out.printf("\n");
+                        //System.out.printf("\n");
                     }
 
                     strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
-                    if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
+                    //if (strongClassifier.getThresholdMultiplier() < DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
                 }
             }
 

@@ -36,7 +36,7 @@ public class FaceRecognition {
 
             if (loadFromFile) {
                 // Load strong classifier from file
-                cascadedClassifier = Data.loadCascade("cascade1.cascade");
+                cascadedClassifier = Data.loadCascade("save.cascade");
             } else {
                 cascadedClassifier = trainCascadedClassifier(data.positiveSamples, data.negativeSamples, data.validationData);
                 // Save cascaded classifier
@@ -353,9 +353,14 @@ public class FaceRecognition {
      * @throws Exception
      */
     public static void test(List<StrongClassifier> degenerateDecisionTree, List<LabeledIntegralImage> testData) throws Exception {
-        System.out.println("Testing Cascade Classifier");
+        int strongAmount = degenerateDecisionTree.size();
+        int totalWeak = 0;
+        for (StrongClassifier s : degenerateDecisionTree) {
+            totalWeak += s.getSize();
+        }
+        System.out.printf("Cascade Classifier. %d strong, total %d weak.\n", strongAmount, totalWeak);
         for(StrongClassifier c : degenerateDecisionTree) {
-            System.out.println("\t" + c);
+            System.out.println(c);
         }
 
         int nrCorrectIsFace = 0;

@@ -110,8 +110,8 @@ public class FaceRecognition {
         // Train cascaded classifier
         List<StrongClassifier> cascadedClassifier = new ArrayList<>();
 
-        double maxFalsePositiveRatePerLayer = 0.5;
-        double minDetectionRatePerLayer = 0.995;
+        double maxFalsePositiveRatePerLayer = 0.6;
+        double minDetectionRatePerLayer = 0.99;
         double prevFalsePositiveRate = 1;
         double curFalsePositiveRate = 1;
         double prevDetectionRate = 1;

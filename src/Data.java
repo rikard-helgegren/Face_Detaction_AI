@@ -22,14 +22,14 @@ public class Data {
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
         HalIntegralImage[] trainFaces = {};
         HalIntegralImage[] trainNonFaces = {};
-        HalIntegralImage[] testFaces = {};
+        //HalIntegralImage[] testFaces = {};
         HalIntegralImage[] testNonFaces = {};
         try {
             // Read images for training set
             trainFaces = Data.readImagesFromDataBase("./res/source/data/train/face"); // Read face images
             trainNonFaces = Data.readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
             // Read images for test set
-            testFaces = Data.readImagesFromDataBase("./res/source/data/test/face");
+            //testFaces = Data.readImagesFromDataBase("./res/source/data/test/face");
             testNonFaces = Data.readImagesFromDataBase("./res/source/data/test/non-face");
 
             //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
@@ -38,12 +38,12 @@ public class Data {
             System.exit(1);
         }
         // Re-store arrays of training data as a list and add face label.
-        double weightFace = 1.0 / (2 * (trainFaces.length + testFaces.length));
+        double weightFace = 1.0 / (2 * (trainFaces.length /*+ testFaces.length*/));
         double weightNoFace = 1.0 / (2 * (trainNonFaces.length + testNonFaces.length));
 
         List<LabeledIntegralImage> allFaces = new ArrayList<>();
         for (HalIntegralImage img : trainFaces) allFaces.add(new LabeledIntegralImage(img, true, weightFace));
-        for (HalIntegralImage img : testFaces) allFaces.add(new LabeledIntegralImage(img, true, weightFace));
+        //for (HalIntegralImage img : testFaces) allFaces.add(new LabeledIntegralImage(img, true, weightFace));
         Collections.shuffle(allFaces);
 
         List<LabeledIntegralImage> allNonFaces = new ArrayList<>();
@@ -51,14 +51,14 @@ public class Data {
         for (HalIntegralImage img : testNonFaces) allNonFaces.add(new LabeledIntegralImage(img, false, weightNoFace));
         Collections.shuffle(allNonFaces);
 
-        negativeSamples = new ArrayList<>(allNonFaces.subList(0, 4000));
-        positiveSamples = new ArrayList<>(allFaces.subList(0, 2000));
+        negativeSamples = new ArrayList<>(allNonFaces.subList(0, allNonFaces.size()/4));
+        positiveSamples = new ArrayList<>(allFaces.subList(0, allFaces.size()/2));
 
-        validationData = new ArrayList<>(allNonFaces.subList(4000, 6000));
-        validationData.addAll(allFaces.subList(2000, 2400));
+        validationData = new ArrayList<>(allNonFaces.subList(allNonFaces.size()/2, allNonFaces.size()*3/4));
+        validationData.addAll(allFaces.subList(allFaces.size()/2, allFaces.size()*3/4));
 
-        testData = new ArrayList<>(allNonFaces.subList(6000, 19000));
-        testData.addAll(allFaces.subList(2400, 2900));
+        testData = new ArrayList<>(allNonFaces.subList(allNonFaces.size()*3/4, allNonFaces.size()));
+        testData.addAll(allFaces.subList(allFaces.size()*3/4, allFaces.size()));
 
         allSamples = new ArrayList<>();
         allSamples.addAll(negativeSamples);

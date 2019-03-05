@@ -14,8 +14,8 @@ import java.awt.Graphics;
 
 public class MultipleFaceRecognition extends JPanel{
 
-    public static final int minFaceSize = 19;
-    public static final int maxFaceSize = 20;
+    public static final int minFaceSize = 30;
+    public static final int maxFaceSize = 31;
     private  static BufferedImage img;
     private static FastBitmap fb;
     private static ArrayList<Square> facess;
@@ -69,25 +69,23 @@ public class MultipleFaceRecognition extends JPanel{
         ArrayList<Square> faces = new ArrayList<>();
         System.out.println(img.getHeight());
 
-        for (int x = 0; x < img.getWidth()-minFaceSize; x+=1){
-            for (int y = 0; y < img.getHeight()-minFaceSize; y+=1) {
-                for (int w = minFaceSize; w <= maxFaceSize && x+w<img.getWidth(); w+=1) {
-                    for (int h = minFaceSize; h <= maxFaceSize && y+h<img.getHeight(); h += 1){
-                        if(cascade.isFace(integralImageFromSubWindow(x,y,w,h))){
-                            Square newFace = new Square(x, y, w, h);
-                            boolean overlaps = false;
-                            for(Square s:faces){
-                                if(s.overlaps(newFace)){
-                                    overlaps = true;
-                                }
+        for (int s = minFaceSize; s <= maxFaceSize; s+=1) {
+            for (int x = 0; x < img.getWidth()-s; x+=s/8){
+                for (int y = 0; y < img.getHeight()-s; y+=s/8) {
+                    if(cascade.isFace(integralImageFromSubWindow(x,y,s,s))){
+                        Square newFace = new Square(x, y, s, s);
+                        boolean overlaps = false;
+                        for(Square sq:faces){
+                            if(sq.overlaps(newFace)){
+                                overlaps = true;
                             }
-                            if(!overlaps){
-                                System.out.println("Face found: "+newFace);
-                                faces.add(newFace);
-                            }
-
-                            y+=h;
                         }
+                        if(!overlaps){
+                            System.out.println("Face found: "+newFace);
+                            faces.add(newFace);
+                        }
+
+                        y+=s;
                     }
                 }
             }

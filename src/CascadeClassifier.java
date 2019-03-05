@@ -81,8 +81,8 @@ public class CascadeClassifier implements Serializable {
 			prevFalsePositiveRate = curFalsePositiveRate;
 
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
-				System.out.printf("Current false positive rate is %.2f\n", curFalsePositiveRate);
-				System.out.printf("Current detection rate rate is %.2f\n", curDetectionRate);
+				System.out.printf("Current false positive rate is %.4f\n", curFalsePositiveRate);
+				System.out.printf("Current detection rate rate is %.4f\n", curDetectionRate);
 				System.out.println(strongClassifier);
 				System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 

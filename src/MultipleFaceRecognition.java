@@ -14,8 +14,8 @@ import java.awt.Graphics;
 
 public class MultipleFaceRecognition extends JPanel{
 
-    public static final int minFaceSize = 30;
-    public static final int maxFaceSize = 31;
+    public static final int minFaceSize = 25;
+    public static final int maxFaceSize = 35;
     private  static BufferedImage img;
     private static FastBitmap fb;
     private static ArrayList<Square> facess;
@@ -69,12 +69,15 @@ public class MultipleFaceRecognition extends JPanel{
         ArrayList<Square> faces = new ArrayList<>();
         System.out.println(img.getHeight());
 
-        for (int s = minFaceSize; s <= maxFaceSize; s+=1) {
+        for (int s = minFaceSize; s <= maxFaceSize; s+=2) {
             for (int x = 0; x < img.getWidth()-s; x+=s/8){
                 for (int y = 0; y < img.getHeight()-s; y+=s/8) {
                     if(cascade.isFace(integralImageFromSubWindow(x,y,s,s))){
                         Square newFace = new Square(x, y, s, s);
-                        boolean overlaps = false;
+                        System.out.println("Face found: "+newFace);
+                        faces.add(newFace);
+
+                        /*boolean overlaps = false;
                         for(Square sq:faces){
                             if(sq.overlaps(newFace)){
                                 overlaps = true;
@@ -83,7 +86,7 @@ public class MultipleFaceRecognition extends JPanel{
                         if(!overlaps){
                             System.out.println("Face found: "+newFace);
                             faces.add(newFace);
-                        }
+                        }*/
 
                         y+=s;
                     }

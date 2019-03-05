@@ -4,6 +4,8 @@ import Catalano.Statistics.Kernels.SquaredSinc;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +50,7 @@ public class MultipleFaceRecognition extends JPanel{
         img = loadImageAsGrayScale("test-res/examples/many_faces.png");
         fb = new FastBitmap(img);
         CascadeClassifier cascade = new CascadeClassifier("save.cascade");
-        System.out.println(cascade.isFace(integralImageFromSubWindow(2,2,19,19)));
+        //System.out.println(cascade.isFace(integralImageFromSubWindow(2,2,19,19)));
 
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
@@ -69,6 +71,51 @@ public class MultipleFaceRecognition extends JPanel{
         ArrayList<Square> faces = new ArrayList<>();
         System.out.println(img.getHeight());
 
+
+        int w = img.getWidth();
+        int h = img.getHeight();
+        BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
+        AffineTransform at = new AffineTransform();
+        at.scale(0.5, 0.5);
+        AffineTransformOp scaleOp =
+                new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        after = scaleOp.filter(img, after);
+
+        //img = after;
+
+
+        int s = 19;
+        for (int x = 0; x < after.getWidth()-s; x+=s/8){
+            for (int y = 0; y < after.getHeight()-s; y+=s/8) {
+                if(cascade.isFace(integralImageFromSubWindow(x,y,s,s,after))){
+                    Square newFace = new Square(x*2, y*2, s*2, s*2);
+                    System.out.println("Face found: "+newFace);
+                    faces.add(newFace);
+
+                    System.out.println("Face found: "+newFace);
+                    faces.add(newFace);
+
+                    /*
+                    boolean overlaps = false;
+                    for(Square sq:faces){
+                        if(sq.overlaps(newFace)){
+                            overlaps = true;
+                        }
+                    }
+                    if(!overlaps){
+                        System.out.println("Face found: "+newFace);
+                        faces.add(newFace);
+                    }*/
+
+                    y+=s;
+                }
+            }
+        }
+
+
+
+
+        /*
         for (int s = minFaceSize; s <= maxFaceSize; s+=2) {
             for (int x = 0; x < img.getWidth()-s; x+=s/8){
                 for (int y = 0; y < img.getHeight()-s; y+=s/8) {
@@ -77,7 +124,7 @@ public class MultipleFaceRecognition extends JPanel{
                         System.out.println("Face found: "+newFace);
                         faces.add(newFace);
 
-                        /*boolean overlaps = false;
+                        boolean overlaps = false;
                         for(Square sq:faces){
                             if(sq.overlaps(newFace)){
                                 overlaps = true;
@@ -86,18 +133,18 @@ public class MultipleFaceRecognition extends JPanel{
                         if(!overlaps){
                             System.out.println("Face found: "+newFace);
                             faces.add(newFace);
-                        }*/
+                        }
 
                         y+=s;
                     }
                 }
             }
-        }
+        }*/
 
         return faces;
     }
 
-    private static HalIntegralImage integralImageFromSubWindow(int x, int y, int width, int height) throws Exception {
+    private static HalIntegralImage integralImageFromSubWindow(int x, int y, int width, int height, BufferedImage img) throws Exception {
         BufferedImage newBuff = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
         int yl = 0;
         for(yl = y;yl<height+y;yl++){

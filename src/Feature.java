@@ -8,7 +8,8 @@ public class Feature implements Serializable {
 
     // TODO Currently, dimensions has to be set here to keep generateAllFeatures private.
     //  It would be nice to set dimensions depending on input data.
-    public static ArrayList<Feature> allFeatures = generateAllFeatures(19, 19);
+    public static ArrayList<Feature> allFeatures = generateAllFeatures(
+            FaceRecognition.trainingDataWidth, FaceRecognition.trainingDataHeight);
 
     /**
      * Represents the 4 different types of feature.
@@ -59,6 +60,20 @@ public class Feature implements Serializable {
      * @throws Exception if any calculation fails or the given feature was not a recognized type.
      */
     public int calculateFeatureValue(HalIntegralImage img) throws Exception {
+        switch (type) {
+            case HORIZONTAL: return calcHorizontalTwoRectFeature(img, x, y, w, h);
+            case VERTICAL: return calcVerticalTwoRectFeature(img, x, y, w, h);
+            case THREE: return calcThreeRectFeature(img, x, y, w, h);
+            case FOUR: return calcFourRectFeature(img, x, y, w, h);
+        }
+        throw new Exception("The feature was not of a recognized type. Type was: " + type);
+    }
+    public int calculateFeatureValue(HalIntegralImage img, int receptiveFieldWidth,int receptiveFieldHeight) throws Exception {
+        x=x/FaceRecognition.trainingDataWidth*receptiveFieldWidth;
+        y=y/FaceRecognition.trainingDataHeight*receptiveFieldHeight;
+        w=w/FaceRecognition.trainingDataWidth*receptiveFieldWidth;
+        h=h/FaceRecognition.trainingDataHeight*receptiveFieldHeight;
+
         switch (type) {
             case HORIZONTAL: return calcHorizontalTwoRectFeature(img, x, y, w, h);
             case VERTICAL: return calcVerticalTwoRectFeature(img, x, y, w, h);

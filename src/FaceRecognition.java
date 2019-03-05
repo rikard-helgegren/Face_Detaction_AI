@@ -12,7 +12,7 @@ public class FaceRecognition {
     private static final boolean trainFullCascade = true;
     private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
     //The overall false positive rate the cascaded classifier should reach.
-    private static final double overallFalsePositiveRate = 0.1;
+    private static final double overallFalsePositiveRate = 0.005;
     public static final double DELTA = 0.00001;
     public static final int trainingDataWidth = 19;
     public static final int trainingDataHeight = 19;
@@ -52,7 +52,7 @@ public class FaceRecognition {
                 // Load strong classifier from file
                 strongClassifier = Data.loadStrong("save.strong");
             } else {
-                strongClassifier = trainTestStrongClassifier(data.allSamples, 200, data.testData);
+                strongClassifier = trainTestStrongClassifier(data.allSamples, 10, data.testData);
                 // Save cascaded classifier
                 Data.saveStrong(strongClassifier, "save.strong");
             }

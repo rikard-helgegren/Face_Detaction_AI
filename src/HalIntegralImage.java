@@ -15,6 +15,10 @@ public class HalIntegralImage {
     private int[] featureValues;
     private String name;
 
+    public HalIntegralImage(BufferedImage bi) throws Exception {
+        this(new FastBitmap(bi));
+    }
+
     public HalIntegralImage(BufferedImage bi, String name) throws Exception {
         this(new FastBitmap(bi), name);
     }

@@ -119,4 +119,11 @@ public class HalIntegralImage {
         }
         return f.calculateFeatureValue(this);
     }
+
+    public int getFeatureValue(Feature f, int receptiveFieldWidth,int receptiveFieldHeight) throws Exception {
+        if (featureValues != null) {
+            return featureValues[f.getId()];
+        }
+        return f.calculateFeatureValue(this, receptiveFieldWidth, receptiveFieldHeight);
+    }
 }

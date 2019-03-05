@@ -14,6 +14,8 @@ public class FaceRecognition {
     //The overall false positive rate the cascaded classifier should reach.
     private static final double overallFalsePositiveRate = 0.1;
     public static final double DELTA = 0.00001;
+    public static final int trainingDataWidth = 19;
+    public static final int trainingDataHeight = 19;
 
     //A class used to store a threshold-parity pair
     public static class ThresholdParity{
@@ -418,9 +420,9 @@ public class FaceRecognition {
         return new PerformanceStats(truePositive, falsePositive, falseNegative);
     }
 
-    public static boolean isFace(List<StrongClassifier> strongClassifiers, HalIntegralImage i) throws Exception{
+    public static boolean isFace(List<StrongClassifier> cascade, HalIntegralImage i) throws Exception{
         //How it looks like you should do according to computerphile
-        for(StrongClassifier c : strongClassifiers){
+        for(StrongClassifier c : cascade){
             if(!c.canBeFace(i)) return false;
         }
 

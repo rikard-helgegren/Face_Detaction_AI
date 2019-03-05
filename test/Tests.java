@@ -2,6 +2,12 @@ import Catalano.Imaging.FastBitmap;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -219,10 +225,11 @@ public class Tests {
     }
 
     public static void printImageValues(FastBitmap fb){
-        int widthHeight = 19;
+        int width = fb.getWidth();
+        int height = fb.getHeight();
 
-        for(int h=0;h<widthHeight;h++) {
-            for (int w = 0; w < widthHeight; w++) {
+        for(int h=0;h<height;h++) {
+            for (int w = 0; w < width; w++) {
                 System.out.print(fb.getGray(h, w) + ", ");
             }
             System.out.println();
@@ -251,5 +258,24 @@ public class Tests {
                 "Rectangle sum for the top 4 pixels of the image test-res/B20_03379.png is wrong.");
         assertEquals(img.getRectangleSum(0,0,4,18), 1415,
                 "Rectangle sum for the leftmost 4 pixels of the image test-res/B20_03379.png is wrong.");
+    }
+
+
+    @Test
+    public void testConvert() throws Exception {
+        BufferedImage bi = ImageIO.read(new File("./example-res/many_faces.png"));
+
+        BufferedImage image = new BufferedImage(bi.getWidth(), bi.getHeight(),
+                BufferedImage.TYPE_BYTE_GRAY);
+        Graphics g = image.getGraphics();
+        g.drawImage(bi, 0, 0, null);
+        g.dispose();
+
+        FastBitmap fb = new FastBitmap(image);
+
+        //printImageValues(fb);
+
+        //assertTrue(fb.isGrayscale());
+        assertTrue(fb.isGrayscale());
     }
 }

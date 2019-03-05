@@ -60,6 +60,21 @@ public class StrongClassifier extends FaceDetector implements Serializable {
         return value>=getThreshold()*thresholdMultiplier;
     }
 
+    //TODO Using overloading to avoid extra calculations during training
+    public boolean canBeFace(HalIntegralImage img, int receptiveFieldWidth,int receptiveFieldHeight) throws Exception {
+        if (weakClassifiers.size() < 1) throw new Exception("This strong classifier has no weak classifiers.");
+        //How it looks like you should do according to the paper:
+
+        double value = 0;
+        for(Classifier c:weakClassifiers){
+            int isFace = (c.canBeFace(img, receptiveFieldWidth, receptiveFieldHeight)) ? 1 : 0;
+            value+=c.getAlpha()*isFace;
+        }
+
+        //FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
+        return value>=getThreshold()*thresholdMultiplier;
+    }
+
     public int getSize() {
         return weakClassifiers.size();
     }

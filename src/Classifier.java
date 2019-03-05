@@ -70,6 +70,15 @@ public class Classifier extends FaceDetector implements Serializable {
         return parity * img.getFeatureValue(feature) < parity * threshold;
     }
 
+    public boolean canBeFace(HalIntegralImage img, int receptiveFieldWidth,int receptiveFieldHeight) throws Exception {
+        if (parity != 1 && parity != -1) throw new Exception("Parity was not 1 or -1. It was: " + parity);
+
+        //System.out.println("My (weak classifier) threshold: "+threshold);
+        //System.out.println("The feature value of the image: "+feature.calculateFeatureValue(img));
+        //System.out.println("parity: "+parity);
+        return parity * img.getFeatureValue(feature,receptiveFieldWidth,receptiveFieldHeight) < parity * threshold;
+    }
+
     public Feature getFeature() {
         return feature;
     }

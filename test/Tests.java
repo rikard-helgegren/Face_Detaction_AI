@@ -41,8 +41,8 @@ public class Tests {
 
         // Test black
         //System.out.println("== BLACK ==");
-        assertEquals(26, black.getHeight());
-        assertEquals(26, black.getWidth());
+        assertEquals(25, black.getHeight());
+        assertEquals(25, black.getWidth());
         //System.out.println(Arrays.deepToString(blackFB.toMatrixGrayAsInt())); // Expecting this to be all 0. Is all 1.
         //System.out.println(Arrays.deepToString(black.getInternalData())); // Consistent with above except first line is 0.
         assertEquals(1, black.getRectangleSum(0, 0, 0, 0));
@@ -85,8 +85,8 @@ public class Tests {
         assertEquals(265, blackLeft10.getInternalData()[1][11]);
 
         // Test that dimensions are correct.
-        assertEquals(93, face92x112.getWidth());
-        assertEquals(113, face92x112.getHeight());
+        assertEquals(92, face92x112.getWidth());
+        assertEquals(112, face92x112.getHeight());
     }
 
     // Tests so that feature calculation is correct

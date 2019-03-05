@@ -107,11 +107,11 @@ public class HalIntegralImage {
     }
 
     public int getHeight(){
-        return data.length;
+        return data.length-1;
     }
 
     public int getWidth() {
-        return data[0].length;
+        return data[0].length-1;
     }
 
     public void setFeatureValues(int[] featureValues) {

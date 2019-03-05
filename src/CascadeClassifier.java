@@ -83,6 +83,8 @@ public class CascadeClassifier implements Serializable {
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
 				System.out.printf("Current false positive rate is %.4f\n", curFalsePositiveRate);
 				System.out.printf("Current detection rate rate is %.4f\n", curDetectionRate);
+				System.out.printf("Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
+
 				System.out.println(strongClassifier);
 				System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
@@ -116,6 +118,11 @@ public class CascadeClassifier implements Serializable {
 
 			if(curFalsePositiveRate > targetMaxFalsePositive){
 				negativeSamples = Data.filter(this, negativeSamples);
+			}
+
+			if (negativeSamples.size() == 0) {
+				System.err.println("Cascade training stopped since we ran out of negative data.");
+				break;
 			}
 		}
 	}

@@ -128,14 +128,14 @@ public class Data {
 
     /**
      * Removes the data that does not pass the strong classifier.
-     * @param cascadedClassifier
+     * @param cascadeClassifier
      * @param data
      * @return an array of images that the strong classifier thinks could be faces
      */
-    public static ArrayList<LabeledIntegralImage> filter(List<StrongClassifier> cascadedClassifier, List<LabeledIntegralImage> data) throws Exception {
+    public static ArrayList<LabeledIntegralImage> filter(CascadeClassifier cascadeClassifier, List<LabeledIntegralImage> data) throws Exception {
         ArrayList<LabeledIntegralImage> maybeFaces = new ArrayList<>(data.size()/2);
         for (LabeledIntegralImage d : data) {
-            if (FaceRecognition.isFace(cascadedClassifier, d.img)) {
+            if (cascadeClassifier.isFace(d.img)) {
                 maybeFaces.add(d);
             }
         }
@@ -163,15 +163,6 @@ public class Data {
         in.close();
         fileIn.close();
         return s;
-    }
-
-    public static void saveCascade(List<StrongClassifier> classifiers, String fileName){
-        ArrayList<StrongClassifier> cs = (ArrayList<StrongClassifier>) classifiers;
-        save(cs, fileName);
-    }
-
-    public static List<StrongClassifier> loadCascade(String fileName) throws IOException, ClassNotFoundException {
-        return (List<StrongClassifier>) load(fileName);
     }
 
     public static void saveStrong(StrongClassifier strongClassifier, String fileName){

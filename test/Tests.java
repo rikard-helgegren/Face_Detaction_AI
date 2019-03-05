@@ -141,27 +141,28 @@ public class Tests {
             e.printStackTrace();
         }
 
-        StrongClassifier a = new StrongClassifier(new ArrayList<Classifier>(Arrays.asList(a1)));
-        StrongClassifier b = new StrongClassifier(new ArrayList<Classifier>(Arrays.asList(b1)));
+        StrongClassifier a = new StrongClassifier();
+        a.addClassifier(a1);
+        StrongClassifier b = new StrongClassifier();
+        b.addClassifier(b1);
 
 
-        ArrayList<StrongClassifier> classifiers = new ArrayList<>(2);
-        classifiers.add(a);
-        classifiers.add(b);
+        CascadeClassifier cascadeClassifier = new CascadeClassifier();
+        cascadeClassifier.addStrongClassifier(a);
+        cascadeClassifier.addStrongClassifier(b);
 
-        Data.saveCascade(classifiers, "test.classifiers");
+        cascadeClassifier.save("test-res/test.cascade");
 
-        List<StrongClassifier> loaded = new ArrayList<>();
+        CascadeClassifier loaded = new CascadeClassifier();
         try {
-            loaded = Data.loadCascade("test.classifiers");
+            loaded = new CascadeClassifier("test-res/test.cascade");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
-        assertEquals(classifiers.get(0), loaded.get(0));
-        assertEquals(classifiers.get(1), loaded.get(1));
+        assertEquals(cascadeClassifier, loaded);
 
         new File("test.classifiers").delete();
     }
@@ -195,17 +196,17 @@ public class Tests {
 
 
         Feature rect = new Feature(Feature.Type.HORIZONTAL, 6,8,2,2);
-        FaceRecognition.ThresholdParity rectTP = FaceRecognition.calcBestThresholdAndParity(trainingData, rect);
+        ThresholdParity rectTP = Classifier.calcBestThresholdAndParity(trainingData, rect);
         //System.out.println("threshold " + rectTP.threshold + "; Parity " + rectTP.parity);
         assertTrue(0 <= rectTP.threshold && rectTP.threshold <= 65, "Expected in [0, 65]. Was: " + rectTP.threshold);
 
         Feature rect2 = new Feature(Feature.Type.VERTICAL, 6,8,2,2);
-        FaceRecognition.ThresholdParity rect2TP = FaceRecognition.calcBestThresholdAndParity(trainingData, rect2);
+        ThresholdParity rect2TP = Classifier.calcBestThresholdAndParity(trainingData, rect2);
         //System.out.println("threshold " + rect2TP.threshold + "; Parity " + rect2TP.parity);
         assertTrue(-69 <= rectTP.threshold && rectTP.threshold <= 0, "Expected in [-69, 0]. Was: " + rect2TP.threshold);
 
         Feature rect3 = new Feature(Feature.Type.THREE, 6,8,3,2);
-        FaceRecognition.ThresholdParity rect3TP = FaceRecognition.calcBestThresholdAndParity(trainingData, rect3);
+        ThresholdParity rect3TP = Classifier.calcBestThresholdAndParity(trainingData, rect3);
         //System.out.println("threshold " + rect3TP.threshold + "; Parity " + rect3TP.parity);
         assertTrue(-338 <= rect3TP.threshold && rect3TP.threshold <= -2, "Expected in [-338, -2]. Was: " + rect3TP.threshold);
 

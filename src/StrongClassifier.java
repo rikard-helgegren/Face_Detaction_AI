@@ -6,16 +6,14 @@ import java.util.List;
 public class StrongClassifier extends FaceDetector implements Serializable {
     private static final long serialVersionUID = 0; // Increase when changing something in this class
 
-    private List<Classifier> weakClassifiers;
+    private List<Classifier> weakClassifiers = new ArrayList<>();
     //private double threshold;
     private double thresholdMultiplier = 0.5;
 
     public StrongClassifier() {
-        weakClassifiers = new ArrayList<>();
     }
 
     public StrongClassifier(int size, List<LabeledIntegralImage> trainingData) throws Exception {
-        weakClassifiers = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             weakClassifiers.add(new Classifier(trainingData));
         }

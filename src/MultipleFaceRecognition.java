@@ -45,10 +45,10 @@ public class MultipleFaceRecognition extends JPanel{
     }
 
     public static void main(String[] args) throws Exception {
-        img = loadImageAsGrayScale("./code/test-res/example-res/many_faces.png");
+        img = loadImageAsGrayScale("test-res/examples/many_faces.png");
         fb = new FastBitmap(img);
-        List<StrongClassifier> cascade = Data.loadCascade("code/save.cascade");
-        System.out.println(isFace(cascade,integralImageFromSubWindow(2,2,19,19)));
+        CascadeClassifier cascade = new CascadeClassifier("save.cascade");
+        System.out.println(cascade.isFace(integralImageFromSubWindow(2,2,19,19)));
 
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
@@ -65,7 +65,7 @@ public class MultipleFaceRecognition extends JPanel{
 
 
     private static ArrayList<Square> findFaces() throws Exception {
-        List<StrongClassifier> cascade = Data.loadCascade("code/save.cascade");
+        CascadeClassifier cascade = new CascadeClassifier("save.cascade");
         ArrayList<Square> faces = new ArrayList<>();
         System.out.println(img.getHeight());
 
@@ -73,7 +73,7 @@ public class MultipleFaceRecognition extends JPanel{
             for (int y = 0; y < img.getHeight()-minFaceSize; y+=1) {
                 for (int w = minFaceSize; w <= maxFaceSize && x+w<img.getWidth(); w+=1) {
                     for (int h = minFaceSize; h <= maxFaceSize && y+h<img.getHeight(); h += 1){
-                        if(isFace(cascade, integralImageFromSubWindow(x,y,w,h))){
+                        if(cascade.isFace(integralImageFromSubWindow(x,y,w,h))){
                             Square newFace = new Square(x, y, w, h);
                             boolean overlaps = false;
                             for(Square s:faces){
@@ -106,16 +106,6 @@ public class MultipleFaceRecognition extends JPanel{
         }
 
         return new HalIntegralImage(newBuff);
-    }
-
-    //TODO: this is a copy from FaceRec
-    private static boolean isFace(List<StrongClassifier> cascade, HalIntegralImage img) throws Exception{
-
-        for(StrongClassifier c : cascade){
-            if(!c.canBeFace(img)) return false;
-        }
-
-        return true;
     }
 
     public void paint(Graphics g) {

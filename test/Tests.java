@@ -21,6 +21,9 @@ public class Tests {
 
     private String path = "./test-res/testing/";
 
+    //The coordinates for all references to an integral images and their expected values have been increased by one
+    //to correct for the now larger integral image.
+
     @Test
     public void testImageRead() {
         HalIntegralImage[] images = {};
@@ -54,12 +57,12 @@ public class Tests {
         assertEquals(9, black.getRectangleSum(0, 0, 2, 2));
         assertEquals(9, black.getRectangleSum(1, 1, 3, 3));
         assertEquals(25, black.getRectangleSum(0, 0, 4, 4));
-        assertEquals(black.getInternalData()[24][24], black.getRectangleSum(0, 0, 24, 24));
+        assertEquals(black.getInternalData()[25][25], black.getRectangleSum(0, 0, 24, 24));
 
         //Test white
         //System.out.println("== WHITE ==");
         //System.out.println(Arrays.deepToString(white.getInternalData())); // Consistent with above except first line is 0.
-        assertEquals(254, white.getInternalData()[0][0]);
+        assertEquals(254, white.getInternalData()[1][1]);
 
         //Test face
         //System.out.println("== FACE ==");
@@ -74,18 +77,18 @@ public class Tests {
         //assertEquals(255, blackTop10.fastBitmap.getGray(10, 0));
         //System.out.println("---------------");
         //printIntegralImage(blackTop10.getInternalData());
-        assertEquals(1, blackTop10.getInternalData()[0][0]);
-        assertEquals(10, blackTop10.getInternalData()[9][0]);
-        assertEquals(265, blackTop10.getInternalData()[10][0]);
-        assertEquals(11, blackTop10.getInternalData()[0][10]);
+        assertEquals(1, blackTop10.getInternalData()[1][1]);
+        assertEquals(10, blackTop10.getInternalData()[10][1]);
+        assertEquals(265, blackTop10.getInternalData()[11][1]);
+        assertEquals(11, blackTop10.getInternalData()[1][11]);
 
         // Test image with where leftmost 10 columns are black, rightmost 15 columns are white.
         //System.out.println("== Black left 10 ==");
         //System.out.println(Arrays.deepToString(blackTop10.getInternalData()));
-        assertEquals(1, blackLeft10.getInternalData()[0][0]);
-        assertEquals(10, blackLeft10.getInternalData()[9][0]);
-        assertEquals(11, blackLeft10.getInternalData()[10][0]);
-        assertEquals(265, blackLeft10.getInternalData()[0][10]);
+        assertEquals(1, blackLeft10.getInternalData()[1][1]);
+        assertEquals(10, blackLeft10.getInternalData()[10][1]);
+        assertEquals(11, blackLeft10.getInternalData()[11][1]);
+        assertEquals(265, blackLeft10.getInternalData()[1][11]);
 
         // Test that dimensions are correct.
         assertEquals(92, face92x112.getWidth());
@@ -144,27 +147,28 @@ public class Tests {
             e.printStackTrace();
         }
 
-        StrongClassifier a = new StrongClassifier(new ArrayList<Classifier>(Arrays.asList(a1)));
-        StrongClassifier b = new StrongClassifier(new ArrayList<Classifier>(Arrays.asList(b1)));
+        StrongClassifier a = new StrongClassifier();
+        a.addClassifier(a1);
+        StrongClassifier b = new StrongClassifier();
+        b.addClassifier(b1);
 
 
-        ArrayList<StrongClassifier> classifiers = new ArrayList<>(2);
-        classifiers.add(a);
-        classifiers.add(b);
+        CascadeClassifier cascadeClassifier = new CascadeClassifier();
+        cascadeClassifier.addStrongClassifier(a);
+        cascadeClassifier.addStrongClassifier(b);
 
-        Data.saveCascade(classifiers, "test.classifiers");
+        cascadeClassifier.save("test-res/test.cascade");
 
-        List<StrongClassifier> loaded = new ArrayList<>();
+        CascadeClassifier loaded = new CascadeClassifier();
         try {
-            loaded = Data.loadCascade("test.classifiers");
+            loaded = new CascadeClassifier("test-res/test.cascade");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
-        assertEquals(classifiers.get(0), loaded.get(0));
-        assertEquals(classifiers.get(1), loaded.get(1));
+        assertEquals(cascadeClassifier, loaded);
 
         new File("test.classifiers").delete();
     }
@@ -198,17 +202,17 @@ public class Tests {
 
 
         Feature rect = new Feature(Feature.Type.HORIZONTAL, 6,8,2,2);
-        FaceRecognition.ThresholdParity rectTP = FaceRecognition.calcBestThresholdAndParity(trainingData, rect);
+        ThresholdParity rectTP = Classifier.calcBestThresholdAndParity(trainingData, rect);
         //System.out.println("threshold " + rectTP.threshold + "; Parity " + rectTP.parity);
         assertTrue(0 <= rectTP.threshold && rectTP.threshold <= 65, "Expected in [0, 65]. Was: " + rectTP.threshold);
 
         Feature rect2 = new Feature(Feature.Type.VERTICAL, 6,8,2,2);
-        FaceRecognition.ThresholdParity rect2TP = FaceRecognition.calcBestThresholdAndParity(trainingData, rect2);
+        ThresholdParity rect2TP = Classifier.calcBestThresholdAndParity(trainingData, rect2);
         //System.out.println("threshold " + rect2TP.threshold + "; Parity " + rect2TP.parity);
         assertTrue(-69 <= rectTP.threshold && rectTP.threshold <= 0, "Expected in [-69, 0]. Was: " + rect2TP.threshold);
 
         Feature rect3 = new Feature(Feature.Type.THREE, 6,8,3,2);
-        FaceRecognition.ThresholdParity rect3TP = FaceRecognition.calcBestThresholdAndParity(trainingData, rect3);
+        ThresholdParity rect3TP = Classifier.calcBestThresholdAndParity(trainingData, rect3);
         //System.out.println("threshold " + rect3TP.threshold + "; Parity " + rect3TP.parity);
         assertTrue(-338 <= rect3TP.threshold && rect3TP.threshold <= -2, "Expected in [-338, -2]. Was: " + rect3TP.threshold);
 
@@ -241,7 +245,7 @@ public class Tests {
         File file = new File(path + "B20_03379.png");
         HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), file.getName());
 
-        /*
+
         System.out.println("GRAY:");
         printImageValues(new FastBitmap(ImageIO.read(file)));
 
@@ -249,7 +253,7 @@ public class Tests {
         System.out.println();
         System.out.println("II:");
         printIntegralImage(img.getInternalData());
-        */
+
 
         assertTrue(img.getRectangleSum(0,0,18,4)>img.getRectangleSum(0,0,4,18),
                 "The test failed on the image test-res/B20_03379.png. " +

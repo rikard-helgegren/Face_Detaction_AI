@@ -35,7 +35,7 @@ public class HalIntegralImage {
     }
 
     public static int[][] toIntegralData(FastBitmap fb) {
-        int[][] integral = new int[fb.getHeight()][fb.getWidth()];
+        int[][] integral = new int[fb.getHeight()+1][fb.getWidth()+1];
         //System.out.printf("Dimension: %s, %s\n", fb.getWidth(), fb.getHeight());
 
         // TODO Seems to not always work if images are not square. Fix or find out what this depends on.
@@ -52,10 +52,18 @@ public class HalIntegralImage {
                 //System.out.printf("\t%s, %s\n", x, y);
                 rowSum += fb.getGray(y, x); //Shouldn't the coordinates be the other way around
                 int aboveSum = 0; // Default to 0 for first row, when y is 0.
-                if (y > 0) aboveSum = integral[y-1][x];
-                integral[y][x] = rowSum + aboveSum;
-                //System.out.println(rowSum + " + " + aboveSum);
+                if (y > 0) aboveSum = integral[y][x+1];
+                integral[y+1][x+1] = rowSum + aboveSum;
+                //System.out.println(rowSum + " + " + aboveSum)
             }
+        }
+        int integralHeight = fb.getHeight()+1;
+        int integralWidth  = fb.getWidth()+1;
+        for(int y = 0; y < integralHeight; y++) {
+            integral[y][0] = 0;
+        }
+        for(int x = 1; x < integralWidth; x++) {
+            integral[0][x] = 0;
         }
         return integral;
     }
@@ -85,9 +93,14 @@ public class HalIntegralImage {
         }
         if ( x2 < x1 || y2 < y1) throw new Exception("Coordinates are given in the wrong order.");
 
-        int corner = (x1 == 0 || y1 == 0) ? 0 : data[y1-1][x1-1]; // If x1 or y1 is 0, there is no corner piece.
-        int left = (x1 == 0) ? 0 : data[y2][x1-1]; // If x1 is 0, there is no left piece
-        int top = (y1 == 0) ? 0: data[y1-1][x2]; // If y1 is 0, there is no top piece
+        x1++;
+        y1++;
+        x2++;
+        y2++;
+
+        int corner = data[y1-1][x1-1]; // If x1 or y1 is 0, there is no corner piece.
+        int left = data[y2][x1-1]; // If x1 is 0, there is no left piece
+        int top = data[y1-1][x2]; // If y1 is 0, there is no top piece
         int main = data[y2][x2]; // There is always a main piece
 
         return main + corner - left - top;
@@ -98,11 +111,11 @@ public class HalIntegralImage {
     }
 
     public int getHeight(){
-        return data.length;
+        return data.length-1;
     }
 
     public int getWidth() {
-        return data[0].length;
+        return data[0].length-1;
     }
 
     public void setFeatureValues(int[] featureValues) {

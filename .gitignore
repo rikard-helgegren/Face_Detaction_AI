@@ -2,3 +2,5 @@ out
 *.class
 res/source/data
 *.zip
+save.strong
+save.cascade

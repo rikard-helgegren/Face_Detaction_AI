@@ -6,8 +6,7 @@ import java.util.List;
 public class Feature implements Serializable {
     private static final long serialVersionUID = 0; // Increase when changing something in this class
 
-    // TODO Currently, dimensions has to be set here to keep generateAllFeatures private.
-    //  It would be nice to set dimensions depending on input data.
+    // Generate all features depending on data dimensions.
     public static ArrayList<Feature> allFeatures = generateAllFeatures(
             FaceRecognition.trainingDataWidth, FaceRecognition.trainingDataHeight);
 

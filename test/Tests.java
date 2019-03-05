@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Tests {
 
-    private String path = "./test-res/";
+    private String path = "./test-res/testing/";
 
     @Test
     public void testImageRead() {

@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Tests {
 
-    private String path = "./test-res/";
+    private String path = "./test-res/testing/";
 
     @Test
     public void testImageRead() {
@@ -238,7 +238,7 @@ public class Tests {
 
     @Test
     public void testGetRectangleSum() throws Exception {
-        File file = new File("./test-res/B20_03379.png");
+        File file = new File(path + "B20_03379.png");
         HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), file.getName());
 
         /*
@@ -263,7 +263,7 @@ public class Tests {
 
     @Test
     public void testConvert() throws Exception {
-        BufferedImage bi = ImageIO.read(new File("./example-res/many_faces.png"));
+        BufferedImage bi = ImageIO.read(new File("./test-res/examples/many_faces.png"));
 
         BufferedImage image = new BufferedImage(bi.getWidth(), bi.getHeight(),
                 BufferedImage.TYPE_BYTE_GRAY);

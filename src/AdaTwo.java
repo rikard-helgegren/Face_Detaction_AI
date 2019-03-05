@@ -20,7 +20,7 @@ public class AdaTwo extends Thread {
                 Feature j = features.get(i);
                 //if(j.getW()==18) System.out.println("Tried feature: "+j);
 
-                FaceRecognition.ThresholdParity p = FaceRecognition.calcBestThresholdAndParity(allSamples, j);
+                ThresholdParity p = Classifier.calcBestThresholdAndParity(allSamples, j);
 
 
                 int threshold = p.threshold;

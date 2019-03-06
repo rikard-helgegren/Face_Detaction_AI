@@ -12,17 +12,17 @@ public class Data {
 
     // Percentages and maximums for datasets.
     // Percentages are always normalized to 1.
-    private double percentTrainFaces = 0;
+    private double percentTrainFaces = 0.7;
     private int maxTrainFaces = 4000;
-    private double percentTrainNonFaces = 0;
+    private double percentTrainNonFaces = 0.2;
     private int maxTrainNonFaces = 4000;
 
-    private double percentTestFaces = 1;
+    private double percentTestFaces = 0.2;
     private int maxTestFaces = 30000;
     private double percentTestNonFaces = 0.7;
     private int maxTestNonFaces = 30000;
 
-    private double percentValidateFaces = 0;
+    private double percentValidateFaces = 0.1;
     private int maxValidateFaces = 400;
     private double percentValidateNonFaces = 0.1;
     private int maxValidateNonFaces = 2000;

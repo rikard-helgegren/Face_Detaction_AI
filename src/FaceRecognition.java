@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class FaceRecognition {
     // Should an entire cascade be trained? If not, a strong classifier will be trained.
     private static final boolean trainFullCascade = true;
-    private static final boolean loadFromFile = true; // Set this boolean to loadCascade or train.
+    private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
     //The overall false positive rate the cascaded classifier should reach.
 
     public static final double DELTA = 0.00001;

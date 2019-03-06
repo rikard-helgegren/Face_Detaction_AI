@@ -12,40 +12,42 @@ public class Data {
 
     // Percentages and maximums for datasets.
     // Percentages are always normalized to 1.
-    public double percentTrainFaces = 0.8;
-    public int maxTrainFaces = 4000;
-    public double percentTrainNonFaces = 0.1;
-    public int maxTrainNonFaces = 4000;
+    private double percentTrainFaces = 0;
+    private int maxTrainFaces = 4000;
+    private double percentTrainNonFaces = 0;
+    private int maxTrainNonFaces = 4000;
 
-    public double percentTestFaces = 0.1;
-    public int maxTestFaces = 30000;
-    public double percentTestNonFaces = 0.7;
-    public int maxTestNonFaces = 30000;
+    private double percentTestFaces = 1;
+    private int maxTestFaces = 30000;
+    private double percentTestNonFaces = 0.7;
+    private int maxTestNonFaces = 30000;
 
-    public double percentValidateFaces = 0.1;
-    public int maxValidateFaces = 400;
-    public double percentValidateNonFaces = 0.1;
-    public int maxValidateNonFaces = 2000;
+    private double percentValidateFaces = 0;
+    private int maxValidateFaces = 400;
+    private double percentValidateNonFaces = 0.1;
+    private int maxValidateNonFaces = 2000;
+
     public List<LabeledIntegralImage> negativeSamples;
     public List<LabeledIntegralImage> positiveSamples;
     public List<LabeledIntegralImage> allSamples;
     public List<LabeledIntegralImage> testData;
     public List<LabeledIntegralImage> validationData;
-    String originalTrainFaces = "./res/faces/original-train-face";
-    String originalTestFaces = "./res/faces/original-test-face";
-    String attFaces = "./res/faces/att";
-    String lfw2Faces = "./res/faces/lfw2-19px"; // For testing only
-    String fddbFaces = "./res/faces/fddb-flat"; // For testing only
-    String originalTrainNonFaces = "./res/non-faces/original-test-non-face";
-    String originalTestNonFaces = "./res/non-faces/original-train-non-face";
-    String crawledNonFaces = "./res/non-faces/scraped";
-    String manyFacesTest = "./test-res/examples";
 
     public Data() throws Exception {
-        //pathsToFaces = new String[]{originalTrainFaces, attFaces};
-        //pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces};
-        pathsToFaces = new String[]{lfw2Faces};
-        pathsToNonFaces = new String[]{originalTestNonFaces};
+        String originalTrainFaces = "./res/faces/original-train-face";
+        String originalTestFaces = "./res/faces/original-test-face";
+        String attFaces = "./res/faces/att";
+        String lfw2Faces = "./res/faces/lfw2-19px"; // For testing only
+        String fddbFaces = "./res/faces/fddb-flat"; // For testing only
+        String originalTrainNonFaces = "./res/non-faces/original-test-non-face";
+        String originalTestNonFaces = "./res/non-faces/original-train-non-face";
+        String crawledNonFaces = "./res/non-faces/scraped";
+        String manyFacesTest = "./test-res/examples";
+
+        pathsToFaces = new String[]{originalTrainFaces, attFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces};
+        //pathsToFaces = new String[]{lfw2Faces};
+        //pathsToNonFaces = new String[]{originalTestNonFaces};
 
         partitionData();
 
@@ -95,8 +97,8 @@ public class Data {
         int endTestFacesIndex = allFaces.size();
         int endTestNonFacesIndex = allNonFaces.size();
 
-        positiveSamples = new ArrayList<>(allFaces.subList(0, Math.min(endTrainFacesIndex, maxTestFaces)));
-        negativeSamples = new ArrayList<>(allNonFaces.subList(0, Math.min(endTrainNonFacesIndex, maxTestNonFaces)));
+        positiveSamples = new ArrayList<>(allFaces.subList(0, Math.min(endTrainFacesIndex, maxTrainFaces)));
+        negativeSamples = new ArrayList<>(allNonFaces.subList(0, Math.min(endTrainNonFacesIndex, maxTrainNonFaces)));
 
         // Set training data weights
         double weightFace = 1.0 / (2 * positiveSamples.size());
@@ -125,7 +127,7 @@ public class Data {
                 Math.min(endTestFacesIndex, endValidateFacesIndex + maxTestFaces)));
         testData.addAll(allNonFaces.subList(
                 endValidateNonFacesIndex,
-                Math.min(endTestNonFacesIndex, endValidateNonFacesIndex + maxTestFaces)));
+                Math.min(endTestNonFacesIndex, endValidateNonFacesIndex + maxTestNonFaces)));
 
     }
 

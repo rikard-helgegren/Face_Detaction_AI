@@ -20,13 +20,15 @@ public class Data {
     public double percentValidateFaces = 0.1;
     public double percentValidateNonFaces = 0.1;
 
-    String originalTrainFaces = "./res/source/data/train/face";
-    String originalTestFaces = "./res/source/data/test/face";
-    String generatedFaces = "./res/generated/att-faces-scaled";
+    String originalTrainFaces = "./res/faces/original-train-face";
+    String originalTestFaces = "./res/faces/original-test-face";
+    String attFaces = "./res/faces/att";
+    String lfw2Faces = "./res/faces/lfw2-19px";
 
-    String originalTrainNonFaces = "./res/source/data/train/non-face";
-    String originalTestNonFaces =  "./res/source/data/test/non-face";
-    String crawledNonFaces = "./res/source/no-faces-crawled";
+    String originalTrainNonFaces = "./res/non-faces/original-test-non-face";
+    String originalTestNonFaces =  "./res/non-faces/original-train-non-face";
+    String crawledNonFaces = "./res/non-faces/scraped";
+
 
     String manyFacesTest = "./test-res/examples";
 
@@ -38,7 +40,7 @@ public class Data {
     public List<LabeledIntegralImage> validationData;
 
     public Data() throws Exception {
-        pathsToFaces = new String[]{originalTrainFaces, generatedFaces};
+        pathsToFaces = new String[]{originalTrainFaces, attFaces};
         pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces};
 
         // Read images from file system amd calculate integralImages.

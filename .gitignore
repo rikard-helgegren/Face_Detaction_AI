@@ -1,6 +1,6 @@
 out
 *.class
-res/source/data
+res/
 *.zip
 save.strong
 save.cascade

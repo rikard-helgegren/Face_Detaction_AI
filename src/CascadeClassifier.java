@@ -120,7 +120,7 @@ public class CascadeClassifier implements Serializable {
 				negativeSamples = Data.filter(this, negativeSamples);
 			}
 
-			if (negativeSamples.size() == 0) {
+			if (negativeSamples.size() < 10) {
 				System.err.println("Cascade training stopped since we ran out of negative data.");
 				break;
 			}
@@ -181,6 +181,7 @@ public class CascadeClassifier implements Serializable {
 		System.out.println("Testing...");
 		System.out.println(this.toString());
 
+		System.out.printf("Test done on %d test images. ", testData.size());
 		System.out.println("RESULTS: " + stats);
 	}
 

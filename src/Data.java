@@ -10,6 +10,26 @@ import java.util.List;
 
 public class Data {
 
+    public String[] pathsToFaces;
+    public String[] pathsToNonFaces;
+
+    public double percentTrainFaces = 0.8;
+    public double percentTrainNonFaces = 0.3;
+    public double percentTestFaces = 0.1;
+    public double percentTestNonFaces = 0.1;
+    public double percentValidateFaces = 0.1;
+    public double percentValidateNonFaces = 0.1;
+
+    String originalTrainFaces = "./res/source/data/train/face";
+    String originalTestFaces = "./res/source/data/test/face";
+    String generatedFaces = "./res/generated/att-faces-scaled";
+
+    String originalTrainNonFaces = "./res/source/data/train/non-face";
+    String originalTestNonFaces =  "./res/source/data/test/non-face";
+    String crawledNonFaces = "./res/source/no-faces-crawled";
+
+    String manyFacesTest = "./test-res/examples";
+
     public List<LabeledIntegralImage> negativeSamples;
     public List<LabeledIntegralImage> positiveSamples;
     public List<LabeledIntegralImage> allSamples;
@@ -18,79 +38,59 @@ public class Data {
     public List<LabeledIntegralImage> validationData;
 
     public Data() throws Exception {
+        pathsToFaces = new String[]{originalTrainFaces, generatedFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces};
+
         // Read images from file system amd calculate integralImages.
         // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
-        HalIntegralImage[] trainFaces = {};
-        HalIntegralImage[] trainNonFaces = {};
-        //HalIntegralImage[] testFaces = {};
-        HalIntegralImage[] testNonFaces = {};
+        ArrayList<HalIntegralImage> faces = new ArrayList<>();
+        ArrayList<HalIntegralImage> nonFaces = new ArrayList<>();
         try {
-            // Read images for training set
-            trainFaces = Data.readImagesFromDataBase("./res/source/data/train/face"); // Read face images
-            trainNonFaces = Data.readImagesFromDataBase("./res/source/data/train/non-face"); // Read no-face images
-            // Read images for test set
-            //testFaces = Data.readImagesFromDataBase("./res/source/data/test/face");
-            testNonFaces = Data.readImagesFromDataBase("./res/source/data/test/non-face");
+            // Read images for faces
+            for(String path : pathsToFaces) faces.addAll(Data.readImagesFromDataBase(path));
+             // Read images for non-faces
+            for(String path : pathsToNonFaces) nonFaces.addAll(Data.readImagesFromDataBase(path));
 
-            //System.out.println("Read faces (and the corresponding non faces) from " + faceImagesFolder[i]);
         } catch (Exception e) {
             System.err.println("Data folder not found. Have you extracted data.zip correctly?");
             System.exit(1);
         }
         // Re-store arrays of training data as a list and add face label.
-        double weightFace = 1.0 / (2 * (trainFaces.length /*+ testFaces.length*/));
-        double weightNoFace = 1.0 / (2 * (trainNonFaces.length + testNonFaces.length));
+        double weightFace = 1.0 / (2 * faces.size());
+        double weightNoFace = 1.0 / (2 * nonFaces.size());
 
-        List<LabeledIntegralImage> allFaces = new ArrayList<>();
-        for (HalIntegralImage img : trainFaces) allFaces.add(new LabeledIntegralImage(img, true, weightFace));
-        //for (HalIntegralImage img : testFaces) allFaces.add(new LabeledIntegralImage(img, true, weightFace));
+        ArrayList<LabeledIntegralImage> allFaces = new ArrayList<>();
+        ArrayList<LabeledIntegralImage> allNonFaces = new ArrayList<>();
+
+        for(HalIntegralImage img : faces) allFaces.add(new LabeledIntegralImage(img, true, weightFace));
+        for(HalIntegralImage img : nonFaces) allNonFaces.add(new LabeledIntegralImage(img, false, weightNoFace));
+
         Collections.shuffle(allFaces);
-
-        List<LabeledIntegralImage> allNonFaces = new ArrayList<>();
-        for (HalIntegralImage img : trainNonFaces) allNonFaces.add(new LabeledIntegralImage(img, false, weightNoFace));
-        for (HalIntegralImage img : testNonFaces) allNonFaces.add(new LabeledIntegralImage(img, false, weightNoFace));
         Collections.shuffle(allNonFaces);
 
-        negativeSamples = new ArrayList<>(allNonFaces.subList(0, allNonFaces.size()/4));
-        positiveSamples = new ArrayList<>(allFaces.subList(0, allFaces.size()/2));
+        int endTrainFacesIndex = (int)((allFaces.size()-1)*percentTrainFaces);
+        int endTrainNonFacesIndex = (int)((allNonFaces.size()-1)*percentTrainNonFaces);
+        int endValidateFacesIndex = (int)((allFaces.size()-1)*(percentTrainFaces+percentValidateFaces));
+        int endValidateNonFacesIndex = (int)((allNonFaces.size()-1)*(percentTrainNonFaces+percentValidateNonFaces));
+        int endTestFacesIndex = (int)((allFaces.size()-1)*(percentTrainFaces+percentValidateFaces+percentTestFaces));
+        int endTestNonFacesIndex = (int)((allNonFaces.size()-1)*(percentTrainNonFaces+percentValidateNonFaces+percentTestNonFaces));
 
-        validationData = new ArrayList<>(allNonFaces.subList(allNonFaces.size()/2, allNonFaces.size()*3/4));
-        validationData.addAll(allFaces.subList(allFaces.size()/2, allFaces.size()*3/4));
+        if(endTestFacesIndex >= allFaces.size() || endTestNonFacesIndex >= allNonFaces.size()) {
+            throw new Exception("The final index is larger than allFaces or allNonFaces, perhaps the sum of percentages exceed 1.");
+        }
 
-        testData = new ArrayList<>(allNonFaces.subList(allNonFaces.size()*3/4, allNonFaces.size()));
-        testData.addAll(allFaces.subList(allFaces.size()*3/4, allFaces.size()));
+        positiveSamples = new ArrayList<>(allFaces.subList(0, endTrainFacesIndex));
+        negativeSamples = new ArrayList<>(allNonFaces.subList(0, endTrainNonFacesIndex));
 
         allSamples = new ArrayList<>();
         allSamples.addAll(negativeSamples);
         allSamples.addAll(positiveSamples);
 
-        /*
-        int faceSplitIndex = 5 * trainFaces.length / 6;
-        int noFaceSplitIndex = 5 * trainNonFaces.length / 6;
-        System.out.printf("Splitting faces at %d and non-faces at %d\n", faceSplitIndex, noFaceSplitIndex);
+        validationData = new ArrayList<>(allFaces.subList(endTrainFacesIndex+1, endValidateFacesIndex));
+        validationData.addAll(allNonFaces.subList(endTrainNonFacesIndex+1, endValidateNonFacesIndex));
 
-        negativeSamples = new ArrayList<>();
-        positiveSamples = new ArrayList<>();
-        allSamples = new ArrayList<>();
-        for (int i = 0; i < noFaceSplitIndex; i++) {
-            HalIntegralImage img = trainNonFaces[i];
-            negativeSamples.add(new LabeledIntegralImage(img, false, weightNoFace));
-        }
-        for (int i = 0; i < faceSplitIndex; i++) {
-            HalIntegralImage img = trainFaces[i];
-            positiveSamples.add(new LabeledIntegralImage(img, true, weightFace));
-        }
-
-        // Re-store arrays of test data as list and add face label. Test data weights will not be used.
-        testData = new ArrayList<>(20000);
-        for (int i = noFaceSplitIndex; i < trainNonFaces.length; i++) {
-            HalIntegralImage img = trainNonFaces[i];
-            testData.add(new LabeledIntegralImage(img, false, 0));
-        }
-        for (int i = faceSplitIndex; i < trainFaces.length; i++) {
-            HalIntegralImage img = trainFaces[i];
-            testData.add(new LabeledIntegralImage(img, true, 0));
-        }*/
+        testData = new ArrayList<>(allFaces.subList(endValidateFacesIndex+1, endTestFacesIndex));
+        testData.addAll(allNonFaces.subList(endValidateNonFacesIndex+1, endTestNonFacesIndex));
 
         // Pre-calculate all feature values
         System.out.println("Pre-calculating feature values for training data...");
@@ -105,9 +105,9 @@ public class Data {
      * @param path a path to a folder containing only images. Images should have correct size and other properties.
      * @throws IOException
      */
-    public static HalIntegralImage[] readImagesFromDataBase(String path) throws Exception {
+    public static ArrayList<HalIntegralImage> readImagesFromDataBase(String path) throws Exception {
         File imageFolder = new File(path);
-        HalIntegralImage[] images = new HalIntegralImage[imageFolder.listFiles().length];
+        ArrayList<HalIntegralImage> images = new ArrayList<>(imageFolder.listFiles().length);
 
         File[] listFiles = imageFolder.listFiles();
         for (int i = 0; i < listFiles.length; i++) {
@@ -115,7 +115,7 @@ public class Data {
             BufferedImage bi = ImageIO.read(imgFile);
             FastBitmap fb = new FastBitmap(bi);
             try {
-                images[i] = new HalIntegralImage(fb, imgFile.getName());
+                images.add(new HalIntegralImage(fb, imgFile.getName()));
             } catch (Exception e) {
                 System.err.println("Could not read " + imgFile.getPath());
                 e.printStackTrace();

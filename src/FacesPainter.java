@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 class FacesPainter extends JLabel {
     private BufferedImage img;
-    ArrayList<Square> faces;
-    FacesPainter(BufferedImage img, ArrayList<Square> faces){
+    ArrayList<Rectangle> faces;
+    FacesPainter(BufferedImage img, ArrayList<Rectangle> faces){
         this.img = img;
         this.faces = faces;
     }

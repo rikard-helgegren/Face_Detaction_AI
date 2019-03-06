@@ -10,22 +10,43 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 
 public class MultipleFaceRecognition{
+    //The image to be used
     private static final String path = "test-res/examples/many_faces.png";
-    private static final int minFaceSize = 25;
-    private static final int maxFaceSize = 35;
+    //The minimum size of the sliding window
+    private static final int minFaceSize = 40;
+    //The maximum size of the sliding window
+    private static final int maxFaceSize = 40;
+    //How much the slidning window increases every iteration.
+    private static final int slidingWindowIncrease = 3;
+    /*
+    Should we allow the algorithm to find two or more overlapping faces?
+    For example find a face in both squares below:
+
+     |‾‾‾‾‾‾‾‾‾‾|
+     | |‾‾‾‾‾‾‾‾|‾|
+     | |        | |
+     | |        | |
+     |_|________| |
+       |__________|
+
+     */
+    private static final boolean allowOverlapping = false;
+    //Should the full image be scaled down or the features scaled up?
+    private static final boolean scaleFeatures = true;
 
     public static void main(String[] args) throws Exception {
-        BufferedImage img = loadImageAsGrayScale(path);
+        BufferedImage img = loadImageAsGrayscale(path);
         CascadeClassifier cascade = new CascadeClassifier("save.cascade");
 
-        ArrayList<Square> faces = findFaces(cascade, img);
+        //ArrayList<Rectangle> faces = findFaces(cascade, img);
+        ArrayList<Rectangle>  faces = new ArrayList<>();
 
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    createAndShowGUI(img,faces);
+                    startGUI(img,faces);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -33,67 +54,98 @@ public class MultipleFaceRecognition{
         });
     }
 
+    /**
+     * Finds faces in an image using the method specified by the variable scaleFeatures.
+     *
+     * @param cascade The cascaded classifier to use
+     * @param img The image to search for faces using the cascade
+     * @return An arraylist of squares which surround the found faces.
+     * @throws Exception
+     */
+    private static ArrayList<Rectangle> findFaces(CascadeClassifier cascade, BufferedImage img) throws Exception {
+        ArrayList<Rectangle> faces = new ArrayList<>();
 
-    private static ArrayList<Square> findFaces(CascadeClassifier cascade, BufferedImage img) throws Exception {
-        ArrayList<Square> faces = new ArrayList<>();
-
-
-        int w = img.getWidth();
-        int h = img.getHeight();
-        BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
-        AffineTransform at = new AffineTransform();
-        at.scale(0.5, 0.5);
-        AffineTransformOp scaleOp =
-                new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-        after = scaleOp.filter(img, after);
-
-        //img = after;
-
-
-        int s = 19;
-        for (int x = 0; x < after.getWidth()-s; x+=s/8){
-            for (int y = 0; y < after.getHeight()-s; y+=s/8) {
-                if(cascade.isFace(integralImageFromSubWindow(x,y,s,after))){
-                    Square newFace = new Square(x*2, y*2, s*2, s*2);
-                    System.out.println("Face found: "+newFace);
-                    faces.add(newFace);
-
-                    System.out.println("Face found: "+newFace);
-                    faces.add(newFace);
-
-                    /*
-                    boolean overlaps = false;
-                    for(Square sq:faces){
-                        if(sq.overlaps(newFace)){
-                            overlaps = true;
-                        }
-                    }
-                    if(!overlaps){
-                        System.out.println("Face found: "+newFace);
-                        faces.add(newFace);
-                    }*/
-
-                    y+=s;
-                }
-            }
+        if(scaleFeatures){
+            faces = findFacesScaleFeatures(cascade,img);
+        }else{
+            faces = findFacesScaleImage(cascade, img);
         }
 
+        return faces;
+    }
 
+    /**
+     * Finds faces in an image using the method of scaling up the features to the appropriate size.
+     *
+     * @param cascade The cascaded classifier to use
+     * @param img The image to search for faces using the cascade
+     * @return An arraylist of squares which surround the found faces.
+     * @throws Exception
+     */
+    private static ArrayList<Rectangle> findFacesScaleImage(CascadeClassifier cascade, BufferedImage img) throws Exception {
+        ArrayList<Rectangle> faces = new ArrayList<>();
 
+        double scaleImageToMaxFace = (double)FaceRecognition.trainingDataWidth/maxFaceSize;
+        double scaleImageToMinFace = (double)FaceRecognition.trainingDataWidth/minFaceSize;
+        double scalePerLayer = (double) FaceRecognition.trainingDataWidth/(FaceRecognition.trainingDataWidth + slidingWindowIncrease);
+        BufferedImage scaled = scaleImage(img, scaleImageToMinFace);
+        System.out.println(scaleImageToMinFace);
 
-        /*
-        for (int s = minFaceSize; s <= maxFaceSize; s+=2) {
-            for (int x = 0; x < img.getWidth()-s; x+=s/8){
-                for (int y = 0; y < img.getHeight()-s; y+=s/8) {
-                    if(cascade.isFace(integralImageFromSubWindow(x,y,s,img))){
-                        Square newFace = new Square(x, y, s, s);
-                        System.out.println("Face found: "+newFace);
+        while(scaled.getWidth()>=scaleImageToMaxFace*img.getWidth()){
+            ArrayList<Rectangle> newFaces = findFaces(cascade, scaled, FaceRecognition.trainingDataWidth);
+            for(Rectangle r:newFaces){
+                r.scale((double)img.getWidth()/scaled.getWidth());
+            }
+            faces.addAll(newFaces);
+
+            scaled = scaleImage(scaled, scalePerLayer);
+        }
+
+        return faces;
+    }
+
+    /**
+     * Finds faces in an image using the method of scaling down the image to
+     * make the features the appropriate size i relation to the image.
+     *
+     * @param cascade The cascaded classifier to use
+     * @param img The image to search for faces using the cascade
+     * @return An arraylist of squares which surround the found faces.
+     * @throws Exception
+     */
+    private static ArrayList<Rectangle> findFacesScaleFeatures(CascadeClassifier cascade, BufferedImage img) throws Exception {
+        ArrayList<Rectangle> faces = new ArrayList<>();
+
+        for (int s = minFaceSize; s <= maxFaceSize; s+= slidingWindowIncrease) {
+            faces.addAll(findFaces(cascade, img, s));
+        }
+
+        return faces;
+    }
+
+    /**
+     * Finds faces in an image using a specified size of the sliding window.
+     *
+     * @param cascade The cascaded classifier to use
+     * @param img The image to search for faces using the cascade
+     * @param slidingWindowSize The size of the sliding window
+     * @return An arraylist of squares which surround the found faces
+     * @throws Exception
+     */
+    private static ArrayList<Rectangle> findFaces(CascadeClassifier cascade, BufferedImage img, int slidingWindowSize) throws Exception {
+        ArrayList<Rectangle> faces = new ArrayList<>();
+
+        for (int x = 0; x < img.getWidth()-slidingWindowSize; x+=slidingWindowSize/8){
+            for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=slidingWindowSize/8) {
+                if(cascade.isFace(integralImageFromSubWindow(x,y,slidingWindowSize,img))){
+                    Rectangle newFace = new Rectangle(x, y, slidingWindowSize, slidingWindowSize);
+
+                    if(allowOverlapping) {
+                        System.out.println("Face found: " + newFace);
                         faces.add(newFace);
-
+                    }else{
                         boolean overlaps = false;
-
-                        /*boolean overlaps = false;
-                        for(Square sq:faces){
+                        for(Rectangle sq:faces){
                             if(sq.overlaps(newFace)){
                                 overlaps = true;
                             }
@@ -102,16 +154,43 @@ public class MultipleFaceRecognition{
                             System.out.println("Face found: "+newFace);
                             faces.add(newFace);
                         }
-
-                        y+=s;
                     }
+
+                    y+=slidingWindowSize;
                 }
             }
-        }*/
+        }
 
         return faces;
     }
 
+    /**
+     * Scales an image with a factor.
+     *
+     * @param img The image which to scale
+     * @param scale The scale factor
+     * @return A scaled image
+     */
+    private static BufferedImage scaleImage(BufferedImage img, double scale){
+        AffineTransform at = new AffineTransform();
+
+        BufferedImage after = new BufferedImage((int)(img.getWidth() * scale), (int)(img.getHeight()*scale), BufferedImage.TYPE_BYTE_GRAY);
+
+        at.scale(scale, scale);
+        AffineTransformOp scaleOp =
+                new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        return scaleOp.filter(img, after);
+    }
+
+    /**
+     * Get an integral image from a subwindow of an image.
+     *
+     * @param x The x coordinate for the subwindow
+     * @param y The y coordinate for the subwindow
+     * @param size The size of the subwindow (width and height)
+     * @param img The image from where to take the subwindow
+     * @return The integral image from the subwindow
+     */
     private static HalIntegralImage integralImageFromSubWindow(int x, int y, int size, BufferedImage img) throws Exception {
         BufferedImage newBuff = new BufferedImage(size, size, BufferedImage.TYPE_BYTE_GRAY);
         int yl;
@@ -124,7 +203,14 @@ public class MultipleFaceRecognition{
         return new HalIntegralImage(newBuff);
     }
 
-    private static void createAndShowGUI(BufferedImage img, ArrayList<Square> faces) {
+    /**
+     * Start a GUI showing the image with the found faces.
+     *
+     * @param img The image to show
+     * @param faces The faces on the image
+     * @return
+     */
+    private static void startGUI(BufferedImage img, ArrayList<Rectangle> faces) {
 
         //Create and set up the window.
         JFrame frame = new JFrame("Face recognition using the method proposed by Viola-Jones");
@@ -141,19 +227,26 @@ public class MultipleFaceRecognition{
         frame.setVisible(true);
     }
 
-    //TODO Not sure how well this works...
-    private static BufferedImage loadImageAsGrayScale(String path) throws IOException {
-        BufferedImage bi = ImageIO.read(new File(path));
+    /**
+     * Load an image and convert it to grayscale.
+     *
+     * @param path The path to the image
+     * @return An image in grayscale
+     */
+    private static BufferedImage loadImageAsGrayscale(String path) throws IOException {
+        //Load the image
+        BufferedImage loadedImage = ImageIO.read(new File(path));
 
-
-        BufferedImage image = new BufferedImage(bi.getWidth(), bi.getHeight(),
+        //Make a new empty BufferedImage and set its type to grayscale
+        BufferedImage grayImage = new BufferedImage(loadedImage.getWidth(), loadedImage.getHeight(),
                 BufferedImage.TYPE_BYTE_GRAY);
 
-        Graphics g = image.getGraphics();
-        g.drawImage(bi, 0, 0, null);
+        //Draw loadedImage in grayscale on grayImage
+        Graphics g = grayImage.getGraphics();
+        g.drawImage(loadedImage, 0, 0, null);
         g.dispose();
 
 
-        return image;
+        return grayImage;
     }
 }

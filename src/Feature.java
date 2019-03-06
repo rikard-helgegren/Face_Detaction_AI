@@ -183,7 +183,7 @@ public class Feature implements Serializable {
 
     
     /**
-     * Calculates the difference between the rectangle sums of four rectangles located next to each other like a chess board..
+     * Calculates the difference between the rectangle sums of four rectangles located next to each other like a chess board.
      *
      * |‾‾‾‾‾|‾‾‾‾‾|
      * |  +  |  -  |
@@ -232,7 +232,6 @@ public class Feature implements Serializable {
 
     public String toString(){
         return String.format("%10s, (x=%2d, y=%2d), (w=%2d, h=%2d)", getType(), getX(), getY(), getW(), getH());
-        //return "[x: "+getX()+" y: "+getY()+" w: "+getW()+" h: "+getH()+ " type: "+getType()+"]";
     }
 
     @Override

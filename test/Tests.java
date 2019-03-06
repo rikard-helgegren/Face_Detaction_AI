@@ -26,14 +26,14 @@ public class Tests {
 
     @Test
     public void testImageRead() {
-        HalIntegralImage[] images = {};
+        ArrayList<HalIntegralImage> images = new ArrayList<>();
         try {
             images = Data.readImagesFromDataBase(path); // Read images
         } catch (Exception e) {
             e.printStackTrace();
         }
         // Correctly reads all images
-        assertEquals(images.length, new File(path).listFiles().length);
+        assertEquals(images.size(), new File(path).listFiles().length);
     }
 
     @Test

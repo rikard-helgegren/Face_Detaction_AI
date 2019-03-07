@@ -15,6 +15,6 @@ public class PerformanceStats implements Serializable {
 
     @Override
     public String toString(){
-        return String.format("DetRate %.2f, FalsePos %.2f", truePositive, falsePositive);
+        return String.format("DetRate %.4f, FalsePos %.4f", truePositive, falsePositive);
     }
 }

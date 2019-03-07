@@ -1,7 +1,3 @@
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 // Target: 70% true positive, 105 false positive
 /**
  * This file should be run with the project root as working directory.
@@ -30,9 +26,9 @@ public class FaceRecognition {
                 cascadedClassifier = new CascadeClassifier("save.cascade");
             } else {
                 cascadedClassifier = new CascadeClassifier(
-                        0.01,
-                        0.6,
-                        0.98,
+                        0.001,
+                        0.7,
+                        0.99,
                         data.positiveSamples, data.negativeSamples, data.validationData);
                 // Save cascaded classifier
                 cascadedClassifier.save("save.cascade");

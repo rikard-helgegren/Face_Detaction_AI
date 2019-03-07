@@ -38,8 +38,8 @@ public class MultipleFaceRecognition{
         BufferedImage img = loadImageAsGrayscale(path);
         CascadeClassifier cascade = new CascadeClassifier("save.cascade");
 
-        //ArrayList<Rectangle> faces = findFaces(cascade, img);
-        ArrayList<Rectangle>  faces = new ArrayList<>();
+        ArrayList<Rectangle> faces = findFaces(cascade, img);
+        //ArrayList<Rectangle>  faces = new ArrayList<>();
 
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.

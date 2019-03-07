@@ -14,12 +14,12 @@ public class Data {
     // Percentages are always normalized to 1.
     private double percentTrainFaces = 0.7;
     private int maxTrainFaces = 4000;
-    private double percentTrainNonFaces = 0.2;
+    private double percentTrainNonFaces = 0.4;
     private int maxTrainNonFaces = 4000;
 
     private double percentTestFaces = 0.2;
     private int maxTestFaces = 30000;
-    private double percentTestNonFaces = 0.7;
+    private double percentTestNonFaces = 0.5;
     private int maxTestNonFaces = 30000;
 
     private double percentValidateFaces = 0.1;

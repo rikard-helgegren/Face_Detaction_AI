@@ -30,9 +30,11 @@ public class MultipleFaceRecognition{
        |__________|
 
      */
-    private static final boolean allowOverlapping = false;
+    private static final boolean allowOverlapping = true;
     //Should the full image be scaled down or the features scaled up?
     private static final boolean scaleFeatures = true;
+    //Decide whether we should save all "faces" found for further training
+    private static final boolean saveImages = false;
 
     public static void main(String[] args) throws Exception {
         BufferedImage img = loadImageAsGrayscale(path);
@@ -135,10 +137,29 @@ public class MultipleFaceRecognition{
     private static ArrayList<Rectangle> findFaces(CascadeClassifier cascade, BufferedImage img, int slidingWindowSize) throws Exception {
         ArrayList<Rectangle> faces = new ArrayList<>();
 
+        int imageIndex = 0;
+
         for (int x = 0; x < img.getWidth()-slidingWindowSize; x+=slidingWindowSize/8){
             for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=slidingWindowSize/8) {
-                if(cascade.isFace(integralImageFromSubWindow(x,y,slidingWindowSize,img))){
+                BufferedImage imgFromSubWindow = imageFromSubWindow(x,y,slidingWindowSize,img);
+                if(cascade.isFace(new HalIntegralImage(imgFromSubWindow))){
                     Rectangle newFace = new Rectangle(x, y, slidingWindowSize, slidingWindowSize);
+
+                    //Saves all "faces" found
+                    if(saveImages) {
+                        int w = imgFromSubWindow.getWidth();
+                        int h = imgFromSubWindow.getHeight();
+                        BufferedImage imgScaled = new BufferedImage(19, 19, BufferedImage.TYPE_BYTE_GRAY);
+
+                        AffineTransform at = new AffineTransform();
+                        at.scale((double) 19 / h, (double) 19 / h);
+                        AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+                        imgScaled = scaleOp.filter(imgFromSubWindow, imgScaled);
+
+                        File saveFile = new File("./res/non-faces/smartest-picture-non-face/round2img" + imageIndex + ".png");
+                        ImageIO.write(imgScaled, "png", saveFile);
+                        imageIndex++;
+                    }
 
                     if(allowOverlapping) {
                         System.out.println("Face found: " + newFace);
@@ -201,6 +222,18 @@ public class MultipleFaceRecognition{
         }
 
         return new HalIntegralImage(newBuff);
+    }
+
+    private static BufferedImage imageFromSubWindow(int x, int y, int size, BufferedImage img) throws Exception {
+        BufferedImage newBuff = new BufferedImage(size, size, BufferedImage.TYPE_BYTE_GRAY);
+        int yl;
+        for(yl = y;yl<size+y;yl++){
+            for(int xl = x; xl<size+x; xl++){
+                newBuff.setRGB(xl-x,yl-y, img.getRGB(xl, yl));
+            }
+        }
+
+        return newBuff;
     }
 
     /**

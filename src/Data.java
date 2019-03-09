@@ -1,9 +1,11 @@
 import Catalano.Imaging.FastBitmap;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 public class Data {
 
@@ -13,19 +15,19 @@ public class Data {
     // Percentages and maximums for datasets.
     // Percentages are always normalized to 1.
     private double percentTrainFaces = 0.7;
-    private int maxTrainFaces = 4000;
-    private double percentTrainNonFaces = 0.7;
-    private int maxTrainNonFaces = 4000;
+    private int maxTrainFaces = 10850;
+    private double percentTrainNonFaces = 0.85;
+    private int maxTrainNonFaces = 50000;
 
     private double percentTestFaces = 0.2;
-    private int maxTestFaces = 30000;
-    private double percentTestNonFaces = 0.2;
-    private int maxTestNonFaces = 30000;
+    private int maxTestFaces = 3100;
+    private double percentTestNonFaces = 0.1;
+    private int maxTestNonFaces = 14400;
 
     private double percentValidateFaces = 0.1;
-    private int maxValidateFaces = 400;
-    private double percentValidateNonFaces = 0.1;
-    private int maxValidateNonFaces = 2000;
+    private int maxValidateFaces = 1550;
+    private double percentValidateNonFaces = 0.05;
+    private int maxValidateNonFaces = 7200;
 
     public List<LabeledIntegralImage> negativeSamples;
     public List<LabeledIntegralImage> positiveSamples;
@@ -39,14 +41,16 @@ public class Data {
         String attFaces = "./res/faces/att";
         String lfw2Faces = "./res/faces/lfw2-19px"; // For testing only
         String fddbFaces = "./res/faces/fddb-flat"; // For testing only
+
         String originalTrainNonFaces = "./res/non-faces/original-test-non-face";
         String originalTestNonFaces = "./res/non-faces/original-train-non-face";
         String crawledNonFaces = "./res/non-faces/scraped";
         String manyFacesTest = "./test-res/examples";
-        //String smartestPictureNonFaces = "./res/non-faces/smartest-picture-non-face";
+        String smartestPictureNonFaces = "./res/non-faces/smartest-picture-non-face";
+        String manyScrapedNonFaces = "./res/non-faces/many-scraped-non-face";
 
         pathsToFaces = new String[]{originalTrainFaces, attFaces, lfw2Faces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, smartestPictureNonFaces, manyScrapedNonFaces};
         //pathsToFaces = new String[]{lfw2Faces};
         //pathsToNonFaces = new String[]{originalTestNonFaces};
 
@@ -68,9 +72,15 @@ public class Data {
         ArrayList<HalIntegralImage> nonFaces = new ArrayList<>();
         try {
             // Read images for faces
-            for (String path : pathsToFaces) faces.addAll(Data.readImagesFromDataBase(path));
+            for (String path : pathsToFaces) {
+                System.out.println(path);
+                faces.addAll(Data.readImagesFromDataBase(path));
+            }
             // Read images for non-faces
-            for (String path : pathsToNonFaces) nonFaces.addAll(Data.readImagesFromDataBase(path));
+            for (String path : pathsToNonFaces) {
+                System.out.println(path);
+                nonFaces.addAll(Data.readImagesFromDataBase(path));
+            }
 
         } catch (Exception e) {
             System.err.println("Data folder not found. Have you extracted res.zip correctly?");
@@ -145,7 +155,7 @@ public class Data {
         File[] listFiles = imageFolder.listFiles();
         for (int i = 0; i < listFiles.length; i++) {
             File imgFile = listFiles[i];
-            BufferedImage bi = ImageIO.read(imgFile);
+            BufferedImage bi = loadImageAsGrayscale(imgFile);
             FastBitmap fb = new FastBitmap(bi);
             try {
                 images.add(new HalIntegralImage(fb, imgFile.getName()));
@@ -174,6 +184,23 @@ public class Data {
             }
         }
         return maybeFaces;
+    }
+
+    private static BufferedImage loadImageAsGrayscale(File file) throws IOException {
+        //Load the image
+        BufferedImage loadedImage = ImageIO.read(file);
+
+        //Make a new empty BufferedImage and set its type to grayscale
+        BufferedImage grayImage = new BufferedImage(loadedImage.getWidth(), loadedImage.getHeight(),
+                BufferedImage.TYPE_BYTE_GRAY);
+
+        //Draw loadedImage in grayscale on grayImage
+        Graphics g = grayImage.getGraphics();
+        g.drawImage(loadedImage, 0, 0, null);
+        g.dispose();
+
+
+        return grayImage;
     }
 
     public static void save(Serializable s, String fileName) {

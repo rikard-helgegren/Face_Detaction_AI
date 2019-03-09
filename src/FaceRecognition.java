@@ -26,7 +26,7 @@ public class FaceRecognition {
                 cascadedClassifier = new CascadeClassifier("save.cascade");
             } else {
                 cascadedClassifier = new CascadeClassifier(
-                        0.01,
+                        0.001,
                         0.4,
                         0.99,
                         data.positiveSamples, data.negativeSamples, data.validationData);

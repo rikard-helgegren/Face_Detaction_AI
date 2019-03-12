@@ -26,8 +26,8 @@ public class FaceRecognition {
                 cascadedClassifier = new CascadeClassifier("save.cascade");
             } else {
                 cascadedClassifier = new CascadeClassifier(
-                        0.001,
-                        0.4,
+                        0.01,
+                        0.5,
                         0.99,
                         data.positiveSamples, data.negativeSamples, data.validationData);
                 // Save cascaded classifier
@@ -39,11 +39,11 @@ public class FaceRecognition {
             StrongClassifier strongClassifier;
             if (loadFromFile) {
                 // Load strong classifier from file
-                strongClassifier = Data.loadStrong("save.strong");
+                strongClassifier = new StrongClassifier("save.strong");
             } else {
                 strongClassifier = new StrongClassifier(200, data.allSamples, data.testData);
                 // Save cascaded classifier
-                Data.saveStrong(strongClassifier, "save.strong");
+                strongClassifier.save("save.strong");
             }
             strongClassifier.test(data.testData);
         }

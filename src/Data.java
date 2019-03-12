@@ -13,21 +13,21 @@ public class Data {
     public String[] pathsToNonFaces;
 
     // Percentages and maximums for datasets.
-    // Percentages are always normalized to 1.
-    private double percentTrainFaces = 0.7;
-    private int maxTrainFaces = 10850;
-    private double percentTrainNonFaces = 0.85;
-    private int maxTrainNonFaces = 50000;
+    // Percentage sum is automatically normalized to 1.
+    private double percentTrainFaces = 0.5;
+    private int maxTrainFaces = 4000;
+    private double percentTrainNonFaces = 0.5;
+    private int maxTrainNonFaces = 10000;
 
-    private double percentTestFaces = 0.2;
-    private int maxTestFaces = 3100;
-    private double percentTestNonFaces = 0.1;
-    private int maxTestNonFaces = 14400;
+    private double percentTestFaces = 0.5;
+    private int maxTestFaces = 10000;
+    private double percentTestNonFaces = 0.5;
+    private int maxTestNonFaces = 50000;
 
     private double percentValidateFaces = 0.1;
-    private int maxValidateFaces = 1550;
-    private double percentValidateNonFaces = 0.05;
-    private int maxValidateNonFaces = 7200;
+    private int maxValidateFaces = 1000;
+    private double percentValidateNonFaces = 0.1;
+    private int maxValidateNonFaces = 2000;
 
     public List<LabeledIntegralImage> negativeSamples;
     public List<LabeledIntegralImage> positiveSamples;
@@ -36,6 +36,7 @@ public class Data {
     public List<LabeledIntegralImage> validationData;
 
     public Data() throws Exception {
+        // Define paths to all datasets
         String originalTrainFaces = "./res/faces/original-train-face";
         String originalTestFaces = "./res/faces/original-test-face";
         String attFaces = "./res/faces/att";
@@ -49,6 +50,7 @@ public class Data {
         String smartestPictureNonFaces = "./res/non-faces/smartest-picture-non-face";
         String manyScrapedNonFaces = "./res/non-faces/many-scraped-non-face";
 
+        // Select which datasets to use
         pathsToFaces = new String[]{originalTrainFaces, attFaces, lfw2Faces};
         pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, smartestPictureNonFaces, manyScrapedNonFaces};
         //pathsToFaces = new String[]{lfw2Faces};
@@ -57,7 +59,7 @@ public class Data {
         partitionData();
 
 
-        // Pre-calculate all feature values
+        // Pre-calculate feature values. OK to pre-calculate on only part of data.
         System.out.println("Pre-calculating feature values for training data...");
         Feature.calculateFeatureValues(allSamples);
         //System.out.println("Pre-calculating feature values for test data...");
@@ -66,8 +68,7 @@ public class Data {
     }
 
     private void partitionData() throws Exception {
-        // Read images from file system amd calculate integralImages.
-        // This now uses our own HalIntegralImage. It seems to work, but there could be bugs.
+        // Read images from file system and calculate integral images.
         ArrayList<HalIntegralImage> faces = new ArrayList<>();
         ArrayList<HalIntegralImage> nonFaces = new ArrayList<>();
         try {
@@ -87,15 +88,17 @@ public class Data {
             System.exit(1);
         }
 
+        // Label all integral images
         ArrayList<LabeledIntegralImage> allFaces = new ArrayList<>();
         ArrayList<LabeledIntegralImage> allNonFaces = new ArrayList<>();
-
         for (HalIntegralImage img : faces) allFaces.add(new LabeledIntegralImage(img, true, 0));
         for (HalIntegralImage img : nonFaces) allNonFaces.add(new LabeledIntegralImage(img, false, 0));
 
+        // Shuffle so that final sets have contribution from each file-system set. Use seed to make shuffling deterministic.
         Collections.shuffle(allFaces, new Random(1));
         Collections.shuffle(allNonFaces, new Random(1));
 
+        // Calculate indexes to split sets correctly based on percentage and max value
         double totalFacePercentage = percentTrainFaces + percentValidateFaces + percentTestFaces;
         double totalNonFacePercentage = percentTrainNonFaces + percentValidateNonFaces + percentTestNonFaces;
 
@@ -122,6 +125,7 @@ public class Data {
             i.setWeight(weightNoFace);
         }
 
+        // Create final sets
         allSamples = new ArrayList<>();
         allSamples.addAll(negativeSamples);
         allSamples.addAll(positiveSamples);
@@ -226,11 +230,5 @@ public class Data {
         return s;
     }
 
-    public static void saveStrong(StrongClassifier strongClassifier, String fileName) {
-        save(strongClassifier, fileName);
-    }
 
-    public static StrongClassifier loadStrong(String fileName) throws IOException, ClassNotFoundException {
-        return (StrongClassifier) load(fileName);
-    }
 }

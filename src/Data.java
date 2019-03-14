@@ -40,7 +40,8 @@ public class Data {
         String originalTrainFaces = "./res/faces/original-train-face";
         String originalTestFaces = "./res/faces/original-test-face";
         String attFaces = "./res/faces/att";
-        String lfw2Faces = "./res/faces/lfw2-19px"; // For testing only
+        String lfw2Faces = "./res/faces/lfw2-19px";
+        String lfw2BigFaces = "./res/faces/lfw2-big-19px";
         String fddbFaces = "./res/faces/fddb-flat"; // For testing only
 
         String originalTrainNonFaces = "./res/non-faces/original-test-non-face";
@@ -51,8 +52,8 @@ public class Data {
         String manyScrapedNonFaces = "./res/non-faces/many-scraped-non-face";
 
         // Select which datasets to use
-        pathsToFaces = new String[]{originalTrainFaces, attFaces, lfw2Faces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, manyScrapedNonFaces};
+        pathsToFaces = new String[]{lfw2BigFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces/*, manyScrapedNonFaces*/};
         //pathsToFaces = new String[]{lfw2Faces};
         //pathsToNonFaces = new String[]{originalTestNonFaces};
 

@@ -5,7 +5,7 @@
  */
 public class FaceRecognition {
     // True if a cascade classifier should be used. Otherwise a strong classifier.
-    private static final boolean trainFullCascade = true;
+    private static final boolean trainFullCascade = false;
 
     // True if a network should be loaded. Otherwise, one will be trained.
     private static final boolean loadFromFile = false;
@@ -42,7 +42,7 @@ public class FaceRecognition {
                 // Load strong classifier from file
                 strongClassifier = new StrongClassifier("save.strong");
             } else {
-                strongClassifier = new StrongClassifier(200, data.allSamples, data.testData);
+                strongClassifier = new StrongClassifier(2, data.allSamples, data.testData);
                 // Save cascaded classifier
                 strongClassifier.save("save.strong");
             }

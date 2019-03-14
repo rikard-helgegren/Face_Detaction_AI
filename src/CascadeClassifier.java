@@ -66,6 +66,10 @@ public class CascadeClassifier implements Serializable {
 			  List<LabeledIntegralImage> positiveSamples,
 			  List<LabeledIntegralImage> negativeSamples,
 			  List<LabeledIntegralImage> validationData) throws Exception {
+		int posValidation = 0;
+		for (LabeledIntegralImage l : validationData) {
+			if (l.isFace) posValidation++;
+		}
 
 		//double maxFalsePositiveRatePerLayer = 0.7;
 		//double minDetectionRatePerLayer = 0.95;
@@ -88,19 +92,22 @@ public class CascadeClassifier implements Serializable {
 			prevFalsePositiveRate = curFalsePositiveRate;
 
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
-				System.out.printf("Current false positive rate is %.4f\n", curFalsePositiveRate);
-				System.out.printf("Current detection rate rate is %.4f\n", curDetectionRate);
-				System.out.printf("Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
-
+				System.out.println("Current Strong Classifier:");
 				System.out.println(strongClassifier);
+				System.out.printf("Validation data %d positive, %d negative. ", posValidation, validationData.size() - posValidation);
+				System.out.printf("Detection rate rate is %.4f. ", curDetectionRate);
+				System.out.printf("False positive rate is %.4f.\n", curFalsePositiveRate);
+				System.out.println();
+				System.out.printf("Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
 				System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
-				if (strongClassifier.getSize() == 0) {
+				/*if (strongClassifier.getSize() == 0) {
 					strongClassifier.addClassifier(new Classifier(allSamples));
 					strongClassifier.addClassifier(new Classifier(allSamples));
 				} else {
 					strongClassifier.addClassifier(new Classifier(allSamples));
-				}
+				}*/
+				strongClassifier.addClassifier(new Classifier(allSamples));
 				strongClassifier.setThresholdMultiplier(1);
 
 				while(true) {

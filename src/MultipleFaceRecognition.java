@@ -194,7 +194,7 @@ public class MultipleFaceRecognition{
 
         double scaleImageToMaxFace = (double)resultingWidth/maxSlidingWindowSize;
         double scaleImageToMinFace = (double)resultingWidth/minSlidingWindowSize;
-        double scalePerLayer = (double) resultingWidth/(resultingWidth + slidingWindowIncrease);
+        double scalePerLayer = (double)resultingWidth/(resultingWidth + slidingWindowIncrease);
         BufferedImage scaled = scaleImage(img, scaleImageToMinFace);
 
         while(scaled.getWidth()>=scaleImageToMaxFace*img.getWidth()){

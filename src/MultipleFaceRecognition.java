@@ -33,8 +33,6 @@ public class MultipleFaceRecognition{
     private static final boolean allowOverlapping = true;
     //Should the full image be scaled down or the features scaled up?
     private static final boolean scaleFeatures = true;
-    //Decide whether we should save all "faces" found, as an image.
-    private static final boolean saveImages = false;
     //If sliding windows should move at a speed proportional to it's size.
     private static final boolean slidingWindowSpeedAsScale = true;
 
@@ -164,13 +162,6 @@ public class MultipleFaceRecognition{
                 if(cascade.isFace(new HalIntegralImage(imgFromSubWindow))){
                     Rectangle newFace = new Rectangle(x, y, slidingWindowSize, slidingWindowSize);
 
-
-                    if(saveImages) {
-                        //Saves all "faces" found
-                        saveImage(imgFromSubWindow, "./res/non-faces/smartest-picture-non-face/round2img" + imageIndex + ".png", 19,19);
-                        imageIndex++;
-                    }
-
                     if(allowOverlapping) {
                         System.out.println("Face found: " + newFace);
                         faces.add(newFace);
@@ -291,19 +282,5 @@ public class MultipleFaceRecognition{
 
 
         return grayImage;
-    }
-
-    private static void saveImage(BufferedImage img, String path, int width, int height) throws IOException {
-        int currentWidth = img.getWidth();
-        int currentHeight = img.getHeight();
-        BufferedImage imgScaled = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-
-        AffineTransform at = new AffineTransform();
-        at.scale((double) width / currentWidth, (double) height / currentHeight);
-        AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-        imgScaled = scaleOp.filter(img, imgScaled);
-
-        File saveFile = new File(path);
-        ImageIO.write(imgScaled, "png", saveFile);
     }
 }

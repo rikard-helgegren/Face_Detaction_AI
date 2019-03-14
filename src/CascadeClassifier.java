@@ -156,7 +156,8 @@ public class CascadeClassifier implements Serializable {
 	}
 
 	public boolean isFace(HalIntegralImage i) throws Exception{
-		//How it looks like you should do according to computerphile
+		//Iterate through all strong classifiers, if the image passes all of
+		//them return true.
 		for(StrongClassifier c : strongClassifiers){
 			if(!c.canBeFace(i)) return false;
 		}

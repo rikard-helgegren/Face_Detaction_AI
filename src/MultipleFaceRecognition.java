@@ -167,7 +167,7 @@ public class MultipleFaceRecognition{
 
                     if(saveImages) {
                         //Saves all "faces" found
-                        saveImage(imgFromSubWindow, "./res/non-faces/smartest-picture-non-face/round2img" + imageIndex + ".png");
+                        saveImage(imgFromSubWindow, "./res/non-faces/smartest-picture-non-face/round2img" + imageIndex + ".png", 19,19);
                         imageIndex++;
                     }
 
@@ -293,13 +293,13 @@ public class MultipleFaceRecognition{
         return grayImage;
     }
 
-    private static void saveImage(BufferedImage img, String c) throws IOException {
-        int w = img.getWidth();
-        int h = img.getHeight();
-        BufferedImage imgScaled = new BufferedImage(19, 19, BufferedImage.TYPE_BYTE_GRAY);
+    private static void saveImage(BufferedImage img, String path, int width, int height) throws IOException {
+        int currentWidth = img.getWidth();
+        int currentHeight = img.getHeight();
+        BufferedImage imgScaled = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 
         AffineTransform at = new AffineTransform();
-        at.scale((double) 19 / h, (double) 19 / h);
+        at.scale((double) width / currentWidth, (double) height / currentHeight);
         AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
         imgScaled = scaleOp.filter(img, imgScaled);
 

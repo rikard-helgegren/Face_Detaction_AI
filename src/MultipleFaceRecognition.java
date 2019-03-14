@@ -186,6 +186,25 @@ public class MultipleFaceRecognition{
         return faces;
     }
 
+    
+    private static ArrayList<HalIntegralImage> findFaceIntegralImages(CascadeClassifier cascade, BufferedImage img, int slidingWindowSize) throws Exception {
+        ArrayList<HalIntegralImage> faces = new ArrayList<>();
+
+        for (int x = 0; x < img.getWidth()-slidingWindowSize; x+=1){
+            for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=1) {
+
+                HalIntegralImage integralImage = integralImageFromSubwindow(x,y,slidingWindowSize,img);
+                if(cascade.isFace(integralImage)){
+                    faces.add(integralImage);
+
+                    y+=slidingWindowSize;
+                }
+            }
+        }
+
+        return faces;
+    }
+
     /**
      * Scales an image with a factor.
      *

@@ -209,6 +209,9 @@ public class MultipleFaceRecognition{
 
     private static ArrayList<HalIntegralImage> findFaceIntegralImages(CascadeClassifier cascade, BufferedImage img, int slidingWindowSize) throws Exception {
         ArrayList<HalIntegralImage> faces = new ArrayList<>();
+        int xIncreaseMax = 10;
+        int yIncreaseMax = 10;
+
         int xIncrease = 1;
         int yIncrease = 1;
 
@@ -220,6 +223,11 @@ public class MultipleFaceRecognition{
                     faces.add(integralImage);
 
                     y+=slidingWindowSize;
+                    xIncrease = 1;
+                    yIncrease = 1;
+                }else{
+                    xIncrease = xIncrease==xIncreaseMax?xIncrease:xIncrease+1;
+                    yIncrease = yIncrease==yIncreaseMax?yIncrease:yIncrease+1;
                 }
             }
         }

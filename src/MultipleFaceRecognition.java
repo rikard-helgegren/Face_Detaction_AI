@@ -13,9 +13,9 @@ public class MultipleFaceRecognition{
     //The image to be used
     private static final String path = "test-res/examples/many_faces.png";
     //The minimum size of the sliding window
-    private static final int minFaceSize = 40;
+    private static final int minFaceSize = 28;
     //The maximum size of the sliding window
-    private static final int maxFaceSize = 40;
+    private static final int maxFaceSize = 28;
     //How much the slidning window increases every iteration.
     private static final int slidingWindowIncrease = 3;
     /*
@@ -33,15 +33,24 @@ public class MultipleFaceRecognition{
     private static final boolean allowOverlapping = true;
     //Should the full image be scaled down or the features scaled up?
     private static final boolean scaleFeatures = true;
-    //Decide whether we should save all "faces" found for further training
-    private static final boolean saveImages = false;
+    //If sliding windows should move at a speed proportional to it's size.
+    private static final boolean slidingWindowSpeedAsScale = true;
+
+    //How fast to move the sliding window if it should move at a
+    //speed proportional to it's size.
+    private static final double slidingWindowMoveSpeedScale = 2d/19;
+    //How fast to move the sliding window if it should move at a
+    //constant rate.
+    private static final int slidingWindowMoveSpeed = 2;
 
     public static void main(String[] args) throws Exception {
+        //Take the image from the image path, convert it to grayscale and store it here
         BufferedImage img = loadImageAsGrayscale(path);
+        //Load the cascaded classifier
         CascadeClassifier cascade = new CascadeClassifier("save.cascade");
 
+        //Find all faces in the image using the cascade
         ArrayList<Rectangle> faces = findFaces(cascade, img);
-        //ArrayList<Rectangle>  faces = new ArrayList<>();
 
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
@@ -139,27 +148,19 @@ public class MultipleFaceRecognition{
 
         int imageIndex = 0;
 
-        for (int x = 0; x < img.getWidth()-slidingWindowSize; x+=slidingWindowSize/8){
-            for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=slidingWindowSize/8) {
+        int slidingWindowSpeed;
+
+        if(slidingWindowSpeedAsScale){
+            slidingWindowSpeed = (int)(slidingWindowSize*slidingWindowMoveSpeedScale);
+        }else{
+            slidingWindowSize = slidingWindowMoveSpeed;
+        }
+
+        for (int x = 0; x < img.getWidth()-slidingWindowSize; x+=slidingWindowSpeed){
+            for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=slidingWindowSpeed) {
                 BufferedImage imgFromSubWindow = imageFromSubWindow(x,y,slidingWindowSize,img);
                 if(cascade.isFace(new HalIntegralImage(imgFromSubWindow))){
                     Rectangle newFace = new Rectangle(x, y, slidingWindowSize, slidingWindowSize);
-
-                    //Saves all "faces" found
-                    if(saveImages) {
-                        int w = imgFromSubWindow.getWidth();
-                        int h = imgFromSubWindow.getHeight();
-                        BufferedImage imgScaled = new BufferedImage(19, 19, BufferedImage.TYPE_BYTE_GRAY);
-
-                        AffineTransform at = new AffineTransform();
-                        at.scale((double) 19 / h, (double) 19 / h);
-                        AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-                        imgScaled = scaleOp.filter(imgFromSubWindow, imgScaled);
-
-                        File saveFile = new File("./res/non-faces/smartest-picture-non-face/round2img" + imageIndex + ".png");
-                        ImageIO.write(imgScaled, "png", saveFile);
-                        imageIndex++;
-                    }
 
                     if(allowOverlapping) {
                         System.out.println("Face found: " + newFace);

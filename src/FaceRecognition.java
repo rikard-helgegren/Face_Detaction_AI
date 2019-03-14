@@ -4,10 +4,11 @@
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    // Should an entire cascade be trained? If not, a strong classifier will be trained.
-    private static final boolean trainFullCascade = true;
-    private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
-    //The overall false positive rate the cascaded classifier should reach.
+    // True if a cascade classifier should be used. Otherwise a strong classifier.
+    private static final boolean trainFullCascade = false;
+
+    // True if a network should be loaded. Otherwise, one will be trained.
+    private static final boolean loadFromFile = false;
 
     public static final double DELTA = 0.00001;
     public static final int trainingDataWidth = 19;
@@ -27,7 +28,7 @@ public class FaceRecognition {
             } else {
                 cascadedClassifier = new CascadeClassifier(
                         0.01,
-                        0.4,
+                        0.5,
                         0.99,
                         data.positiveSamples, data.negativeSamples, data.validationData);
                 // Save cascaded classifier
@@ -39,11 +40,11 @@ public class FaceRecognition {
             StrongClassifier strongClassifier;
             if (loadFromFile) {
                 // Load strong classifier from file
-                strongClassifier = Data.loadStrong("save.strong");
+                strongClassifier = new StrongClassifier("save.strong");
             } else {
-                strongClassifier = new StrongClassifier(200, data.allSamples, data.testData);
+                strongClassifier = new StrongClassifier(2, data.allSamples, data.testData);
                 // Save cascaded classifier
-                Data.saveStrong(strongClassifier, "save.strong");
+                strongClassifier.save("save.strong");
             }
             strongClassifier.test(data.testData);
         }

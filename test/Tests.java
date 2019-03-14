@@ -157,10 +157,13 @@ public class Tests {
         cascadeClassifier.addStrongClassifier(a);
         cascadeClassifier.addStrongClassifier(b);
 
+        a.save("test-res/test.strong");
         cascadeClassifier.save("test-res/test.cascade");
 
+        StrongClassifier loadedStrong = new StrongClassifier();
         CascadeClassifier loaded = new CascadeClassifier();
         try {
+            loadedStrong = new StrongClassifier("test-res/test.strong");
             loaded = new CascadeClassifier("test-res/test.cascade");
         } catch (IOException e) {
             e.printStackTrace();
@@ -168,9 +171,11 @@ public class Tests {
             e.printStackTrace();
         }
 
+        assertEquals(a, loadedStrong);
         assertEquals(cascadeClassifier, loaded);
 
-        new File("test.classifiers").delete();
+        new File("test-res/test.strong").delete();
+        new File("test-res/test.cascade").delete();
     }
 
     private HalIntegralImage readImage(String path) throws Exception {

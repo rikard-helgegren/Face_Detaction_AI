@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +18,10 @@ public class StrongClassifier extends FaceDetector implements Serializable {
         for (int i = 0; i < size; i++) {
             weakClassifiers.add(new Classifier(trainingData));
         }
+    }
+
+    public StrongClassifier(String fileName) throws IOException, ClassNotFoundException {
+        this((StrongClassifier) Data.load(fileName));
     }
 
     /**
@@ -128,6 +133,10 @@ public class StrongClassifier extends FaceDetector implements Serializable {
         return weakClassifiers.get(weakClassifiers.size()-1);
     }
 
+    public void save(String fileName) {
+        Data.save(this, fileName);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof StrongClassifier)) return false;
@@ -143,6 +152,11 @@ public class StrongClassifier extends FaceDetector implements Serializable {
             }
         }
         return true;
+    }
+
+    public String toStringSummary() {
+        String s = String.format("=== Strong Classifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
+        return s;
     }
 
     @Override

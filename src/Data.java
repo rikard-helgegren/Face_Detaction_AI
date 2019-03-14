@@ -20,7 +20,7 @@ public class Data {
     private double percentTrainFaces = 0.5;
     private int maxTrainFaces = 4000;
     private double percentTrainNonFaces = 0.5;
-    private int maxTrainNonFaces = 30000;
+    private int maxTrainNonFaces = 10000;
 
     private double percentTestFaces = 0.5;
     private int maxTestFaces = 10000;
@@ -28,9 +28,9 @@ public class Data {
     private int maxTestNonFaces = 50000;
 
     private double percentValidateFaces = 0.1;
-    private int maxValidateFaces = 1000;
+    private int maxValidateFaces = 2000;
     private double percentValidateNonFaces = 0.1;
-    private int maxValidateNonFaces = 2000;
+    private int maxValidateNonFaces = 4000;
 
     public List<LabeledIntegralImage> negativeSamples;
     public List<LabeledIntegralImage> positiveSamples;
@@ -56,7 +56,7 @@ public class Data {
 
         // Select which datasets to use
         pathsToFaces = new String[]{lfw2BigFaces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, manyScrapedNonFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces/*, manyScrapedNonFaces*/};
 
         partitionData();
 
@@ -71,6 +71,8 @@ public class Data {
 
     public static List<LabeledIntegralImage> getRefills(CascadeClassifier cascade, int targetAmount) throws Exception {
         int amount = 0;
+        int emptyFiles = 0;
+        int filesSearched = 0;
         List<LabeledIntegralImage> refills = new ArrayList<>();
         List<File> imgFiles = new ArrayList<>();
         for (String path : pathsToRefill) {
@@ -79,14 +81,17 @@ public class Data {
         for (File f : imgFiles) {
             BufferedImage b = MultipleFaceRecognition.loadImageAsGrayscale(f.getPath());
             List<HalIntegralImage> imgs = MultipleFaceRecognition.findFaceIntegralImagesScaleImage(cascade, b, 19);
+            if (imgs.isEmpty()) emptyFiles++;
             for (HalIntegralImage img : imgs) {
                 refills.add(new LabeledIntegralImage(img, false, 0));
                 amount++;
-                if (amount >= targetAmount) return refills;
+                if (amount >= targetAmount) break;
             }
+            if (amount >= targetAmount) break;
         }
         if (refills.size() == 0) System.err.println("Out of refills.");
 
+        System.out.printf("Returned %d refills from %d images. Of those %d were empty.\n", refills.size(), filesSearched, emptyFiles);
         return refills;
     }
 

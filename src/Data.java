@@ -11,7 +11,9 @@ public class Data {
 
     public String[] pathsToFaces;
     public String[] pathsToNonFaces;
-    public String[] pathsToRefill;
+
+    private static String scrapedRefillGrey = "./res/non-faces/scraped-refill-grey";
+    private static String[] pathsToRefill = new String[]{scrapedRefillGrey};
 
     // Percentages and maximums for datasets.
     // Percentage sum is automatically normalized to 1.
@@ -52,13 +54,9 @@ public class Data {
         String smartestPictureNonFaces = "./res/non-faces/smartest-picture-non-face";
         String manyScrapedNonFaces = "./res/non-faces/many-scraped-non-face";
 
-        String scrapedRefillGrey = "./res/non-faces/scraped-refill-grey";
-
         // Select which datasets to use
         pathsToFaces = new String[]{lfw2BigFaces};
         pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, manyScrapedNonFaces};
-
-        pathsToRefill = new String[]{scrapedRefillGrey};
 
         partitionData();
 
@@ -71,7 +69,7 @@ public class Data {
 
     }
 
-    public List<LabeledIntegralImage> getRefills(CascadeClassifier cascade, int targetAmount) throws Exception {
+    public static List<LabeledIntegralImage> getRefills(CascadeClassifier cascade, int targetAmount) throws Exception {
         int amount = 0;
         List<LabeledIntegralImage> refills = new ArrayList<>();
         List<File> imgFiles = new ArrayList<>();

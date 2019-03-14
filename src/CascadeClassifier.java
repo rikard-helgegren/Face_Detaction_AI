@@ -132,6 +132,10 @@ public class CascadeClassifier implements Serializable {
 
 			if(curFalsePositiveRate > targetMaxFalsePositive){
 				negativeSamples = Data.filter(this, negativeSamples);
+				if (negativeSamples.size() < 10000) {
+					List<LabeledIntegralImage> refills = Data.getRefills(this, 10000 - negativeSamples.size());
+					negativeSamples.addAll(refills);
+				}
 			}
 
 			if (negativeSamples.size() < 10) {

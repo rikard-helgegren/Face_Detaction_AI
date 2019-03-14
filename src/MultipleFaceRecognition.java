@@ -146,8 +146,7 @@ public class MultipleFaceRecognition{
     private static ArrayList<Rectangle> findFaces(CascadeClassifier cascade, BufferedImage img, int slidingWindowSize) throws Exception {
         ArrayList<Rectangle> faces = new ArrayList<>();
 
-        int imageIndex = 0;
-
+        //Set the speed of the sliding window.
         int slidingWindowSpeed;
 
         if(slidingWindowSpeedAsScale){
@@ -158,8 +157,9 @@ public class MultipleFaceRecognition{
 
         for (int x = 0; x < img.getWidth()-slidingWindowSize; x+=slidingWindowSpeed){
             for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=slidingWindowSpeed) {
-                BufferedImage imgFromSubWindow = imageFromSubWindow(x,y,slidingWindowSize,img);
-                if(cascade.isFace(new HalIntegralImage(imgFromSubWindow))){
+
+                //Use the cascaded classifier to check every window
+                if(cascade.isFace(integralImageFromSubwindow(x,y,slidingWindowSize,img))){
                     Rectangle newFace = new Rectangle(x, y, slidingWindowSize, slidingWindowSize);
 
                     if(allowOverlapping) {
@@ -213,28 +213,17 @@ public class MultipleFaceRecognition{
      * @param img The image from where to take the subwindow
      * @return The integral image from the subwindow
      */
-    private static HalIntegralImage integralImageFromSubWindow(int x, int y, int size, BufferedImage img) throws Exception {
-        BufferedImage newBuff = new BufferedImage(size, size, BufferedImage.TYPE_BYTE_GRAY);
+    private static HalIntegralImage integralImageFromSubwindow(int x, int y, int size, BufferedImage img) throws Exception {
+        //Create a subimage from the original
+        BufferedImage subimage = new BufferedImage(size, size, BufferedImage.TYPE_BYTE_GRAY);
         int yl;
         for(yl = y;yl<size+y;yl++){
             for(int xl = x; xl<size+x; xl++){
-                newBuff.setRGB(xl-x,yl-y, img.getRGB(xl, yl));
+                subimage.setRGB(xl-x,yl-y, img.getRGB(xl, yl));
             }
         }
-
-        return new HalIntegralImage(newBuff);
-    }
-
-    private static BufferedImage imageFromSubWindow(int x, int y, int size, BufferedImage img) throws Exception {
-        BufferedImage newBuff = new BufferedImage(size, size, BufferedImage.TYPE_BYTE_GRAY);
-        int yl;
-        for(yl = y;yl<size+y;yl++){
-            for(int xl = x; xl<size+x; xl++){
-                newBuff.setRGB(xl-x,yl-y, img.getRGB(xl, yl));
-            }
-        }
-
-        return newBuff;
+        //Convert the subimage to an integralImage and return it.
+        return new HalIntegralImage(subimage);
     }
 
     /**
@@ -246,11 +235,14 @@ public class MultipleFaceRecognition{
      */
     private static void startGUI(BufferedImage img, ArrayList<Rectangle> faces) {
 
-        //Create and set up the window.
+        //Create the window.
         JFrame frame = new JFrame("Face recognition using the method proposed by Viola-Jones");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //Set the size of the window to the size of the image.
         frame.setPreferredSize(new Dimension(img.getWidth(),img.getHeight()));
         frame.setMinimumSize(new Dimension(img.getWidth(),img.getHeight()));
+
+        //Place the image at the center of the screen
         frame.setLocationRelativeTo(null);
 
         //Draw the buffered image with the recognized faces.

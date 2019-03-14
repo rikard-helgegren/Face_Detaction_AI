@@ -199,7 +199,7 @@ public class CascadeClassifier implements Serializable {
 			if (l.isFace) testFaces++;
 		}
 
-		System.out.printf("Test done on %d test images. %d positive, %d negative.", testData.size(), testFaces, testData.size()-testFaces);
+		System.out.printf("Test done on %d test images. %d positive, %d negative. ", testData.size(), testFaces, testData.size()-testFaces);
 		System.out.println("RESULTS: " + stats);
 
 		for (int i = 0; i < strongClassifiers.size(); i++) {

@@ -186,12 +186,34 @@ public class MultipleFaceRecognition{
         return faces;
     }
 
-    
+    private static ArrayList<HalIntegralImage> findFaceIntegralImagesScaleImage(CascadeClassifier cascade, BufferedImage img, int resultingWidth) throws Exception {
+        ArrayList<HalIntegralImage> faces = new ArrayList<>();
+        int maxSlidingWindowSize = 100;
+        int minSlidingWindowSize = 19;
+        int slidingWindowIncrease = 1;
+
+        double scaleImageToMaxFace = (double)resultingWidth/maxSlidingWindowSize;
+        double scaleImageToMinFace = (double)resultingWidth/minSlidingWindowSize;
+        double scalePerLayer = (double) resultingWidth/(resultingWidth + slidingWindowIncrease);
+        BufferedImage scaled = scaleImage(img, scaleImageToMinFace);
+
+        while(scaled.getWidth()>=scaleImageToMaxFace*img.getWidth()){
+            ArrayList<HalIntegralImage> newFaces = findFaceIntegralImages(cascade, scaled, FaceRecognition.trainingDataWidth);
+            faces.addAll(newFaces);
+
+            scaled = scaleImage(scaled, scalePerLayer);
+        }
+
+        return faces;
+    }
+
     private static ArrayList<HalIntegralImage> findFaceIntegralImages(CascadeClassifier cascade, BufferedImage img, int slidingWindowSize) throws Exception {
         ArrayList<HalIntegralImage> faces = new ArrayList<>();
+        int xIncrease = 1;
+        int yIncrease = 1;
 
-        for (int x = 0; x < img.getWidth()-slidingWindowSize; x+=1){
-            for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=1) {
+        for (int x = 0; x < img.getWidth()-slidingWindowSize; x+=xIncrease){
+            for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=yIncrease) {
 
                 HalIntegralImage integralImage = integralImageFromSubwindow(x,y,slidingWindowSize,img);
                 if(cascade.isFace(integralImage)){

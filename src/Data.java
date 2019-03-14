@@ -11,6 +11,7 @@ public class Data {
 
     public String[] pathsToFaces;
     public String[] pathsToNonFaces;
+    public String[] pathsToRefill;
 
     // Percentages and maximums for datasets.
     // Percentage sum is automatically normalized to 1.
@@ -51,11 +52,13 @@ public class Data {
         String smartestPictureNonFaces = "./res/non-faces/smartest-picture-non-face";
         String manyScrapedNonFaces = "./res/non-faces/many-scraped-non-face";
 
+        String scrapedRefillGrey = "./res/non-faces/scraped-refill-grey";
+
         // Select which datasets to use
         pathsToFaces = new String[]{lfw2BigFaces};
         pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, manyScrapedNonFaces};
-        //pathsToFaces = new String[]{lfw2Faces};
-        //pathsToNonFaces = new String[]{originalTestNonFaces};
+
+        pathsToRefill = new String[]{scrapedRefillGrey};
 
         partitionData();
 
@@ -66,6 +69,27 @@ public class Data {
         //System.out.println("Pre-calculating feature values for test data...");
         //Feature.calculateFeatureValues(testData);
 
+    }
+
+    public List<LabeledIntegralImage> getRefills(CascadeClassifier cascade, int targetAmount) throws Exception {
+        int amount = 0;
+        List<LabeledIntegralImage> refills = new ArrayList<>();
+        List<File> imgFiles = new ArrayList<>();
+        for (String path : pathsToRefill) {
+            imgFiles.addAll(Arrays.asList(new File(path).listFiles()));
+        }
+        for (File f : imgFiles) {
+            BufferedImage b = MultipleFaceRecognition.loadImageAsGrayscale(f.getPath());
+            List<HalIntegralImage> imgs = MultipleFaceRecognition.findFaceIntegralImagesScaleImage(cascade, b, 19);
+            for (HalIntegralImage img : imgs) {
+                refills.add(new LabeledIntegralImage(img, false, 0));
+                amount++;
+                if (amount >= targetAmount) return refills;
+            }
+        }
+        if (refills.size() == 0) System.err.println("Out of refills.");
+
+        return refills;
     }
 
     private void partitionData() throws Exception {

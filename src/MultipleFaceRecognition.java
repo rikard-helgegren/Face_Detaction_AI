@@ -186,7 +186,7 @@ public class MultipleFaceRecognition{
         return faces;
     }
 
-    private static ArrayList<HalIntegralImage> findFaceIntegralImagesScaleImage(CascadeClassifier cascade, BufferedImage img, int resultingWidth) throws Exception {
+    public static ArrayList<HalIntegralImage> findFaceIntegralImagesScaleImage(CascadeClassifier cascade, BufferedImage img, int resultingWidth) throws Exception {
         ArrayList<HalIntegralImage> faces = new ArrayList<>();
         int maxSlidingWindowSize = 100;
         int minSlidingWindowSize = 19;
@@ -308,7 +308,7 @@ public class MultipleFaceRecognition{
      * @param path The path to the image
      * @return An image in grayscale
      */
-    private static BufferedImage loadImageAsGrayscale(String path) throws IOException {
+    public static BufferedImage loadImageAsGrayscale(String path) throws IOException {
         //Load the image
         BufferedImage loadedImage = ImageIO.read(new File(path));
 

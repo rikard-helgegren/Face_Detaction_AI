@@ -17,7 +17,7 @@ public class Data {
     private double percentTrainFaces = 0.5;
     private int maxTrainFaces = 4000;
     private double percentTrainNonFaces = 0.5;
-    private int maxTrainNonFaces = 10000;
+    private int maxTrainNonFaces = 30000;
 
     private double percentTestFaces = 0.5;
     private int maxTestFaces = 10000;
@@ -53,7 +53,7 @@ public class Data {
 
         // Select which datasets to use
         pathsToFaces = new String[]{lfw2BigFaces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces/*, manyScrapedNonFaces*/};
+        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, manyScrapedNonFaces};
         //pathsToFaces = new String[]{lfw2Faces};
         //pathsToNonFaces = new String[]{originalTestNonFaces};
 

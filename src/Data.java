@@ -52,7 +52,7 @@ public class Data {
 
         // Select which datasets to use
         pathsToFaces = new String[]{originalTrainFaces, attFaces, lfw2Faces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, smartestPictureNonFaces, manyScrapedNonFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, manyScrapedNonFaces};
         //pathsToFaces = new String[]{lfw2Faces};
         //pathsToNonFaces = new String[]{originalTestNonFaces};
 

@@ -4,10 +4,11 @@
  * Make sure images exist before running.
  */
 public class FaceRecognition {
-    // Should an entire cascade be trained? If not, a strong classifier will be trained.
+    // True if a cascade classifier should be used. Otherwise a strong classifier.
     private static final boolean trainFullCascade = true;
-    private static final boolean loadFromFile = false; // Set this boolean to loadCascade or train.
-    //The overall false positive rate the cascaded classifier should reach.
+
+    // True if a network should be loaded. Otherwise, one will be trained.
+    private static final boolean loadFromFile = false;
 
     public static final double DELTA = 0.00001;
     public static final int trainingDataWidth = 19;

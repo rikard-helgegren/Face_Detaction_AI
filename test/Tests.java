@@ -1,6 +1,5 @@
 import Catalano.Imaging.FastBitmap;
 import hal2019.*;
-import hal2019.graphics.Recognize;
 import hal2019.training.ThresholdParity;
 import hal2019.training.classifiers.CascadeClassifier;
 import hal2019.training.classifiers.StrongClassifier;

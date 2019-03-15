@@ -1,7 +1,7 @@
 package hal2019;
 
 import Catalano.Imaging.FastBitmap;
-import hal2019.graphics.Recognize;
+import hal2019.graphics.Detector;
 import hal2019.training.classifiers.CascadeClassifier;
 import hal2019.training.Feature;
 
@@ -33,9 +33,9 @@ public class Data {
     private int maxTestNonFaces = 50000;
 
     private double percentValidateFaces = 0.3;
-    private int maxValidateFaces = 3000;
+    private int maxValidateFaces = 5000;
     private double percentValidateNonFaces = 0.3;
-    private int maxValidateNonFaces = 6000;
+    private int maxValidateNonFaces = 20000;
 
     public List<LabeledIntegralImage> negativeSamples;
     public List<LabeledIntegralImage> positiveSamples;
@@ -81,7 +81,7 @@ public class Data {
         for (File f : imgFiles) {
             filesSearched++;
             BufferedImage b = loadImageAsGrayscale(f.getPath());
-            List<HalIntegralImage> imgs = Recognize.findFaceIntegralImagesScaleImage(cascade, b, 19);
+            List<HalIntegralImage> imgs = Detector.findFaceIntegralImagesScaleImage(cascade, b, 19);
             if (imgs.isEmpty()) emptyFiles++;
             for (HalIntegralImage img : imgs) {
                 refills.add(new LabeledIntegralImage(img, false, 0));

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
-public class Recognize {
+public class Detector {
     //The image to be used
     private static final String path = "test-res/examples/many_faces.png";
     //The minimum size of the sliding window

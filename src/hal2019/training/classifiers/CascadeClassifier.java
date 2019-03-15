@@ -90,6 +90,9 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 
 		//While the current false positive rate is too high
 		while(curFalsePositiveRate > targetMaxFalsePositive) {
+			long t0layer = System.currentTimeMillis();
+			long tValidation = 0;
+
 			// Create a new layer and init adaboost (reset image weights)
 			ArrayList<LabeledIntegralImage> allSamples = WeakClassifier.initForAdaBoost(positiveSamples, negativeSamples);
 
@@ -104,18 +107,21 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 				System.out.println();
 				System.out.println(this.toStringSummary());
 				System.out.println();
-				System.out.printf("Validation data: %5d positive, %5d negative. ", posValidation, validationData.size() - posValidation);
-				System.out.printf("Detection rate %.4f. ", curDetectionRate);
-				System.out.printf("False positive rate %.4f.\n", curFalsePositiveRate);
-				System.out.printf("Training   data: %5d positive, %5d negative. %d rejected.\n",
+				System.out.printf("Validation in %.1fs. %5d positive, %5d negative. ",
+						tValidation / 1000.0, posValidation, validationData.size() - posValidation);
+				System.out.printf("Detection rate %.2f%%. ", curDetectionRate * 100);
+				System.out.printf("False positive rate %.2f%%.\n", curFalsePositiveRate * 100);
+				System.out.printf("Training  : %5d positive, %5d negative. Total %d rejected.\n",
 						positiveSamples.size(), negativeSamples.size(), rejectedNegatives);
 				System.out.println("--------------------------------------------------------------------------------");
 
 				strongClassifier.addClassifier(new WeakClassifier(allSamples));
 
+
 				strongClassifier.setThresholdMultiplier(1);
 
 				// Test classifier performance
+				long t0Validation = System.currentTimeMillis();
 				while(true) {
 					PerformanceStats stats = eval(validationData);
 					curFalsePositiveRate = stats.falsePositive;
@@ -125,8 +131,9 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 						break;
 					}
 					// Otherwise, decrease threshold
-					strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
+					strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.02));
 				}
+				tValidation = System.currentTimeMillis() - t0Validation;
 			}
 			// False positive rate is now low enough.
 
@@ -140,7 +147,7 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 				negativeSamples = Data.filter(this, negativeSamples);
 				rejectedNegatives += negativeBefore - negativeSamples.size(); // Track nr of rejected negatives
 
-				if (negativeSamples.size() < 10000) {
+				if (negativeSamples.size() < Data.maxTrainNonFaces) {
 
 					// Add more negative samples that this classifier says are false positive
 					List<LabeledIntegralImage> refills = Data.getRefills(this, 10000 - negativeSamples.size());
@@ -148,7 +155,7 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 					negativeSamples.addAll(refills);
 
 					// Stop if we are out of data
-					if (negativeSamples.size() < 1000) {
+					if (negativeSamples.size() < Data.maxTrainNonFaces / 10) {
 						System.err.println("Cascade training stopped since we ran out of negative data.");
 						break;
 					}

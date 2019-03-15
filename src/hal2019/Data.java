@@ -22,10 +22,10 @@ public class Data {
 
     // Percentages and maximums for datasets.
     // Percentage sum is automatically normalized to 1.
-    private double percentTrainFaces = 0.3;
-    private int maxTrainFaces = 4000;
-    private double percentTrainNonFaces = 0.3;
-    private int maxTrainNonFaces = 10000;
+    private static double percentTrainFaces = 0.3;
+    private static int maxTrainFaces = 4000;
+    private static double percentTrainNonFaces = 0.3;
+    public static int maxTrainNonFaces = 10000;
 
     private double percentTestFaces = 0.4;
     private int maxTestFaces = 10000;
@@ -35,7 +35,7 @@ public class Data {
     private double percentValidateFaces = 0.3;
     private int maxValidateFaces = 5000;
     private double percentValidateNonFaces = 0.3;
-    private int maxValidateNonFaces = 20000;
+    private int maxValidateNonFaces = 10000;
 
     public List<LabeledIntegralImage> negativeSamples;
     public List<LabeledIntegralImage> positiveSamples;

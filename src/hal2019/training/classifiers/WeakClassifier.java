@@ -177,7 +177,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
             }
         }
 
-        System.out.printf("Trained one weak classifier in %ds\n", (System.currentTimeMillis() - t0) / 1000);
+        System.out.printf("Trained one weak classifier in %d seconds.\n", (System.currentTimeMillis() - t0) / 1000);
         return bestClassifier;
     }
 

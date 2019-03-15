@@ -99,15 +99,15 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 
 			// Add more weak classifiers until false positive rate is low enough
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
-				System.out.println("Current Cascade:");
+				System.out.println();
 				System.out.println(this.toStringSummary());
-				System.out.printf("Validation data %d positive, %d negative. ", posValidation, validationData.size() - posValidation);
-				System.out.printf("Detection rate is %.4f. ", curDetectionRate);
-				System.out.printf("False positive rate is %.4f.\n", curFalsePositiveRate);
-				//System.out.println();
-				System.out.printf("Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
+				System.out.println();
+				System.out.printf("Validation data: %5d positive, %5d negative. ", posValidation, validationData.size() - posValidation);
+				System.out.printf("Detection rate %.4f. ", curDetectionRate);
+				System.out.printf("False positive rate %.4f.\n", curFalsePositiveRate);
+				System.out.printf("Training   data: %5d positive, %5d negative.\n", positiveSamples.size(), negativeSamples.size());
+				System.out.println("--------------------------------------------------------------------------------");
 
-				//System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 				strongClassifier.addClassifier(new WeakClassifier(allSamples));
 
 				strongClassifier.setThresholdMultiplier(1);
@@ -222,9 +222,11 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 		for (StrongClassifier s : strongClassifiers) {
 			totalWeak += s.getSize();
 		}
-		String s = String.format("Cascade hal2019.training.classifiers.WeakClassifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
-		for(StrongClassifier c:strongClassifiers) {
+		String s = String.format("= Cascade Classifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
+		for (int i = 0; i < strongClassifiers.size(); i++) {
+			StrongClassifier c = strongClassifiers.get(i);
 			s += c.toStringSummary();
+			if (i + 1 < strongClassifiers.size()) s += "\n";
 		}
 		return s;
 	}
@@ -235,9 +237,11 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 		for (StrongClassifier s : strongClassifiers) {
 			totalWeak += s.getSize();
 		}
-		String s = String.format("Cascade hal2019.training.classifiers.WeakClassifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
-		for(StrongClassifier c:strongClassifiers) {
+		String s = String.format("= Cascade Classifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
+		for (int i = 0; i < strongClassifiers.size(); i++) {
+			StrongClassifier c = strongClassifiers.get(i);
 			s += c.toString();
+			if (i + 1 < strongClassifiers.size()) s += "\n";
 		}
 		return s;
 	}

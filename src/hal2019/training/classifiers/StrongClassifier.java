@@ -141,15 +141,17 @@ public class StrongClassifier extends FaceDetector implements Serializable {
     }
 
     public String toStringSummary() {
-        String s = String.format("=== Strong Classifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
+        String s = String.format("=== Strong Classifier. Size: %d. Threshold multiplier: %.2f.", weakClassifiers.size(), getThresholdMultiplier());
         return s;
     }
 
     @Override
     public String toString() {
         String s = String.format("=== Strong Classifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
-        for (WeakClassifier c : weakClassifiers) {
-            s += "====== " + c + "\n";
+        for (int i = 0; i < weakClassifiers.size(); i++) {
+            WeakClassifier c = weakClassifiers.get(i);
+            s += "====== " + c;
+            if (i + 1 < weakClassifiers.size()) s+= "\n";
         }
         return s;
     }

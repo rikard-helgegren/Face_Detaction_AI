@@ -22,20 +22,20 @@ public class Data {
 
     // Percentages and maximums for datasets.
     // Percentage sum is automatically normalized to 1.
-    private double percentTrainFaces = 0.5;
+    private double percentTrainFaces = 0.3;
     private int maxTrainFaces = 4000;
-    private double percentTrainNonFaces = 0.5;
+    private double percentTrainNonFaces = 0.3;
     private int maxTrainNonFaces = 10000;
 
-    private double percentTestFaces = 0.5;
+    private double percentTestFaces = 0.4;
     private int maxTestFaces = 10000;
-    private double percentTestNonFaces = 0.5;
+    private double percentTestNonFaces = 0.4;
     private int maxTestNonFaces = 50000;
 
-    private double percentValidateFaces = 0.1;
-    private int maxValidateFaces = 2000;
-    private double percentValidateNonFaces = 0.1;
-    private int maxValidateNonFaces = 4000;
+    private double percentValidateFaces = 0.3;
+    private int maxValidateFaces = 3000;
+    private double percentValidateNonFaces = 0.3;
+    private int maxValidateNonFaces = 6000;
 
     public List<LabeledIntegralImage> negativeSamples;
     public List<LabeledIntegralImage> positiveSamples;
@@ -60,22 +60,13 @@ public class Data {
         String manyScrapedNonFaces = "./res/non-faces/many-scraped-non-face";
 
         // Select which datasets to use
-
-        pathsToFaces = new String[]{originalTrainFaces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces};
-
-        pathsToRefill = new String[]{scrapedRefillGrey};
-
+        pathsToFaces = new String[]{lfw2BigFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, manyScrapedNonFaces};
 
         partitionData();
 
-
         // Pre-calculate feature values. OK to pre-calculate on only part of data.
         Feature.calculateFeatureValues(allSamples);
-        //System.out.println("Pre-calculating feature values for test data...");
-        //hal2019.training.Feature.calculateFeatureValues(testData);
-
     }
 
     public static List<LabeledIntegralImage> getRefills(CascadeClassifier cascade, int targetAmount) throws Exception {

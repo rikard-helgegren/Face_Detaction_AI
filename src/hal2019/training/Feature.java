@@ -46,7 +46,7 @@ public class Feature implements Serializable {
     }
 
     public static void calculateFeatureValues(List<LabeledIntegralImage> images) throws Exception {
-        System.out.printf("Pre-calculating feature values for %d samples.\n", images.size());
+        //System.out.printf("Pre-calculating feature values for %d samples.\n", images.size());
         for (LabeledIntegralImage img : images) {
             int[] featureValues = new int[Feature.allFeatures.size()];
             for (int i = 0; i < Feature.allFeatures.size(); i++) {

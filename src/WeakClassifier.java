@@ -59,8 +59,8 @@ public class WeakClassifier extends FaceDetector implements Serializable {
 
     public void setBeta(double beta) throws Exception {
         if (beta < -0.01) throw new Exception("Beta must be in [0, inf). Was: " + beta); // TODO maybe can be 0 instead
-        if (beta < 0 && beta > 0 - FaceRecognition.DELTA) beta = 0;
-        //if (beta > 1 && beta < 1 + FaceRecognition.DELTA) beta = 1;
+        if (beta < 0 && beta > 0 - TrainClassifiers.DELTA) beta = 0;
+        //if (beta > 1 && beta < 1 + TrainClassifiers.DELTA) beta = 1;
         //if (beta < 0 || beta > 1) throw new Exception("Beta must be in [0, 1]. Was: " + beta);
         this.beta = beta;
     }

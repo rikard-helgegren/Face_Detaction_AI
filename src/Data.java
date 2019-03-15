@@ -85,8 +85,8 @@ public class Data {
         }
         for (File f : imgFiles) {
             filesSearched++;
-            BufferedImage b = MultipleFaceRecognition.loadImageAsGrayscale(f.getPath());
-            List<HalIntegralImage> imgs = MultipleFaceRecognition.findFaceIntegralImagesScaleImage(cascade, b, 19);
+            BufferedImage b = Recognize.loadImageAsGrayscale(f.getPath());
+            List<HalIntegralImage> imgs = Recognize.findFaceIntegralImagesScaleImage(cascade, b, 19);
             if (imgs.isEmpty()) emptyFiles++;
             for (HalIntegralImage img : imgs) {
                 refills.add(new LabeledIntegralImage(img, false, 0));

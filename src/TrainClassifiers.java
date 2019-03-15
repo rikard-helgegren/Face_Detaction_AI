@@ -3,7 +3,7 @@
  * This file should be run with the project root as working directory.
  * Make sure images exist before running.
  */
-public class FaceRecognition {
+public class TrainClassifiers {
     // True if a cascade classifier should be used. Otherwise a strong classifier.
     private static final boolean trainFullCascade = true;
 

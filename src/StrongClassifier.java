@@ -74,7 +74,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
         double threshold = 0;
         for(WeakClassifier c:weakClassifiers){
             threshold+=c.getAlpha();
-            //FaceRecognition.writer.printf("Alpha: %.3f\n", c.getAlpha());
+            //TrainClassifiers.writer.printf("Alpha: %.3f\n", c.getAlpha());
         }
         return threshold;
     }
@@ -105,7 +105,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
             value+=c.getAlpha()*isFace;
         }
 
-        //FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
+        //TrainClassifiers.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
         return value>=getThreshold()*thresholdMultiplier;
     }
 
@@ -120,7 +120,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
             value+=c.getAlpha()*isFace;
         }
 
-        //FaceRecognition.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
+        //TrainClassifiers.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
         return value>=getThreshold()*thresholdMultiplier;
     }
 

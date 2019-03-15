@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
-public class MultipleFaceRecognition{
+public class Recognize {
     //The image to be used
     private static final String path = "test-res/examples/many_faces.png";
     //The minimum size of the sliding window
@@ -106,14 +106,14 @@ public class MultipleFaceRecognition{
     private static ArrayList<Rectangle> findFacesScaleImage(CascadeClassifier cascade, BufferedImage img) throws Exception {
         ArrayList<Rectangle> faces = new ArrayList<>();
 
-        double scaleImageToMaxFace = (double)FaceRecognition.trainingDataWidth/maxFaceSize;
-        double scaleImageToMinFace = (double)FaceRecognition.trainingDataWidth/minFaceSize;
-        double scalePerLayer = (double) FaceRecognition.trainingDataWidth/(FaceRecognition.trainingDataWidth + slidingWindowIncrease);
+        double scaleImageToMaxFace = (double) TrainClassifiers.trainingDataWidth/maxFaceSize;
+        double scaleImageToMinFace = (double) TrainClassifiers.trainingDataWidth/minFaceSize;
+        double scalePerLayer = (double) TrainClassifiers.trainingDataWidth/(TrainClassifiers.trainingDataWidth + slidingWindowIncrease);
         BufferedImage scaled = scaleImage(img, scaleImageToMinFace);
         System.out.println(scaleImageToMinFace);
 
         while(scaled.getWidth()>=scaleImageToMaxFace*img.getWidth()){
-            ArrayList<Rectangle> newFaces = findFaces(cascade, scaled, FaceRecognition.trainingDataWidth);
+            ArrayList<Rectangle> newFaces = findFaces(cascade, scaled, TrainClassifiers.trainingDataWidth);
             for(Rectangle r:newFaces){
                 r.scale((double)img.getWidth()/scaled.getWidth());
             }
@@ -208,7 +208,7 @@ public class MultipleFaceRecognition{
         BufferedImage scaled = scaleImage(img, scaleImageToMinFace);
 
         while(scaled.getWidth()>=scaleImageToMaxFace*img.getWidth()){
-            ArrayList<HalIntegralImage> newFaces = findFaceIntegralImages(cascade, scaled, FaceRecognition.trainingDataWidth);
+            ArrayList<HalIntegralImage> newFaces = findFaceIntegralImages(cascade, scaled, TrainClassifiers.trainingDataWidth);
             faces.addAll(newFaces);
 
             scaled = scaleImage(scaled, scalePerLayer);

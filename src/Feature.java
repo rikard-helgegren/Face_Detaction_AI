@@ -1,4 +1,3 @@
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +7,7 @@ public class Feature implements Serializable {
 
     // Generate all features depending on data dimensions.
     public static ArrayList<Feature> allFeatures = generateAllFeatures(
-            FaceRecognition.trainingDataWidth, FaceRecognition.trainingDataHeight);
+            TrainClassifiers.trainingDataWidth, TrainClassifiers.trainingDataHeight);
 
     /**
      * Represents the 4 different types of feature.
@@ -68,10 +67,10 @@ public class Feature implements Serializable {
         throw new Exception("The feature was not of a recognized type. Type was: " + type);
     }
     public int calculateFeatureValue(HalIntegralImage img, int receptiveFieldWidth,int receptiveFieldHeight) throws Exception {
-        x=x/FaceRecognition.trainingDataWidth*receptiveFieldWidth;
-        y=y/FaceRecognition.trainingDataHeight*receptiveFieldHeight;
-        w=w/FaceRecognition.trainingDataWidth*receptiveFieldWidth;
-        h=h/FaceRecognition.trainingDataHeight*receptiveFieldHeight;
+        x=x/ TrainClassifiers.trainingDataWidth*receptiveFieldWidth;
+        y=y/ TrainClassifiers.trainingDataHeight*receptiveFieldHeight;
+        w=w/ TrainClassifiers.trainingDataWidth*receptiveFieldWidth;
+        h=h/ TrainClassifiers.trainingDataHeight*receptiveFieldHeight;
 
         switch (type) {
             case HORIZONTAL: return calcHorizontalTwoRectFeature(img, x, y, w, h);

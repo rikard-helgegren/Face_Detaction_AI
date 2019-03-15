@@ -287,7 +287,7 @@ public class Tests {
         String refillPath = "./test-res/refill";
         File[] files = new File(refillPath).listFiles();
         for (File f : files) {
-            BufferedImage b = MultipleFaceRecognition.loadImageAsGrayscale(f.getPath());
+            BufferedImage b = Recognize.loadImageAsGrayscale(f.getPath());
         }
     }
 }

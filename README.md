@@ -28,7 +28,7 @@ If you're not using an IDE you will have to manually make sure that libraries ar
 ## Current Usage
 When running files, make sure that your current working directory is the project root. If you are running from the terminal this means you should be at `[placeInYourFileSystem]/code`, not in any subfolder. If you are running from an IDE such as Eclipse or Intellij IDEA you need to make sure the current working directory is correctly set in your current run configuration. If you have not done this, any hardcoded paths will fail to find the right images etc.
 
-At the top of `FaceRecognition.java` is a boolean variable `loadFromFile` that allows you to load a trained network from file rather than training a new one from scratch.
+At the top of `TrainClassifiers.java` is a boolean variable `loadFromFile` that allows you to load a trained network from file rather than training a new one from scratch.
 
 ## Things that are already done
 * Get some face images.

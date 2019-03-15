@@ -37,7 +37,7 @@ public class Detector {
        |__________|
 
      */
-    private static final boolean allowOverlapping = false;
+    private static final boolean allowOverlapping = true;
     //Should the full image be scaled down or the features scaled up?
     private static final boolean scaleFeatures = true;
     //If sliding windows should move at a speed proportional to it's size.
@@ -56,7 +56,8 @@ public class Detector {
         //Load the cascaded classifier
         CascadeClassifier cascade = new CascadeClassifier("saves/save.cascade");
 
-
+        // TODO Commented out this. It was for testing?
+        /*
         ArrayList<HalIntegralImage> facesII = findFaceIntegralImagesScaleImage(cascade, img, 19);
         for(HalIntegralImage h: facesII){
             if(cascade.canBeFace(h)){
@@ -64,7 +65,7 @@ public class Detector {
             }else{
                 System.out.println("No");
             }
-        }
+        }*/
 
         //Find all faces in the image using the cascade
         ArrayList<Rectangle> faces = findFaces(cascade, img);
@@ -172,6 +173,7 @@ public class Detector {
             slidingWindowSize = slidingWindowMoveSpeed;
         }
 
+        long t0 = System.currentTimeMillis();
         for (int x = 0; x < img.getWidth()-slidingWindowSize; x+=slidingWindowSpeed){
             for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=slidingWindowSpeed) {
 
@@ -180,7 +182,7 @@ public class Detector {
                     Rectangle newFace = new Rectangle(x, y, slidingWindowSize, slidingWindowSize);
 
                     if(allowOverlapping) {
-                        System.out.println("Face found: " + newFace);
+                        //System.out.println("Face found: " + newFace);
                         faces.add(newFace);
                     }else{
                         boolean overlaps = false;
@@ -190,7 +192,7 @@ public class Detector {
                             }
                         }
                         if(!overlaps){
-                            System.out.println("Face found: "+newFace);
+                            //System.out.println("Face found: "+newFace);
                             faces.add(newFace);
                         }
                     }
@@ -199,6 +201,7 @@ public class Detector {
                 }
             }
         }
+        System.out.printf("Found %d faces in %.1f seconds.\n", faces.size(), (System.currentTimeMillis() - t0) / 1000.0);
 
         return faces;
     }

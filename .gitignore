@@ -2,6 +2,6 @@ out
 *.class
 res/
 *.zip
-save.strong
-save.cascade
-saves/
+saves/save.strong
+saves/save.cascade
+saves/autosave.cascade

@@ -68,6 +68,13 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 		this.minDetectionRatePerLayer = 0;
 	}
 
+	/**
+	 * Train this cascade classifier.
+	 * @param positiveSamples Set of positive samples.
+	 * @param negativeSamples Set of initial negative samples.
+	 * @param validationData Set of validation data.
+	 * @throws Exception
+	 */
 	public void train(
 			  List<LabeledIntegralImage> positiveSamples,
 			  List<LabeledIntegralImage> negativeSamples,
@@ -77,8 +84,6 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 			if (l.isFace) posValidation++;
 		}
 
-		//double maxFalsePositiveRatePerLayer = 0.7;
-		//double minDetectionRatePerLayer = 0.95;
 		double prevFalsePositiveRate = 1;
 		double curFalsePositiveRate = 1;
 		double prevDetectionRate = 1;

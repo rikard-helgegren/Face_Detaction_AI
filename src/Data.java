@@ -55,8 +55,9 @@ public class Data {
         String scrapedRefillGrey = "./res/non-faces/scraped-refill-grey";
 
         // Select which datasets to use
-        pathsToFaces = new String[]{lfw2BigFaces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, crawledNonFaces, manyScrapedNonFaces};
+        pathsToFaces = new String[]{originalTrainFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces};
 
         pathsToRefill = new String[]{scrapedRefillGrey};
 

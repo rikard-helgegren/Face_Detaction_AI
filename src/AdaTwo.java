@@ -4,10 +4,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class AdaTwo extends Thread {
 
     private List<Feature> features;
-    private ConcurrentLinkedQueue<Classifier> classifiers;
+    private ConcurrentLinkedQueue<WeakClassifier> classifiers;
     private List<LabeledIntegralImage> allSamples;
 
-    public AdaTwo(List<Feature> features, ConcurrentLinkedQueue<Classifier> classifiers, List<LabeledIntegralImage> allSamples) {
+    public AdaTwo(List<Feature> features, ConcurrentLinkedQueue<WeakClassifier> classifiers, List<LabeledIntegralImage> allSamples) {
         this.features = features;
         this.classifiers = classifiers;
         this.allSamples = allSamples;
@@ -20,7 +20,7 @@ public class AdaTwo extends Thread {
                 Feature j = features.get(i);
                 //if(j.getW()==18) System.out.println("Tried feature: "+j);
 
-                ThresholdParity p = Classifier.calcBestThresholdAndParity(allSamples, j);
+                ThresholdParity p = WeakClassifier.calcBestThresholdAndParity(allSamples, j);
 
 
                 int threshold = p.threshold;
@@ -28,7 +28,7 @@ public class AdaTwo extends Thread {
                 //System.out.println("T & P: "+threshold+", "+parity);
                 // Actual step 2
                 double error = 0;
-                Classifier h = new Classifier(j, threshold, parity);
+                WeakClassifier h = new WeakClassifier(j, threshold, parity);
                 for (LabeledIntegralImage img : allSamples) {
                     int canBeFace = (h.canBeFace(img.img)) ? 1 : 0;
                     int isFace = (img.isFace) ? 1 : 0;

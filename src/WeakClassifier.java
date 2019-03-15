@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Classifier extends FaceDetector implements Serializable {
+public class WeakClassifier extends FaceDetector implements Serializable {
 
     private static final long serialVersionUID = 0; // Increase when changing something in this class
 
@@ -18,11 +18,11 @@ public class Classifier extends FaceDetector implements Serializable {
     public PerformanceStats testPerformance;
     public PerformanceStats trainPerformance;
 
-    public Classifier(List<LabeledIntegralImage> trainingData) throws Exception {
+    public WeakClassifier(List<LabeledIntegralImage> trainingData) throws Exception {
         this(trainOneWeak(trainingData));
     }
 
-    private Classifier(Classifier c) {
+    private WeakClassifier(WeakClassifier c) {
         feature = c.feature;
         threshold = c.threshold;
         parity = c.parity;
@@ -35,7 +35,7 @@ public class Classifier extends FaceDetector implements Serializable {
      * Constructs a classifier that uses the the given type of feature with the given values.
      * @param feature the feature this classifier should use.
      */
-    public Classifier(Feature feature, int threshold, int parity) throws Exception {
+    public WeakClassifier(Feature feature, int threshold, int parity) throws Exception {
         this.feature = feature;
         this.threshold = threshold;
         this.parity = parity;
@@ -137,7 +137,7 @@ public class Classifier extends FaceDetector implements Serializable {
     // Takes 107s with sorting and recalculation.
     // Takes 59s with sorting but without recalculation.
     // Takes 13s with sorting but without recalculation and with 8 threads. (Current)
-    private static Classifier trainOneWeak(List<LabeledIntegralImage> allSamples) throws Exception {
+    private static WeakClassifier trainOneWeak(List<LabeledIntegralImage> allSamples) throws Exception {
         long t0 = System.currentTimeMillis();
         //System.out.println("Started training on weak classifier");
         // Generate all possible features
@@ -145,7 +145,7 @@ public class Classifier extends FaceDetector implements Serializable {
         //Collections.shuffle(allFeatures);
 
         int size = 1;
-        //ArrayList<Classifier> degenerateDecisionTree = new ArrayList<>(size);
+        //ArrayList<WeakClassifier> degenerateDecisionTree = new ArrayList<>(size);
 
         // This is the Adaboost training algorithm
 
@@ -159,13 +159,13 @@ public class Classifier extends FaceDetector implements Serializable {
         }
 
         // 2. Train a classifier for every feature. Each is trained on all trainingData
-        //Queue<Classifier> classifiers = adaBoostStepTwo(allSamples); // Single thread
-        Queue<Classifier> classifiers = adaBoostStepTwoThreaded(allSamples, 8); // Multi-thread
+        //Queue<WeakClassifier> classifiers = adaBoostStepTwo(allSamples); // Single thread
+        Queue<WeakClassifier> classifiers = adaBoostStepTwoThreaded(allSamples, 8); // Multi-thread
 
         // 3. Choose the classifier with the lowest error
-        //Classifier bestClassifier = classifiers.get(0);
-        Classifier bestClassifier = classifiers.poll();
-        for (Classifier c : classifiers) {
+        //WeakClassifier bestClassifier = classifiers.get(0);
+        WeakClassifier bestClassifier = classifiers.poll();
+        for (WeakClassifier c : classifiers) {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
         }
 
@@ -198,8 +198,8 @@ public class Classifier extends FaceDetector implements Serializable {
     }
 
 
-    public static Queue<Classifier> adaBoostStepTwo(List<LabeledIntegralImage> allSamples) throws Exception {
-        Queue<Classifier> classifiers = new LinkedList<>();
+    public static Queue<WeakClassifier> adaBoostStepTwo(List<LabeledIntegralImage> allSamples) throws Exception {
+        Queue<WeakClassifier> classifiers = new LinkedList<>();
         for (int i = 0; i < Feature.allFeatures.size(); i++) {
             Feature j = Feature.allFeatures.get(i);
             ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
@@ -208,7 +208,7 @@ public class Classifier extends FaceDetector implements Serializable {
             //System.out.println("T & P: "+threshold+", "+parity);
             // Actual step 2
             double error = 0;
-            Classifier h = new Classifier(j, threshold, parity);
+            WeakClassifier h = new WeakClassifier(j, threshold, parity);
             for (LabeledIntegralImage img : allSamples) {
                 int canBeFace = (h.canBeFace(img.img)) ? 1 : 0;
                 int isFace = (img.isFace) ? 1 : 0;
@@ -231,9 +231,9 @@ public class Classifier extends FaceDetector implements Serializable {
      * @return
      * @throws InterruptedException
      */
-    private static Queue<Classifier> adaBoostStepTwoThreaded(List<LabeledIntegralImage> allSamples, int partitions) throws InterruptedException {
+    private static Queue<WeakClassifier> adaBoostStepTwoThreaded(List<LabeledIntegralImage> allSamples, int partitions) throws InterruptedException {
         // Multithreaded version of step 2
-        ConcurrentLinkedQueue<Classifier> classifiers = new ConcurrentLinkedQueue<>(); // List of classifiers
+        ConcurrentLinkedQueue<WeakClassifier> classifiers = new ConcurrentLinkedQueue<>(); // List of classifiers
         List<Thread> threads = new ArrayList<>(); // List of all threads
 
         // Partition data and create all but the last thread.
@@ -401,8 +401,8 @@ public class Classifier extends FaceDetector implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Classifier)) return false;
-        Classifier c = (Classifier) o;
+        if (!(o instanceof WeakClassifier)) return false;
+        WeakClassifier c = (WeakClassifier) o;
 
         if (feature.equals(c.feature) && threshold == c.threshold && parity == c.parity &&
                 error == c.error && beta == c.beta && alpha == c.alpha) {

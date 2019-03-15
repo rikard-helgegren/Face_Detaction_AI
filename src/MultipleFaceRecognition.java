@@ -17,7 +17,7 @@ public class MultipleFaceRecognition{
     //The maximum size of the sliding window
     private static final int maxFaceSize = 28;
     //How much the slidning window increases every iteration.
-    private static final int slidingWindowIncrease = 3;
+    private static final int slidingWindowIncrease = 10;
     /*
     Should we allow the algorithm to find two or more overlapping faces?
     For example find a face in both squares below:
@@ -30,7 +30,7 @@ public class MultipleFaceRecognition{
        |__________|
 
      */
-    private static final boolean allowOverlapping = true;
+    private static final boolean allowOverlapping = false;
     //Should the full image be scaled down or the features scaled up?
     private static final boolean scaleFeatures = true;
     //If sliding windows should move at a speed proportional to it's size.
@@ -48,6 +48,16 @@ public class MultipleFaceRecognition{
         BufferedImage img = loadImageAsGrayscale(path);
         //Load the cascaded classifier
         CascadeClassifier cascade = new CascadeClassifier("save.cascade");
+
+
+        ArrayList<HalIntegralImage> facesII = findFaceIntegralImagesScaleImage(cascade, img, 19);
+        for(HalIntegralImage h: facesII){
+            if(cascade.isFace(h)){
+                System.out.println("Noice");
+            }else{
+                System.out.println("No");
+            }
+        }
 
         //Find all faces in the image using the cascade
         ArrayList<Rectangle> faces = findFaces(cascade, img);

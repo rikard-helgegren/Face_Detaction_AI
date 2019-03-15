@@ -84,7 +84,7 @@ public class CascadeClassifier implements Serializable {
 		while(curFalsePositiveRate> targetMaxFalsePositive) {
 			System.out.println(toString());
 
-			ArrayList<LabeledIntegralImage> allSamples = Classifier.initForAdaBoost(positiveSamples, negativeSamples);
+			ArrayList<LabeledIntegralImage> allSamples = WeakClassifier.initForAdaBoost(positiveSamples, negativeSamples);
 			StrongClassifier strongClassifier = new StrongClassifier();
 			strongClassifiers.add(strongClassifier);
 
@@ -92,7 +92,7 @@ public class CascadeClassifier implements Serializable {
 			prevFalsePositiveRate = curFalsePositiveRate;
 
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
-				System.out.println("Current Strong Classifier:");
+				System.out.println("Current Strong WeakClassifier:");
 				System.out.println(strongClassifier);
 				System.out.printf("Validation data %d positive, %d negative. ", posValidation, validationData.size() - posValidation);
 				System.out.printf("Detection rate rate is %.4f. ", curDetectionRate);
@@ -102,12 +102,12 @@ public class CascadeClassifier implements Serializable {
 				System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
 				/*if (strongClassifier.getSize() == 0) {
-					strongClassifier.addClassifier(new Classifier(allSamples));
-					strongClassifier.addClassifier(new Classifier(allSamples));
+					strongClassifier.addClassifier(new WeakClassifier(allSamples));
+					strongClassifier.addClassifier(new WeakClassifier(allSamples));
 				} else {
-					strongClassifier.addClassifier(new Classifier(allSamples));
+					strongClassifier.addClassifier(new WeakClassifier(allSamples));
 				}*/
-				strongClassifier.addClassifier(new Classifier(allSamples));
+				strongClassifier.addClassifier(new WeakClassifier(allSamples));
 				strongClassifier.setThresholdMultiplier(1);
 
 				while(true) {
@@ -240,7 +240,7 @@ public class CascadeClassifier implements Serializable {
 		for (StrongClassifier s : strongClassifiers) {
 			totalWeak += s.getSize();
 		}
-		String s = String.format("Cascade Classifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
+		String s = String.format("Cascade WeakClassifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
 		for(StrongClassifier c:strongClassifiers) {
 			s += c.toStringSummary();
 		}
@@ -253,7 +253,7 @@ public class CascadeClassifier implements Serializable {
 		for (StrongClassifier s : strongClassifiers) {
 			totalWeak += s.getSize();
 		}
-		String s = String.format("Cascade Classifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
+		String s = String.format("Cascade WeakClassifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
 		for(StrongClassifier c:strongClassifiers) {
 			s += c.toString();
 		}

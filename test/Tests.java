@@ -2,17 +2,11 @@ import Catalano.Imaging.FastBitmap;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageFilter;
-import java.awt.image.ImageProducer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -137,12 +131,12 @@ public class Tests {
     @Test
     public void testClassifierSaveLoad() throws Exception {
 
-        Classifier a1 = null;
-        Classifier b1 = null;
+        WeakClassifier a1 = null;
+        WeakClassifier b1 = null;
 
         try {
-            a1 = new Classifier(new Feature(Feature.Type.HORIZONTAL, 1, 2, 4, 4), 10, 10);
-            b1 = new Classifier(new Feature(Feature.Type.VERTICAL, 2, 8, 6, 4), 5, 5);
+            a1 = new WeakClassifier(new Feature(Feature.Type.HORIZONTAL, 1, 2, 4, 4), 10, 10);
+            b1 = new WeakClassifier(new Feature(Feature.Type.VERTICAL, 2, 8, 6, 4), 5, 5);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -207,17 +201,17 @@ public class Tests {
 
 
         Feature rect = new Feature(Feature.Type.HORIZONTAL, 6,8,2,2);
-        ThresholdParity rectTP = Classifier.calcBestThresholdAndParity(trainingData, rect);
+        ThresholdParity rectTP = WeakClassifier.calcBestThresholdAndParity(trainingData, rect);
         //System.out.println("threshold " + rectTP.threshold + "; Parity " + rectTP.parity);
         assertTrue(0 <= rectTP.threshold && rectTP.threshold <= 65, "Expected in [0, 65]. Was: " + rectTP.threshold);
 
         Feature rect2 = new Feature(Feature.Type.VERTICAL, 6,8,2,2);
-        ThresholdParity rect2TP = Classifier.calcBestThresholdAndParity(trainingData, rect2);
+        ThresholdParity rect2TP = WeakClassifier.calcBestThresholdAndParity(trainingData, rect2);
         //System.out.println("threshold " + rect2TP.threshold + "; Parity " + rect2TP.parity);
         assertTrue(-69 <= rectTP.threshold && rectTP.threshold <= 0, "Expected in [-69, 0]. Was: " + rect2TP.threshold);
 
         Feature rect3 = new Feature(Feature.Type.THREE, 6,8,3,2);
-        ThresholdParity rect3TP = Classifier.calcBestThresholdAndParity(trainingData, rect3);
+        ThresholdParity rect3TP = WeakClassifier.calcBestThresholdAndParity(trainingData, rect3);
         //System.out.println("threshold " + rect3TP.threshold + "; Parity " + rect3TP.parity);
         assertTrue(-338 <= rect3TP.threshold && rect3TP.threshold <= -2, "Expected in [-338, -2]. Was: " + rect3TP.threshold);
 

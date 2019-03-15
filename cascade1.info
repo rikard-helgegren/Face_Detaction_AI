@@ -12,7 +12,7 @@ First full cascaded classifier
 6
 7
 Testing decision tree
-	=== Strong Classifier. Size: 6. Threshold: 0.23.
+	=== Strong WeakClassifier. Size: 6. Threshold: 0.23.
 ====== [Feature: x: 0 y: 0 w: 2 h: 2 type: HORIZONTAL. Threshold: -252.0. Parity: 1. Error: 0.5000000000000718 Beta: 1.0. Alpha: 0.0.]
 ====== [Feature: x: 8 y: 2 w: 3 h: 6 type: VERTICAL. Threshold: 2.0. Parity: -1. Error: 0.2545807032183617 Beta: 0.3415268484697386. Alpha: 1.074328983823735.]
 ====== [Feature: x: 4 y: 10 w: 14 h: 2 type: FOUR. Threshold: 5.0. Parity: -1. Error: 0.2792721711602467 Beta: 0.3874863158951784. Alpha: 0.9480747446311774.]
@@ -20,7 +20,7 @@ Testing decision tree
 ====== [Feature: x: 4 y: 4 w: 12 h: 4 type: THREE. Threshold: 141.0. Parity: -1. Error: 0.3215613130766492 Beta: 0.4739725479614031. Alpha: 0.7466058746574815.]
 ====== [Feature: x: 0 y: 8 w: 16 h: 10 type: FOUR. Threshold: 20.0. Parity: -1. Error: 0.30503153963936547 Beta: 0.43891421990730034. Alpha: 0.8234512838442254.]
 
-	=== Strong Classifier. Size: 12. Threshold: 0.29.
+	=== Strong WeakClassifier. Size: 12. Threshold: 0.29.
 ====== [Feature: x: 6 y: 2 w: 3 h: 2 type: THREE. Threshold: -506.0. Parity: -1. Error: 0.49884259259259317 Beta: 0.9953810623556606. Alpha: 0.004629637898739544.]
 ====== [Feature: x: 8 y: 4 w: 8 h: 3 type: HORIZONTAL. Threshold: 12.0. Parity: -1. Error: 0.27315822036742005 Beta: 0.37581524345711403. Alpha: 0.9786576301401733.]
 ====== [Feature: x: 0 y: 6 w: 8 h: 6 type: FOUR. Threshold: 6.0. Parity: -1. Error: 0.32079094345702264 Beta: 0.47230074506040454. Alpha: 0.7501393245661616.]
@@ -34,7 +34,7 @@ Testing decision tree
 ====== [Feature: x: 4 y: 4 w: 12 h: 12 type: THREE. Threshold: 525.0. Parity: -1. Error: 0.38073104194833957 Beta: 0.6148072448943556. Alpha: 0.4864464832388601.]
 ====== [Feature: x: 4 y: 8 w: 6 h: 6 type: HORIZONTAL. Threshold: 8.0. Parity: 1. Error: 0.2802895562708113 Beta: 0.3894476712307903. Alpha: 0.9430257712699793.]
 
-	=== Strong Classifier. Size: 6. Threshold: 0.34.
+	=== Strong WeakClassifier. Size: 6. Threshold: 0.34.
 ====== [Feature: x: 6 y: 10 w: 4 h: 2 type: VERTICAL. Threshold: 3.0. Parity: -1. Error: 0.30547165037733487 Beta: 0.4398260352414651. Alpha: 0.8213760047021321.]
 ====== [Feature: x: 0 y: 8 w: 8 h: 2 type: FOUR. Threshold: 8.0. Parity: -1. Error: 0.32962888514557587 Beta: 0.4917110505531807. Alpha: 0.7098640306390726.]
 ====== [Feature: x: 2 y: 10 w: 10 h: 6 type: FOUR. Threshold: 20.0. Parity: -1. Error: 0.3312733166235699 Beta: 0.49537924066519456. Alpha: 0.7024316669930246.]

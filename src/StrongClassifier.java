@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +6,7 @@ import java.util.List;
 public class StrongClassifier extends FaceDetector implements Serializable {
     private static final long serialVersionUID = 0; // Increase when changing something in this class
 
-    private List<Classifier> weakClassifiers = new ArrayList<>();
+    private List<WeakClassifier> weakClassifiers = new ArrayList<>();
     //private double threshold;
     private double thresholdMultiplier = 0.5;
 
@@ -16,7 +15,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
 
     public StrongClassifier(int size, List<LabeledIntegralImage> trainingData) throws Exception {
         for (int i = 0; i < size; i++) {
-            weakClassifiers.add(new Classifier(trainingData));
+            weakClassifiers.add(new WeakClassifier(trainingData));
         }
     }
 
@@ -41,7 +40,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
 
         for (int i = 0; i < size; i++) {
             System.out.printf("Training weak classifier %d/%d.\n", i + 1, size);
-            Classifier c = new Classifier(trainingData);
+            WeakClassifier c = new WeakClassifier(trainingData);
             c.trainPerformance = c.eval(trainingData);
             c.testPerformance = c.eval(testData);
             addClassifier(c);
@@ -56,7 +55,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
     }
 
     public void test(List<LabeledIntegralImage> testData) throws Exception {
-        System.out.println("Testing Strong Classifier");
+        System.out.println("Testing Strong WeakClassifier");
         System.out.println(toString());
 
         //strongClassifier = new StrongClassifier(strongClassifier, 1);
@@ -73,14 +72,14 @@ public class StrongClassifier extends FaceDetector implements Serializable {
 
     public double getThreshold() {
         double threshold = 0;
-        for(Classifier c:weakClassifiers){
+        for(WeakClassifier c:weakClassifiers){
             threshold+=c.getAlpha();
             //FaceRecognition.writer.printf("Alpha: %.3f\n", c.getAlpha());
         }
         return threshold;
     }
 
-    public void addClassifier(Classifier c) {
+    public void addClassifier(WeakClassifier c) {
         weakClassifiers.add(c);
         //calcThreshold();
     }
@@ -101,7 +100,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
         //How it looks like you should do according to the paper:
 
         double value = 0;
-        for(Classifier c:weakClassifiers){
+        for(WeakClassifier c:weakClassifiers){
             int isFace = (c.canBeFace(img)) ? 1 : 0;
             value+=c.getAlpha()*isFace;
         }
@@ -116,7 +115,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
         //How it looks like you should do according to the paper:
 
         double value = 0;
-        for(Classifier c:weakClassifiers){
+        for(WeakClassifier c:weakClassifiers){
             int isFace = (c.canBeFace(img, receptiveFieldWidth, receptiveFieldHeight)) ? 1 : 0;
             value+=c.getAlpha()*isFace;
         }
@@ -129,7 +128,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
         return weakClassifiers.size();
     }
 
-    public Classifier getLastTrained() {
+    public WeakClassifier getLastTrained() {
         return weakClassifiers.get(weakClassifiers.size()-1);
     }
 
@@ -145,7 +144,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
         if(weakClassifiers.size() != c.weakClassifiers.size()) return false;
 
         for (int i = 0; i < weakClassifiers.size(); i++) {
-            Classifier weakClassifier = weakClassifiers.get(i);
+            WeakClassifier weakClassifier = weakClassifiers.get(i);
 
             if(!weakClassifier.equals(c.weakClassifiers.get(i))){
                 return false;
@@ -155,14 +154,14 @@ public class StrongClassifier extends FaceDetector implements Serializable {
     }
 
     public String toStringSummary() {
-        String s = String.format("=== Strong Classifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
+        String s = String.format("=== Strong WeakClassifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
         return s;
     }
 
     @Override
     public String toString() {
-        String s = String.format("=== Strong Classifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
-        for (Classifier c : weakClassifiers) {
+        String s = String.format("=== Strong WeakClassifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
+        for (WeakClassifier c : weakClassifiers) {
             s += "====== " + c + "\n";
         }
         return s;

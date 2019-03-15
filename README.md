@@ -5,13 +5,19 @@ The [ATT Database of Faces](https://www.cl.cam.ac.uk/research/dtg/attarchive/fac
 The [Catalano Framework](https://github.com/DiegoCatalano/Catalano-Framework) used for image processing.
 
 ## Setup
-First, unzip the `data.zip` that contains training and test images (19x19 grayscale png) to `res/sources/`. The resulting file structure should look like this:
+First, place all datasets inte the `res` folder. Path to each dataset is set in code in the `Data` class but it can be beneficial to have the following folder layout:
 ```
 res/
-└── sources/
-    └── data/
-        ├── test/
-        └── train/
+├── faces/
+│   ├── my-dataset/
+│   │   ├── face.jpg
+│   │   └── face2.png
+│   └── another-dataset/
+└── non-faces/
+    ├── my-dataset/
+    │   ├── no-face.jpg
+    │   └── car.png
+    └── another-dataset/
 ```
 
 Second, set up your local development environment. One way to setup your local development environment for this project is the following.
@@ -48,14 +54,12 @@ At the top of `hal2019.training.TrainClassifiers.java` is a boolean variable `lo
    * For four rectangles (the checkerboard feature). Dummy function in `hal2019.training.Feature.calcFourRectFeature()`.
 * Calculate __parity__ value in Adaboost single-classifier training.
 * Multithreaded step 2 in adaboost.
-
-## Things that are TODO
-* Make single classifier training faster. Right now it calculates about 10 features a second, out of 39150. Some leads:
-   * Optimize feature calculation. hal2019.graphics.Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).
 * Test and improve AdaBoost and cascade classifier.
 * Report performance for 36 feature strong classifier.
 * Hand check S+T+ part of adaboost.
 * Move calculating featurevalues so that it is done once.
-* Use 10 jumps instead.
-* Write test for that regular and multithreaded step2 adaboost get the same result? It seems to be the same, but would be good to have test confirming this.
+
+## Things that are TODO
+* Make single classifier training faster. Some leads:
+   * Optimize feature calculation. hal2019.graphics.Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).
 * Clean up and comment code.

@@ -68,8 +68,6 @@ public class WeakClassifier extends FaceDetector implements Serializable {
     public void setBeta(double beta) throws Exception {
         if (beta < -0.01) throw new Exception("Beta must be in [0, inf). Was: " + beta); // TODO maybe can be 0 instead
         if (beta < 0 && beta > 0 - TrainClassifiers.DELTA) beta = 0;
-        //if (beta > 1 && beta < 1 + hal2019.training.TrainClassifiers.DELTA) beta = 1;
-        //if (beta < 0 || beta > 1) throw new Exception("Beta must be in [0, 1]. Was: " + beta);
         this.beta = beta;
     }
 
@@ -90,19 +88,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
     public boolean canBeFace(HalIntegralImage img) throws Exception {
         if (parity != 1 && parity != -1) throw new Exception("Parity was not 1 or -1. It was: " + parity);
 
-        //System.out.println("My (weak classifier) threshold: "+threshold);
-        //System.out.println("The feature value of the image: "+feature.calculateFeatureValue(img));
-        //System.out.println("parity: "+parity);
         return parity * img.getFeatureValue(feature) < parity * threshold;
-    }
-
-    public boolean canBeFace(HalIntegralImage img, int receptiveFieldWidth,int receptiveFieldHeight) throws Exception {
-        if (parity != 1 && parity != -1) throw new Exception("Parity was not 1 or -1. It was: " + parity);
-
-        //System.out.println("My (weak classifier) threshold: "+threshold);
-        //System.out.println("The feature value of the image: "+feature.calculateFeatureValue(img));
-        //System.out.println("parity: "+parity);
-        return parity * img.getFeatureValue(feature,receptiveFieldWidth,receptiveFieldHeight) < parity * threshold;
     }
 
     /**
@@ -166,7 +152,6 @@ public class WeakClassifier extends FaceDetector implements Serializable {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
         }
 
-        //System.out.println("Best classifier choosen:");
         // 4. Update weights
         bestClassifier.setBeta(bestClassifier.getError() / (1 - bestClassifier.getError()));
         bestClassifier.setAlpha(Math.log(1.0/bestClassifier.getBeta()));
@@ -221,7 +206,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
      */
     private static Queue<WeakClassifier> adaBoostStepTwoThreaded(List<LabeledIntegralImage> allSamples, int partitions) throws InterruptedException {
         // Multithreaded version of step 2
-        ConcurrentLinkedQueue<WeakClassifier> classifiers = new ConcurrentLinkedQueue<>(); // List of hal2019.training.classifiers
+        ConcurrentLinkedQueue<WeakClassifier> classifiers = new ConcurrentLinkedQueue<>(); // List of classifiers
         List<Thread> threads = new ArrayList<>(); // List of all threads
 
         // Partition data and create all but the last thread.

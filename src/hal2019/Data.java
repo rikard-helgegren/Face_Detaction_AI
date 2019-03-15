@@ -72,7 +72,6 @@ public class Data {
 
 
         // Pre-calculate feature values. OK to pre-calculate on only part of data.
-        System.out.println("Pre-calculating feature values for training data...");
         Feature.calculateFeatureValues(allSamples);
         //System.out.println("Pre-calculating feature values for test data...");
         //hal2019.training.Feature.calculateFeatureValues(testData);

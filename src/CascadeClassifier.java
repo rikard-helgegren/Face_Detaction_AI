@@ -92,41 +92,26 @@ public class CascadeClassifier implements Serializable {
 			prevFalsePositiveRate = curFalsePositiveRate;
 
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
-				System.out.println("Current Strong Classifier:");
-				System.out.println(strongClassifier);
+				System.out.println("Current Cascade:");
+				System.out.println(this.toStringSummary());
 				System.out.printf("Validation data %d positive, %d negative. ", posValidation, validationData.size() - posValidation);
-				System.out.printf("Detection rate rate is %.4f. ", curDetectionRate);
+				System.out.printf("Detection rate is %.4f. ", curDetectionRate);
 				System.out.printf("False positive rate is %.4f.\n", curFalsePositiveRate);
-				System.out.println();
+				//System.out.println();
 				System.out.printf("Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
-				System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
+				//System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
-				/*if (strongClassifier.getSize() == 0) {
-					strongClassifier.addClassifier(new Classifier(allSamples));
-					strongClassifier.addClassifier(new Classifier(allSamples));
-				} else {
-					strongClassifier.addClassifier(new Classifier(allSamples));
-				}*/
 				strongClassifier.addClassifier(new Classifier(allSamples));
 				strongClassifier.setThresholdMultiplier(1);
 
 				while(true) {
-					//System.out.printf("Evaluating threshold multiplier %.2f. With threshold: %.2f. ",
-					//        cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier(),
-					//        cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
 					PerformanceStats stats = eval(validationData);
-					//System.out.printf("Performance: %s. ", stats);
 					curFalsePositiveRate = stats.falsePositive;
 					curDetectionRate = stats.truePositive;
 					if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) {
-						//System.out.printf("GOOD! Using this one. \n");
 						break;
-					} else {
-						//System.out.printf("\n");
 					}
-
 					strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
-					//if (strongClassifier.getThresholdMultiplier() < FaceRecognition.DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
 				}
 			}
 
@@ -138,7 +123,7 @@ public class CascadeClassifier implements Serializable {
 				}
 			}
 
-			// TODO No longer needed after adding refills
+			// No longer needed after adding refills
 			/*if (negativeSamples.size() < 10) {
 				System.err.println("Cascade training stopped since we ran out of negative data.");
 				break;

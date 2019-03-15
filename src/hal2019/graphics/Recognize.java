@@ -54,7 +54,7 @@ public class Recognize {
         //Take the image from the image path, convert it to grayscale and store it here
         BufferedImage img = Data.loadImageAsGrayscale(path);
         //Load the cascaded classifier
-        CascadeClassifier cascade = new CascadeClassifier("save.cascade");
+        CascadeClassifier cascade = new CascadeClassifier("saves/save.cascade");
 
 
         ArrayList<HalIntegralImage> facesII = findFaceIntegralImagesScaleImage(cascade, img, 19);

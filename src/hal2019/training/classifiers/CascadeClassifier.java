@@ -107,7 +107,7 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 				System.out.printf("Validation data: %5d positive, %5d negative. ", posValidation, validationData.size() - posValidation);
 				System.out.printf("Detection rate %.4f. ", curDetectionRate);
 				System.out.printf("False positive rate %.4f.\n", curFalsePositiveRate);
-				System.out.printf("Training   data: %5d positive, %5d negative. %d done.\n",
+				System.out.printf("Training   data: %5d positive, %5d negative. %d rejected.\n",
 						positiveSamples.size(), negativeSamples.size(), rejectedNegatives);
 				System.out.println("--------------------------------------------------------------------------------");
 

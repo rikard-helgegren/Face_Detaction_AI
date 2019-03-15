@@ -13,7 +13,7 @@ public class TrainClassifiers {
     private static final boolean trainFullCascade = true;
 
     // True if a network should be loaded. Otherwise, one will be trained.
-    private static final boolean loadFromFile = false;
+    private static final boolean loadFromFile = true;
 
     public static final double DELTA = 0.00001;
     public static final int trainingDataWidth = 19;

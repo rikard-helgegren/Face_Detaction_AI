@@ -1,3 +1,8 @@
+package hal2019.training.classifiers;
+
+import hal2019.*;
+import hal2019.training.PerformanceStats;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,7 +29,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
     }
 
     /**
-     * Creates a new strong classifier but tests both weak and strong classifiers to print status messages.
+     * Creates a new strong classifier but tests both weak and strong hal2019.training.classifiers to print status messages.
      * @param size
      * @param trainingData
      * @param testData
@@ -55,10 +60,10 @@ public class StrongClassifier extends FaceDetector implements Serializable {
     }
 
     public void test(List<LabeledIntegralImage> testData) throws Exception {
-        System.out.println("Testing Strong WeakClassifier");
+        System.out.println("Testing Strong hal2019.training.classifiers.WeakClassifier");
         System.out.println(toString());
 
-        //strongClassifier = new StrongClassifier(strongClassifier, 1);
+        //strongClassifier = new hal2019.training.classifiers.StrongClassifier(strongClassifier, 1);
         PerformanceStats stats = null;
         try {
             stats = eval(testData);
@@ -74,7 +79,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
         double threshold = 0;
         for(WeakClassifier c:weakClassifiers){
             threshold+=c.getAlpha();
-            //TrainClassifiers.writer.printf("Alpha: %.3f\n", c.getAlpha());
+            //hal2019.training.TrainClassifiers.writer.printf("Alpha: %.3f\n", c.getAlpha());
         }
         return threshold;
     }
@@ -96,7 +101,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
     }
 
     public boolean canBeFace(HalIntegralImage img) throws Exception {
-        if (weakClassifiers.size() < 1) throw new Exception("This strong classifier has no weak classifiers.");
+        if (weakClassifiers.size() < 1) throw new Exception("This strong classifier has no weak hal2019.training.classifiers.");
         //How it looks like you should do according to the paper:
 
         double value = 0;
@@ -105,13 +110,13 @@ public class StrongClassifier extends FaceDetector implements Serializable {
             value+=c.getAlpha()*isFace;
         }
 
-        //TrainClassifiers.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
+        //hal2019.training.TrainClassifiers.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
         return value>=getThreshold()*thresholdMultiplier;
     }
 
     //TODO Using overloading to avoid extra calculations during training
     public boolean canBeFace(HalIntegralImage img, int receptiveFieldWidth,int receptiveFieldHeight) throws Exception {
-        if (weakClassifiers.size() < 1) throw new Exception("This strong classifier has no weak classifiers.");
+        if (weakClassifiers.size() < 1) throw new Exception("This strong classifier has no weak hal2019.training.classifiers.");
         //How it looks like you should do according to the paper:
 
         double value = 0;
@@ -120,7 +125,7 @@ public class StrongClassifier extends FaceDetector implements Serializable {
             value+=c.getAlpha()*isFace;
         }
 
-        //TrainClassifiers.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
+        //hal2019.training.TrainClassifiers.writer.printf("Value: %.3f, Mult: %.3f, Threshold: %.3f\n", value, thresholdMultiplier, getThreshold());
         return value>=getThreshold()*thresholdMultiplier;
     }
 
@@ -154,13 +159,13 @@ public class StrongClassifier extends FaceDetector implements Serializable {
     }
 
     public String toStringSummary() {
-        String s = String.format("=== Strong WeakClassifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
+        String s = String.format("=== Strong hal2019.training.classifiers.WeakClassifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
         return s;
     }
 
     @Override
     public String toString() {
-        String s = String.format("=== Strong WeakClassifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
+        String s = String.format("=== Strong hal2019.training.classifiers.WeakClassifier. Size: %d. Threshold multiplier: %.2f.\n", weakClassifiers.size(), getThresholdMultiplier());
         for (WeakClassifier c : weakClassifiers) {
             s += "====== " + c + "\n";
         }

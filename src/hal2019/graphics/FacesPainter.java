@@ -1,3 +1,7 @@
+package hal2019.graphics;
+
+import hal2019.graphics.Rectangle;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;

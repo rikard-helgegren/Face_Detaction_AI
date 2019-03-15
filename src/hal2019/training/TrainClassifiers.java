@@ -1,4 +1,9 @@
-// Target: 70% true positive, 105 false positive
+package hal2019.training;// Target: 70% true positive, 105 false positive
+
+import hal2019.Data;
+import hal2019.training.classifiers.CascadeClassifier;
+import hal2019.training.classifiers.StrongClassifier;
+
 /**
  * This file should be run with the project root as working directory.
  * Make sure images exist before running.

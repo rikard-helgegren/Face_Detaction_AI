@@ -28,30 +28,30 @@ If you're not using an IDE you will have to manually make sure that libraries ar
 ## Current Usage
 When running files, make sure that your current working directory is the project root. If you are running from the terminal this means you should be at `[placeInYourFileSystem]/code`, not in any subfolder. If you are running from an IDE such as Eclipse or Intellij IDEA you need to make sure the current working directory is correctly set in your current run configuration. If you have not done this, any hardcoded paths will fail to find the right images etc.
 
-At the top of `TrainClassifiers.java` is a boolean variable `loadFromFile` that allows you to load a trained network from file rather than training a new one from scratch.
+At the top of `hal2019.training.TrainClassifiers.java` is a boolean variable `loadFromFile` that allows you to load a trained network from file rather than training a new one from scratch.
 
 ## Things that are already done
 * Get some face images.
 * Get some no-face images.
 * Load images into java application.
 * Create integral images in java.
-* Create a function to calculate rectangle sum from integral image. See `HalIntegralImage.getRectangleSum(x1, x2, y1, y2)`.
+* Create a function to calculate rectangle sum from integral image. See `hal2019.HalIntegralImage.getRectangleSum(x1, x2, y1, y2)`.
 * Implement function for calculating the 4 features.
    * For horizontal rectangles.
    * For vertical rectangles.
 * Implement core Adaboost algorithm.
-* Finish Adaboost algorithm by iterating multiple times to create many weak classifiers. Currently we only create a single weak classifier.
-* Implement final cascade classifier using all the simple classifiers. (But not finalized.)
-* Implement a way to save and load trained classifiers so that we can use them without first training them every time.
+* Finish Adaboost algorithm by iterating multiple times to create many weak hal2019.training.classifiers. Currently we only create a single weak classifier.
+* Implement final cascade classifier using all the simple hal2019.training.classifiers. (But not finalized.)
+* Implement a way to save and load trained hal2019.training.classifiers so that we can use them without first training them every time.
 * Implement function for calculating the 4 features.
-   * For three rectangles (the nose feature). Dummy function in `Feature.calcThreeRectFeature()`.
-   * For four rectangles (the checkerboard feature). Dummy function in `Feature.calcFourRectFeature()`.
+   * For three rectangles (the nose feature). Dummy function in `hal2019.training.Feature.calcThreeRectFeature()`.
+   * For four rectangles (the checkerboard feature). Dummy function in `hal2019.training.Feature.calcFourRectFeature()`.
 * Calculate __parity__ value in Adaboost single-classifier training.
 * Multithreaded step 2 in adaboost.
 
 ## Things that are TODO
 * Make single classifier training faster. Right now it calculates about 10 features a second, out of 39150. Some leads:
-   * Optimize feature calculation. Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).
+   * Optimize feature calculation. hal2019.graphics.Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).
 * Test and improve AdaBoost and cascade classifier.
 * Report performance for 36 feature strong classifier.
 * Hand check S+T+ part of adaboost.

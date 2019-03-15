@@ -1,3 +1,9 @@
+package hal2019.training.classifiers;
+
+import hal2019.*;
+import hal2019.training.Feature;
+import hal2019.training.PerformanceStats;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -94,7 +100,7 @@ public class CascadeClassifier implements Serializable {
 			prevDetectionRate = curDetectionRate;
 			prevFalsePositiveRate = curFalsePositiveRate;
 
-			// Train weak classifiers until restraints are fulfilled.
+			// Train weak hal2019.training.classifiers until restraints are fulfilled.
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
 				System.out.println("Current Cascade:");
 				System.out.println(this.toStringSummary());
@@ -102,7 +108,7 @@ public class CascadeClassifier implements Serializable {
 				System.out.printf("Detection rate is %.4f. ", curDetectionRate);
 				System.out.printf("False positive rate is %.4f.\n", curFalsePositiveRate);
 				//System.out.println();
-				System.out.printf("Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
+				System.out.printf("hal2019.Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
 
 				//System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 				strongClassifier.addClassifier(new WeakClassifier(allSamples));
@@ -140,7 +146,7 @@ public class CascadeClassifier implements Serializable {
 	}
 
 	public boolean isFace(HalIntegralImage i) throws Exception{
-		//Iterate through all strong classifiers, if the image passes all of
+		//Iterate through all strong hal2019.training.classifiers, if the image passes all of
 		//them return true.
 		for(StrongClassifier c : strongClassifiers){
 			if(!c.canBeFace(i)) return false;
@@ -238,7 +244,7 @@ public class CascadeClassifier implements Serializable {
 		for (StrongClassifier s : strongClassifiers) {
 			totalWeak += s.getSize();
 		}
-		String s = String.format("Cascade WeakClassifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
+		String s = String.format("Cascade hal2019.training.classifiers.WeakClassifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
 		for(StrongClassifier c:strongClassifiers) {
 			s += c.toStringSummary();
 		}
@@ -251,7 +257,7 @@ public class CascadeClassifier implements Serializable {
 		for (StrongClassifier s : strongClassifiers) {
 			totalWeak += s.getSize();
 		}
-		String s = String.format("Cascade WeakClassifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
+		String s = String.format("Cascade hal2019.training.classifiers.WeakClassifier. %d strong, total %d weak.\n", strongClassifiers.size(), totalWeak);
 		for(StrongClassifier c:strongClassifiers) {
 			s += c.toString();
 		}

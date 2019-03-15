@@ -1,3 +1,9 @@
+package hal2019.training.classifiers;
+
+import hal2019.HalIntegralImage;
+import hal2019.LabeledIntegralImage;
+import hal2019.training.PerformanceStats;
+
 import java.util.List;
 
 public abstract class FaceDetector {

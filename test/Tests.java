@@ -1,4 +1,11 @@
 import Catalano.Imaging.FastBitmap;
+import hal2019.*;
+import hal2019.graphics.Recognize;
+import hal2019.training.ThresholdParity;
+import hal2019.training.classifiers.CascadeClassifier;
+import hal2019.training.classifiers.StrongClassifier;
+import hal2019.training.classifiers.WeakClassifier;
+import hal2019.training.Feature;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -127,7 +134,7 @@ public class Tests {
         );
     }
 
-    // Tests saving and loading of classifiers.
+    // Tests saving and loading of hal2019.training.classifiers.
     @Test
     public void testClassifierSaveLoad() throws Exception {
 
@@ -258,9 +265,9 @@ public class Tests {
                 "The test failed on the image test-res/B20_03379.png. " +
                         "The top should be brighter than the left side but isn't");
         assertEquals(img.getRectangleSum(0,0,18,4),14525,
-                "Rectangle sum for the top 4 pixels of the image test-res/B20_03379.png is wrong.");
+                "hal2019.Rectangle sum for the top 4 pixels of the image test-res/B20_03379.png is wrong.");
         assertEquals(img.getRectangleSum(0,0,4,18), 1415,
-                "Rectangle sum for the leftmost 4 pixels of the image test-res/B20_03379.png is wrong.");
+                "hal2019.Rectangle sum for the leftmost 4 pixels of the image test-res/B20_03379.png is wrong.");
     }
 
 

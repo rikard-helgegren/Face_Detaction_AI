@@ -1,3 +1,5 @@
+package hal2019;
+
 public class LabeledIntegralImage {
 	public boolean isFace;
 	public HalIntegralImage img;

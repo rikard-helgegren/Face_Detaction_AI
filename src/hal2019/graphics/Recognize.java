@@ -1,3 +1,9 @@
+package hal2019.graphics;
+
+import hal2019.HalIntegralImage;
+import hal2019.training.TrainClassifiers;
+import hal2019.training.classifiers.CascadeClassifier;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.geom.AffineTransform;

@@ -1,3 +1,5 @@
+package hal2019.training;
+
 import java.io.Serializable;
 
 public class PerformanceStats implements Serializable {

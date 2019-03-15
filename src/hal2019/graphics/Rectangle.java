@@ -1,3 +1,5 @@
+package hal2019.graphics;
+
 class Rectangle {
     public int x;
     public int y;

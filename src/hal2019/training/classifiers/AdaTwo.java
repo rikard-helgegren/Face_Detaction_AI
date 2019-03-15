@@ -1,3 +1,9 @@
+package hal2019.training.classifiers;
+
+import hal2019.LabeledIntegralImage;
+import hal2019.training.ThresholdParity;
+import hal2019.training.Feature;
+
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -37,7 +43,7 @@ public class AdaTwo extends Thread {
 
                 h.setError(error);
                 classifiers.add(h);
-                //if (i % 500 == 0) System.out.printf("Feature %d/%d\n", i, features.size());
+                //if (i % 500 == 0) System.out.printf("hal2019.training.Feature %d/%d\n", i, features.size());
 
 
 

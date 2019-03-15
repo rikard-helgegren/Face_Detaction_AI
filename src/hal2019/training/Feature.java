@@ -1,3 +1,8 @@
+package hal2019.training;
+
+import hal2019.HalIntegralImage;
+import hal2019.LabeledIntegralImage;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +25,12 @@ public class Feature implements Serializable {
     private int w;
     private int h;
 
-    private int id; // Matches the index in each of the LabeledIntegralImage's arrays.
+    private int id; // Matches the index in each of the hal2019.LabeledIntegralImage's arrays.
     private static int ID = 0;
 
     /**
      * Constructs a feature with the given values.
-     * @param type the Feature.Type representing the type of feature.
+     * @param type the hal2019.training.Feature.Type representing the type of feature.
      * @param x coordinate of uppermost left corner
      * @param y coordinate of uppermost left corner
      * @param w width
@@ -52,7 +57,7 @@ public class Feature implements Serializable {
     }
 
     /**
-     * Evaluates an image with this feature by selecting one of Feature's static methods for calculating feature value.
+     * Evaluates an image with this feature by selecting one of hal2019.training.Feature's static methods for calculating feature value.
      * @param img the image to evaluate using this features.
      * @return
      * @throws Exception if any calculation fails or the given feature was not a recognized type.

@@ -1,3 +1,5 @@
+package hal2019.training;
+
 //A class used to store a threshold-parity pair
 public class ThresholdParity {
 	 public int threshold;

@@ -1,4 +1,9 @@
+package hal2019;
+
 import Catalano.Imaging.FastBitmap;
+import hal2019.graphics.Recognize;
+import hal2019.training.classifiers.CascadeClassifier;
+import hal2019.training.Feature;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -70,7 +75,7 @@ public class Data {
         System.out.println("Pre-calculating feature values for training data...");
         Feature.calculateFeatureValues(allSamples);
         //System.out.println("Pre-calculating feature values for test data...");
-        //Feature.calculateFeatureValues(testData);
+        //hal2019.training.Feature.calculateFeatureValues(testData);
 
     }
 
@@ -118,7 +123,7 @@ public class Data {
             }
 
         } catch (Exception e) {
-            System.err.println("Data folder not found. Have you extracted res.zip correctly?");
+            System.err.println("hal2019.Data folder not found. Have you extracted res.zip correctly?");
             System.exit(1);
         }
 

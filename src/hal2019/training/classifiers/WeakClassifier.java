@@ -1,3 +1,11 @@
+package hal2019.training.classifiers;
+
+import hal2019.*;
+import hal2019.training.Feature;
+import hal2019.training.PerformanceStats;
+import hal2019.training.ThresholdParity;
+import hal2019.training.TrainClassifiers;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -60,7 +68,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
     public void setBeta(double beta) throws Exception {
         if (beta < -0.01) throw new Exception("Beta must be in [0, inf). Was: " + beta); // TODO maybe can be 0 instead
         if (beta < 0 && beta > 0 - TrainClassifiers.DELTA) beta = 0;
-        //if (beta > 1 && beta < 1 + TrainClassifiers.DELTA) beta = 1;
+        //if (beta > 1 && beta < 1 + hal2019.training.TrainClassifiers.DELTA) beta = 1;
         //if (beta < 0 || beta > 1) throw new Exception("Beta must be in [0, 1]. Was: " + beta);
         this.beta = beta;
     }
@@ -141,11 +149,11 @@ public class WeakClassifier extends FaceDetector implements Serializable {
         long t0 = System.currentTimeMillis();
         //System.out.println("Started training on weak classifier");
         // Generate all possible features
-        //ArrayList<Feature> allFeatures = Feature.generateAllFeatures(19, 19);
+        //ArrayList<hal2019.training.Feature> allFeatures = hal2019.training.Feature.generateAllFeatures(19, 19);
         //Collections.shuffle(allFeatures);
 
         int size = 1;
-        //ArrayList<WeakClassifier> degenerateDecisionTree = new ArrayList<>(size);
+        //ArrayList<hal2019.training.classifiers.WeakClassifier> degenerateDecisionTree = new ArrayList<>(size);
 
         // This is the Adaboost training algorithm
 
@@ -159,11 +167,11 @@ public class WeakClassifier extends FaceDetector implements Serializable {
         }
 
         // 2. Train a classifier for every feature. Each is trained on all trainingData
-        //Queue<WeakClassifier> classifiers = adaBoostStepTwo(allSamples); // Single thread
+        //Queue<hal2019.training.classifiers.WeakClassifier> hal2019.training.classifiers = adaBoostStepTwo(allSamples); // Single thread
         Queue<WeakClassifier> classifiers = adaBoostStepTwoThreaded(allSamples, 8); // Multi-thread
 
         // 3. Choose the classifier with the lowest error
-        //WeakClassifier bestClassifier = classifiers.get(0);
+        //hal2019.training.classifiers.WeakClassifier bestClassifier = hal2019.training.classifiers.get(0);
         WeakClassifier bestClassifier = classifiers.poll();
         for (WeakClassifier c : classifiers) {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
@@ -190,7 +198,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
             }
         }
         //degenerateDecisionTree.add(bestClassifier);
-        //System.out.println("Best classifiers feature: ");
+        //System.out.println("Best hal2019.training.classifiers feature: ");
         //System.out.println(bestClassifier);
 
         System.out.printf("Trained one weak classifier in %ds\n", (System.currentTimeMillis() - t0) / 1000);
@@ -219,7 +227,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
             //System.out.println("Parity for this feature: "+parity);
             h.setError(error);
             classifiers.add(h);
-            if (i % 2000 == 0) System.out.printf("Feature %d/%d\n", i, Feature.allFeatures.size());
+            if (i % 2000 == 0) System.out.printf("hal2019.training.Feature %d/%d\n", i, Feature.allFeatures.size());
         }
         return classifiers;
     }
@@ -233,7 +241,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
      */
     private static Queue<WeakClassifier> adaBoostStepTwoThreaded(List<LabeledIntegralImage> allSamples, int partitions) throws InterruptedException {
         // Multithreaded version of step 2
-        ConcurrentLinkedQueue<WeakClassifier> classifiers = new ConcurrentLinkedQueue<>(); // List of classifiers
+        ConcurrentLinkedQueue<WeakClassifier> classifiers = new ConcurrentLinkedQueue<>(); // List of hal2019.training.classifiers
         List<Thread> threads = new ArrayList<>(); // List of all threads
 
         // Partition data and create all but the last thread.
@@ -295,7 +303,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
      */
     public static ThresholdParity calcBestThresholdAndParity(List<LabeledIntegralImage> trainingData, Feature j) throws Exception {
 
-        // DONE Feature values are no longer calculated every time.
+        // DONE hal2019.training.Feature values are no longer calculated every time.
         // TODO If possible, move sorting so it does not happen every time.
         // Sort training data based on features
         trainingData.sort((a, b) -> {

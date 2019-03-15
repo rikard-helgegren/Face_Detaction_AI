@@ -1,4 +1,7 @@
+package hal2019;
+
 import Catalano.Imaging.FastBitmap;
+import hal2019.training.Feature;
 
 import java.awt.image.BufferedImage;
 
@@ -76,7 +79,7 @@ public class HalIntegralImage {
      * Calculate sum of pixels in the specified rectangle.
      * Both coordinate sets are inclusive.
      * Image coordinate system has origo (0, 0) in top left corner.
-     * Ex: Rectangle sum of a 25x25 image is calculated as getRectangleSum(0, 0, 24, 24).
+     * Ex: hal2019.graphics.Rectangle sum of a 25x25 image is calculated as getRectangleSum(0, 0, 24, 24).
      *
      * @param x1 Coordinate of left-top rectangle's corner.
      * @param y1 Coordinate of left-top rectangle's corner.
@@ -125,7 +128,7 @@ public class HalIntegralImage {
     /**
      * Gets the image feature value. This method will return a precalculated value if it exists.
      * If not, it will calculate the value from scratch.
-     * To pre-calculate, run Feature.calculateFeatureValues on your dataset.
+     * To pre-calculate, run hal2019.training.Feature.calculateFeatureValues on your dataset.
      * @param f
      * @return
      * @throws Exception

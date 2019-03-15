@@ -223,7 +223,7 @@ public class Data {
     public static ArrayList<LabeledIntegralImage> filter(CascadeClassifier cascadeClassifier, List<LabeledIntegralImage> data) throws Exception {
         ArrayList<LabeledIntegralImage> maybeFaces = new ArrayList<>(data.size() / 2);
         for (LabeledIntegralImage d : data) {
-            if (cascadeClassifier.isFace(d.img)) {
+            if (cascadeClassifier.canBeFace(d.img)) {
                 maybeFaces.add(d);
             }
         }

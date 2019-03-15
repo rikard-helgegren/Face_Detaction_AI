@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CascadeClassifier implements Serializable {
+public class CascadeClassifier extends FaceDetector implements Serializable {
 	private static final long serialVersionUID = 0; // Increase when changing something in this class
 
 	private final double targetMaxFalsePositive;
@@ -153,7 +153,7 @@ public class CascadeClassifier implements Serializable {
 		}
 	}
 
-	public boolean isFace(HalIntegralImage i) throws Exception{
+	public boolean canBeFace(HalIntegralImage i) throws Exception{
 		//Iterate through all strong hal2019.training.classifiers, if the image passes all of
 		//them return true.
 		for(StrongClassifier c : strongClassifiers){
@@ -164,34 +164,6 @@ public class CascadeClassifier implements Serializable {
 
 	public void addStrongClassifier(StrongClassifier c) {
 		strongClassifiers.add(c);
-	}
-
-	private PerformanceStats eval(List<LabeledIntegralImage> testData) throws Exception {
-		int nrCorrectIsFace = 0;
-		int nrWrongIsFace = 0;
-		int nrCorrectIsNotFace = 0;
-		int nrWrongIsNotFace = 0;
-		for(LabeledIntegralImage i:testData){
-			if(i.isFace){
-				if(isFace(i.img)){
-					nrCorrectIsFace++;
-				}else{
-					nrWrongIsFace++;
-				}
-			}
-			if(!i.isFace){
-				if(!isFace(i.img)){
-					nrCorrectIsNotFace++;
-				}else{
-					nrWrongIsNotFace++;
-				}
-			}
-		}
-		double falsePositive = ((double)nrWrongIsNotFace) / (nrCorrectIsNotFace + nrWrongIsNotFace);
-		double truePositive  = ((double)nrCorrectIsFace)  / (nrCorrectIsFace    + nrWrongIsFace);
-		double falseNegative = ((double)nrWrongIsFace)    / (nrCorrectIsFace    + nrWrongIsFace);
-
-		return new PerformanceStats(truePositive, falsePositive, falseNegative);
 	}
 	
 	/**

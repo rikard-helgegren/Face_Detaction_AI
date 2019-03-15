@@ -352,9 +352,9 @@ public class WeakClassifier extends FaceDetector implements Serializable {
                     //if (img.getWeight() < threshold) {
                     if (k < i) {
                         sPlus += img.getWeight();
-                        //System.out.println("isFace: It ("+img.getWeight()+") is below threshold: "+threshold);
+                        //System.out.println("canBeFace: It ("+img.getWeight()+") is below threshold: "+threshold);
                     }else{
-                        //System.out.println("isFace: It is above threshold: "+threshold);
+                        //System.out.println("canBeFace: It is above threshold: "+threshold);
                     }
                 } else if (!img.isFace) {
                     tMinus += img.getWeight();

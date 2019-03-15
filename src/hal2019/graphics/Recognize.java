@@ -58,7 +58,7 @@ public class Recognize {
 
         ArrayList<HalIntegralImage> facesII = findFaceIntegralImagesScaleImage(cascade, img, 19);
         for(HalIntegralImage h: facesII){
-            if(cascade.isFace(h)){
+            if(cascade.canBeFace(h)){
                 System.out.println("Noice");
             }else{
                 System.out.println("No");
@@ -175,7 +175,7 @@ public class Recognize {
             for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=slidingWindowSpeed) {
 
                 //Use the cascaded classifier to check every window
-                if(cascade.isFace(integralImageFromSubwindow(x,y,slidingWindowSize,img))){
+                if(cascade.canBeFace(integralImageFromSubwindow(x,y,slidingWindowSize,img))){
                     Rectangle newFace = new Rectangle(x, y, slidingWindowSize, slidingWindowSize);
 
                     if(allowOverlapping) {
@@ -235,7 +235,7 @@ public class Recognize {
             for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=yIncrease) {
 
                 HalIntegralImage integralImage = integralImageFromSubwindow(x,y,slidingWindowSize,img);
-                if(cascade.isFace(integralImage)){
+                if(cascade.canBeFace(integralImage)){
                     faces.add(integralImage);
 
                     y+=slidingWindowSize;

@@ -101,7 +101,8 @@ public class Data {
         }
         if (refills.size() == 0) System.err.println("Out of refills.");
 
-        System.out.printf("Returned %d refills from %d images. Of those, %d were empty.\n", refills.size(), filesSearched, emptyFiles);
+        System.out.printf("Returned %d refills from %d/%d images. Of those, %d were empty.\n",
+                refills.size(), filesSearched, imgFiles.size(), emptyFiles);
         return refills;
     }
 

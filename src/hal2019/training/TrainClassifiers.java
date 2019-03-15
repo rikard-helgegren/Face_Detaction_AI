@@ -1,4 +1,4 @@
-package hal2019.training;// Target: 70% true positive, 105 false positive
+package hal2019.training;
 
 import hal2019.Data;
 import hal2019.training.classifiers.CascadeClassifier;
@@ -34,7 +34,7 @@ public class TrainClassifiers {
                 cascadedClassifier = new CascadeClassifier(
                         0.001,
                         0.4,
-                        0.99,
+                        0.985,
                         data.positiveSamples, data.negativeSamples, data.validationData);
                 // Save cascaded classifier
                 cascadedClassifier.save("saves/save.cascade");

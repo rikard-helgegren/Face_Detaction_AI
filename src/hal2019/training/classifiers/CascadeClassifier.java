@@ -88,8 +88,6 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 
 		//While the current false positive rate is too high
 		while(curFalsePositiveRate > targetMaxFalsePositive) {
-			System.out.println(toString());
-
 			// Create a new layer and init adaboost (reset image weights)
 			ArrayList<LabeledIntegralImage> allSamples = WeakClassifier.initForAdaBoost(positiveSamples, negativeSamples);
 
@@ -107,7 +105,7 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 				System.out.printf("Detection rate is %.4f. ", curDetectionRate);
 				System.out.printf("False positive rate is %.4f.\n", curFalsePositiveRate);
 				//System.out.println();
-				System.out.printf("hal2019.Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
+				System.out.printf("Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
 
 				//System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 				strongClassifier.addClassifier(new WeakClassifier(allSamples));

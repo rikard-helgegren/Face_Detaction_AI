@@ -115,7 +115,8 @@ public class WeakClassifier extends FaceDetector implements Serializable {
      * @return
      * @throws Exception
      */
-    public static ArrayList<LabeledIntegralImage> initForAdaBoost(List<LabeledIntegralImage> positiveSamples, List<LabeledIntegralImage> negativeSamples) throws Exception {
+    public static ArrayList<LabeledIntegralImage> initForAdaBoost(
+            List<LabeledIntegralImage> positiveSamples, List<LabeledIntegralImage> negativeSamples) throws Exception {
         // Calculate initial weights.
         double weightFace = 1.0 / (2 * positiveSamples.size());
         double weightNoFace = 1.0 / (2 * negativeSamples.size());
@@ -141,19 +142,8 @@ public class WeakClassifier extends FaceDetector implements Serializable {
      * @return a degenerate decision tree representing the strong classifier.
      * @throws Exception if something goes wrong
      */
-    // Takes 16s without sorting and recalculation of featureValues in calcThreshold.
-    // Takes 107s with sorting and recalculation.
-    // Takes 59s with sorting but without recalculation.
-    // Takes 13s with sorting but without recalculation and with 8 threads. (Current)
     private static WeakClassifier trainOneWeak(List<LabeledIntegralImage> allSamples) throws Exception {
         long t0 = System.currentTimeMillis();
-        //System.out.println("Started training on weak classifier");
-        // Generate all possible features
-        //ArrayList<hal2019.training.Feature> allFeatures = hal2019.training.Feature.generateAllFeatures(19, 19);
-        //Collections.shuffle(allFeatures);
-
-        int size = 1;
-        //ArrayList<hal2019.training.classifiers.WeakClassifier> degenerateDecisionTree = new ArrayList<>(size);
 
         // This is the Adaboost training algorithm
 
@@ -167,11 +157,10 @@ public class WeakClassifier extends FaceDetector implements Serializable {
         }
 
         // 2. Train a classifier for every feature. Each is trained on all trainingData
-        //Queue<hal2019.training.classifiers.WeakClassifier> hal2019.training.classifiers = adaBoostStepTwo(allSamples); // Single thread
+        //Queue<WeakClassifier> classifiers = adaBoostStepTwo(allSamples); // Single thread
         Queue<WeakClassifier> classifiers = adaBoostStepTwoThreaded(allSamples, 8); // Multi-thread
 
         // 3. Choose the classifier with the lowest error
-        //hal2019.training.classifiers.WeakClassifier bestClassifier = hal2019.training.classifiers.get(0);
         WeakClassifier bestClassifier = classifiers.poll();
         for (WeakClassifier c : classifiers) {
             if (c.getError() < bestClassifier.getError()) bestClassifier = c;
@@ -179,33 +168,26 @@ public class WeakClassifier extends FaceDetector implements Serializable {
 
         //System.out.println("Best classifier choosen:");
         // 4. Update weights
-        //System.out.println("Error: " + bestClassifier.getError());
-        //System.out.println("Beta: " + bestClassifier.getError() / (1 - bestClassifier.getError()));
         bestClassifier.setBeta(bestClassifier.getError() / (1 - bestClassifier.getError()));
-        //System.out.println("Beta is " + bestClassifier.getBeta());
-        //System.out.println("Setting alpha to " + Math.log(1/bestClassifier.getBeta()));
-        //System.out.println("Alpha: " + Math.log(1.0/bestClassifier.getBeta()));
-        //System.out.println();
         bestClassifier.setAlpha(Math.log(1.0/bestClassifier.getBeta()));
-        //System.out.println("Testing Alpha:");
-        //System.out.println(bestClassifier.getBeta());
-        //System.out.println(Math.log(1/bestClassifier.getBeta()));
-        //System.out.println(bestClassifier.getAlpha());
         for (LabeledIntegralImage img : allSamples) {
             // If classifier is right, multiply by beta
             if (bestClassifier.canBeFace(img.img) == img.isFace) {
                 img.setWeight(img.getWeight() * bestClassifier.getBeta());
             }
         }
-        //degenerateDecisionTree.add(bestClassifier);
-        //System.out.println("Best hal2019.training.classifiers feature: ");
-        //System.out.println(bestClassifier);
 
         System.out.printf("Trained one weak classifier in %ds\n", (System.currentTimeMillis() - t0) / 1000);
         return bestClassifier;
     }
 
 
+    /**
+     * Performs step 2 of adaboost using a single-threaded approach.
+     * @param allSamples
+     * @return
+     * @throws Exception
+     */
     public static Queue<WeakClassifier> adaBoostStepTwo(List<LabeledIntegralImage> allSamples) throws Exception {
         Queue<WeakClassifier> classifiers = new LinkedList<>();
         for (int i = 0; i < Feature.allFeatures.size(); i++) {
@@ -213,7 +195,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
             ThresholdParity p = calcBestThresholdAndParity(allSamples, j);
             int threshold = p.threshold;
             int parity = p.parity;
-            //System.out.println("T & P: "+threshold+", "+parity);
+
             // Actual step 2
             double error = 0;
             WeakClassifier h = new WeakClassifier(j, threshold, parity);
@@ -222,12 +204,10 @@ public class WeakClassifier extends FaceDetector implements Serializable {
                 int isFace = (img.isFace) ? 1 : 0;
                 error += img.getWeight() * Math.abs(canBeFace - isFace); // Throws exception
             }
-            //System.out.println("Error for this feature: "+error);
 
-            //System.out.println("Parity for this feature: "+parity);
             h.setError(error);
             classifiers.add(h);
-            if (i % 2000 == 0) System.out.printf("hal2019.training.Feature %d/%d\n", i, Feature.allFeatures.size());
+            if (i % 2000 == 0) System.out.printf("Feature %d/%d\n", i, Feature.allFeatures.size());
         }
         return classifiers;
     }
@@ -266,34 +246,6 @@ public class WeakClassifier extends FaceDetector implements Serializable {
         return classifiers;
     }
 
-
-    private static ThresholdParity calcAvgThresholdAndParity(List<LabeledIntegralImage> trainingData, Feature j) throws Exception {
-        trainingData.sort((a, b) -> {
-            try {
-                // The order here matters.
-                return a.img.getFeatureValue(j) - b.img.getFeatureValue(j);
-            } catch (Exception e) {
-                System.err.println("Features could not be sorted due to an error.");
-                e.printStackTrace();
-            }
-            return 0;
-        });
-        //TODO Sort this directly?
-        //Go through the sorted training data and store the values from the feature j in featureValues.
-        ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
-        int featureValueSum = 0;
-        for (LabeledIntegralImage img : trainingData) {
-            int fv = img.img.getFeatureValue(j);
-            featureValues.add(fv);
-            featureValueSum += fv;
-        }
-
-        double threshold = Math.round((double) featureValueSum / trainingData.size());
-        int parity = (threshold > 0) ? -1 : 1; // If threshold > 0, parity = -1.
-        return new ThresholdParity((int) threshold, parity);
-
-    }
-
     /**
      * Calculates the best threshold for a single weak classifier.
      * @param trainingData the training data used in adaboost.
@@ -302,14 +254,10 @@ public class WeakClassifier extends FaceDetector implements Serializable {
      * @throws Exception if calculateFeatureValue throws an exception
      */
     public static ThresholdParity calcBestThresholdAndParity(List<LabeledIntegralImage> trainingData, Feature j) throws Exception {
-
-        // DONE hal2019.training.Feature values are no longer calculated every time.
-        // TODO If possible, move sorting so it does not happen every time.
-        // Sort training data based on features
+        // Sort training data based on feature value
         trainingData.sort((a, b) -> {
             try {
-                // The order here matters.
-                //return j.calculateFeatureValue(a.img) - j.calculateFeatureValue(b.img);
+                // The order here seemingly matters.
                 return a.img.getFeatureValue(j) - b.img.getFeatureValue(j);
             } catch (Exception e) {
                 System.err.println("Features could not be sorted due to an error.");
@@ -317,52 +265,38 @@ public class WeakClassifier extends FaceDetector implements Serializable {
             }
             return 0;
         });
-        //Go through the sorted training data and store the values from the feature j in featureValues.
+
+        // Create a list of all feature j's feature values in the same order as the sorted training data
         ArrayList<Integer> featureValues = new ArrayList<>(trainingData.size());
         for (LabeledIntegralImage img : trainingData) {
             featureValues.add(img.img.getFeatureValue(j));
         }
 
-        //System.out.println("Sorted features: " + featureValues);
-        //System.out.println("Sorted list from feature: "+j+": First value"+featureValues.get(0)+", Last: "+featureValues.get(featureValues.size()-1));
-
-        //System.out.println("Testing feature: "+j);
-
+        // Find the best threshold and corresponding parity by calculating at which threshold the feature divides the data best
         int bestThreshold = 0;
         int bestThresholdParity = 0;
         double lowestError = Double.MAX_VALUE; // Corresponding error for the best threshold.
-        // TODO In below for loop, i should be 1 to go through all thresholds.
-        //  However, it should be fine to take big jumps in i. This SIGNIFICANTLY reduces running time.
-        //  Maybe we could even instead of a for loop, basically linear search, use logarithmic search
-        //  to find the best threshold much faster.
+        // In below for loop, 1 should be added to i to go through all thresholds.
+        // However, it should be fine to take big jumps in i. This SIGNIFICANTLY reduces running time.
+        // Maybe we could even instead of a for loop, basically linear search, use logarithmic search
+        // to find the best threshold much faster.
         for (int i = 0; i < featureValues.size(); i += 100) {
             Integer threshold = featureValues.get(i);
-            //Integer threshold = trainingData.get(i).getFeatureValue(j);
-            //System.out.println("Threshold nr: "+i+" = "+threshold);
             double tPlus = 0;
             double tMinus = 0;
             double sPlus = 0;
             double sMinus = 0;
-            //System.out.println("Looping through all trainingdata");
-            // TODO Check calculations here by hand
             for (int k=0; k<trainingData.size(); k++) {
                 LabeledIntegralImage img = trainingData.get(k);
                 if (img.isFace) {
                     tPlus += img.getWeight();
-                    //if (img.getWeight() < threshold) {
                     if (k < i) {
                         sPlus += img.getWeight();
-                        //System.out.println("canBeFace: It ("+img.getWeight()+") is below threshold: "+threshold);
-                    }else{
-                        //System.out.println("canBeFace: It is above threshold: "+threshold);
                     }
                 } else if (!img.isFace) {
                     tMinus += img.getWeight();
                     if (k < i) {
                         sMinus += img.getWeight();
-                        //System.out.println("It is below threshold: "+threshold);
-                    }else{
-                        //System.out.println("It is above threshold: "+threshold);
                     }
                 }
             }
@@ -371,12 +305,7 @@ public class WeakClassifier extends FaceDetector implements Serializable {
             if(sPlus + tMinus - sMinus < sMinus + tPlus - sPlus){
                 error = sPlus + tMinus - sMinus; //Generally: above positive, below negative.
                 parity = -1;
-                //System.out.println("sPlus + tMinus - sMinus is the smallest: "+(sPlus + tMinus - sMinus)+" instead of: "+(sMinus + tPlus - sPlus));
-            }else{
-                //System.out.println("sMinus + tPlus - sPlus is the smallest: "+(sMinus + tPlus - sPlus)+" instead of: "+(sPlus + tMinus - sMinus));
             }
-            //double error = Math.min(sPlus + tMinus - sMinus, sMinus + tPlus - sPlus);
-            //System.out.println("Error for this threshold: "+error);
 
             if (error < lowestError) {
                 lowestError = error;
@@ -386,7 +315,6 @@ public class WeakClassifier extends FaceDetector implements Serializable {
                 bestThresholdParity = parity;
             }
         }
-        //System.out.println("Best threshold for this one: "+bestThreshold);
         return new ThresholdParity(bestThreshold, bestThresholdParity);
     }
 

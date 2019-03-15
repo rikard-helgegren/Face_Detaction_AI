@@ -138,10 +138,11 @@ public class CascadeClassifier implements Serializable {
 				}
 			}
 
-			if (negativeSamples.size() < 10) {
+			// TODO No longer needed after adding refills
+			/*if (negativeSamples.size() < 10) {
 				System.err.println("Cascade training stopped since we ran out of negative data.");
 				break;
-			}
+			}*/
 		}
 	}
 

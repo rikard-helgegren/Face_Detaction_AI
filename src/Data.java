@@ -79,6 +79,7 @@ public class Data {
             imgFiles.addAll(Arrays.asList(new File(path).listFiles()));
         }
         for (File f : imgFiles) {
+            filesSearched++;
             BufferedImage b = MultipleFaceRecognition.loadImageAsGrayscale(f.getPath());
             List<HalIntegralImage> imgs = MultipleFaceRecognition.findFaceIntegralImagesScaleImage(cascade, b, 19);
             if (imgs.isEmpty()) emptyFiles++;

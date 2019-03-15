@@ -2,7 +2,7 @@
 
 The [ATT Database of Faces](https://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html).
 
-The [Catalano Framework](https://github.com/DiegoCatalano/Catalano-Framework) used for image processing.
+The [Catalano Framework](https://github.com/DiegoCatalano/Catalano-Framework) is used only for its FastBitmap class. The library is distributed in this repo for convenience. It is licensed under LGPL and you can find it's copyright notice and full license text in `CATALANO-COPYRIGHT.txt` and `CATALANO-LICENSE.txt` respectively.
 
 ## Setup
 First, place all datasets inte the `res` folder. Path to each dataset is set in code in the `Data` class but it can be beneficial to have the following folder layout:

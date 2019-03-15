@@ -155,7 +155,7 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 					negativeSamples.addAll(refills);
 
 					// Stop if we are out of data
-					if (negativeSamples.size() < Data.maxTrainNonFaces / 10) {
+					if (negativeSamples.size() < Data.maxTrainNonFaces / 5) {
 						System.err.println("Cascade training stopped since we ran out of negative data.");
 						break;
 					}

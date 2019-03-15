@@ -138,7 +138,7 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 				// Remove negative samples that were correctly classified
 				int negativeBefore = negativeSamples.size();
 				negativeSamples = Data.filter(this, negativeSamples);
-				rejectedNegatives = negativeBefore - negativeSamples.size(); // Track nr of rejected negatives
+				rejectedNegatives += negativeBefore - negativeSamples.size(); // Track nr of rejected negatives
 
 				if (negativeSamples.size() < 10000) {
 

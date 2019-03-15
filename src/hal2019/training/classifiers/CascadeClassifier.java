@@ -86,12 +86,11 @@ public class CascadeClassifier implements Serializable {
 
 		strongClassifiers = new ArrayList<>();
 
-		//The training algorithm for building a cascaded detector
-		while(curFalsePositiveRate> targetMaxFalsePositive) {
+		//While the current false positive rate is too high
+		while(curFalsePositiveRate > targetMaxFalsePositive) {
 			System.out.println(toString());
 
-
-			// Init adaboost (reset image weights etc) and create a new layer (strong classifier)
+			// Create a new layer and init adaboost (reset image weights)
 			ArrayList<LabeledIntegralImage> allSamples = WeakClassifier.initForAdaBoost(positiveSamples, negativeSamples);
 
 			StrongClassifier strongClassifier = new StrongClassifier();
@@ -100,7 +99,7 @@ public class CascadeClassifier implements Serializable {
 			prevDetectionRate = curDetectionRate;
 			prevFalsePositiveRate = curFalsePositiveRate;
 
-			// Train weak hal2019.training.classifiers until restraints are fulfilled.
+			// Add more weak classifiers until false positive rate is low enough
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
 				System.out.println("Current Cascade:");
 				System.out.println(this.toStringSummary());
@@ -115,26 +114,35 @@ public class CascadeClassifier implements Serializable {
 
 				strongClassifier.setThresholdMultiplier(1);
 
+				// Test classifier performance
 				while(true) {
 					PerformanceStats stats = eval(validationData);
 					curFalsePositiveRate = stats.falsePositive;
 					curDetectionRate = stats.truePositive;
+					// If detection rate is high enough, break
 					if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) {
 						break;
 					}
+					// Otherwise, decrease threshold
 					strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
 				}
 			}
+			// False positive rate is now low enough.
 
+			// If false positive rate is not yet low enough
 			if(curFalsePositiveRate > targetMaxFalsePositive){
+				// Autosave. For if training has to be canceled.
+				this.save(String.format("saves/autosave.cascade"));
+
 				// Remove negative samples that were correctly classified
 				negativeSamples = Data.filter(this, negativeSamples);
 				if (negativeSamples.size() < 10000) {
+
 					// Add more negative samples that this classifier says are false positive
 					List<LabeledIntegralImage> refills = Data.getRefills(this, 10000 - negativeSamples.size());
 					Feature.calculateFeatureValues(refills);
 					negativeSamples.addAll(refills);
-					this.save(String.format("saves/autosave.cascade"));
+
 					// Stop if we are out of data
 					if (negativeSamples.size() < 1000) {
 						System.err.println("Cascade training stopped since we ran out of negative data.");

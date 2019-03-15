@@ -63,7 +63,6 @@ public class Data {
 
         pathsToFaces = new String[]{originalTrainFaces};
         pathsToNonFaces = new String[]{originalTrainNonFaces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces};
 
         pathsToRefill = new String[]{scrapedRefillGrey};
 
@@ -90,7 +89,7 @@ public class Data {
         }
         for (File f : imgFiles) {
             filesSearched++;
-            BufferedImage b = Recognize.loadImageAsGrayscale(f.getPath());
+            BufferedImage b = loadImageAsGrayscale(f.getPath());
             List<HalIntegralImage> imgs = Recognize.findFaceIntegralImagesScaleImage(cascade, b, 19);
             if (imgs.isEmpty()) emptyFiles++;
             for (HalIntegralImage img : imgs) {
@@ -229,6 +228,21 @@ public class Data {
         return maybeFaces;
     }
 
+    /**
+     * Load an image and convert it to grayscale.
+     *
+     * @param path The path to the image
+     * @return An image in grayscale
+     */
+    public static BufferedImage loadImageAsGrayscale(String path) throws IOException {
+        return loadImageAsGrayscale(new File(path));
+    }
+    /**
+     * Load an image and convert it to grayscale.
+     *
+     * @param file The image file
+     * @return An image in grayscale
+     */
     private static BufferedImage loadImageAsGrayscale(File file) throws IOException {
         //Load the image
         BufferedImage loadedImage = ImageIO.read(file);

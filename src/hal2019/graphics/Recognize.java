@@ -1,5 +1,6 @@
 package hal2019.graphics;
 
+import hal2019.Data;
 import hal2019.HalIntegralImage;
 import hal2019.training.TrainClassifiers;
 import hal2019.training.classifiers.CascadeClassifier;
@@ -51,7 +52,7 @@ public class Recognize {
 
     public static void main(String[] args) throws Exception {
         //Take the image from the image path, convert it to grayscale and store it here
-        BufferedImage img = loadImageAsGrayscale(path);
+        BufferedImage img = Data.loadImageAsGrayscale(path);
         //Load the cascaded classifier
         CascadeClassifier cascade = new CascadeClassifier("save.cascade");
 
@@ -316,28 +317,5 @@ public class Recognize {
         //Display the window.
         frame.pack();
         frame.setVisible(true);
-    }
-
-    /**
-     * Load an image and convert it to grayscale.
-     *
-     * @param path The path to the image
-     * @return An image in grayscale
-     */
-    public static BufferedImage loadImageAsGrayscale(String path) throws IOException {
-        //Load the image
-        BufferedImage loadedImage = ImageIO.read(new File(path));
-
-        //Make a new empty BufferedImage and set its type to grayscale
-        BufferedImage grayImage = new BufferedImage(loadedImage.getWidth(), loadedImage.getHeight(),
-                BufferedImage.TYPE_BYTE_GRAY);
-
-        //Draw loadedImage in grayscale on grayImage
-        Graphics g = grayImage.getGraphics();
-        g.drawImage(loadedImage, 0, 0, null);
-        g.dispose();
-
-
-        return grayImage;
     }
 }

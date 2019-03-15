@@ -29,7 +29,7 @@ public class TrainClassifiers {
 
             if (loadFromFile) {
                 // Load strong classifier from file
-                cascadedClassifier = new CascadeClassifier("save.cascade");
+                cascadedClassifier = new CascadeClassifier("saves/save.cascade");
             } else {
                 cascadedClassifier = new CascadeClassifier(
                         0.001,
@@ -37,7 +37,7 @@ public class TrainClassifiers {
                         0.99,
                         data.positiveSamples, data.negativeSamples, data.validationData);
                 // Save cascaded classifier
-                cascadedClassifier.save("save.cascade");
+                cascadedClassifier.save("saves/save.cascade");
             }
             cascadedClassifier.test(data.testData);
         } else {
@@ -45,11 +45,11 @@ public class TrainClassifiers {
             StrongClassifier strongClassifier;
             if (loadFromFile) {
                 // Load strong classifier from file
-                strongClassifier = new StrongClassifier("save.strong");
+                strongClassifier = new StrongClassifier("saves/save.strong");
             } else {
                 strongClassifier = new StrongClassifier(2, data.allSamples, data.testData);
                 // Save cascaded classifier
-                strongClassifier.save("save.strong");
+                strongClassifier.save("saves/save.strong");
             }
             strongClassifier.test(data.testData);
         }

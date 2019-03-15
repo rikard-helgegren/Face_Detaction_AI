@@ -134,14 +134,14 @@ public class CascadeClassifier implements Serializable {
 					List<LabeledIntegralImage> refills = Data.getRefills(this, 10000 - negativeSamples.size());
 					Feature.calculateFeatureValues(refills);
 					negativeSamples.addAll(refills);
+					this.save(String.format("saves/autosave.cascade"));
+					// Stop if we are out of data
+					if (negativeSamples.size() < 1000) {
+						System.err.println("Cascade training stopped since we ran out of negative data.");
+						break;
+					}
 				}
 			}
-
-			// No longer needed after adding refills
-			/*if (negativeSamples.size() < 10) {
-				System.err.println("Cascade training stopped since we ran out of negative data.");
-				break;
-			}*/
 		}
 	}
 

@@ -84,6 +84,8 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 		double prevDetectionRate = 1;
 		double curDetectionRate = 1;
 
+		int rejectedNegatives = 0;
+
 		strongClassifiers = new ArrayList<>();
 
 		//While the current false positive rate is too high
@@ -105,7 +107,8 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 				System.out.printf("Validation data: %5d positive, %5d negative. ", posValidation, validationData.size() - posValidation);
 				System.out.printf("Detection rate %.4f. ", curDetectionRate);
 				System.out.printf("False positive rate %.4f.\n", curFalsePositiveRate);
-				System.out.printf("Training   data: %5d positive, %5d negative.\n", positiveSamples.size(), negativeSamples.size());
+				System.out.printf("Training   data: %5d positive, %5d negative. %d done.\n",
+						positiveSamples.size(), negativeSamples.size(), rejectedNegatives);
 				System.out.println("--------------------------------------------------------------------------------");
 
 				strongClassifier.addClassifier(new WeakClassifier(allSamples));
@@ -133,7 +136,10 @@ public class CascadeClassifier extends FaceDetector implements Serializable {
 				this.save(String.format("saves/autosave.cascade"));
 
 				// Remove negative samples that were correctly classified
+				int negativeBefore = negativeSamples.size();
 				negativeSamples = Data.filter(this, negativeSamples);
+				rejectedNegatives = negativeBefore - negativeSamples.size(); // Track nr of rejected negatives
+
 				if (negativeSamples.size() < 10000) {
 
 					// Add more negative samples that this classifier says are false positive

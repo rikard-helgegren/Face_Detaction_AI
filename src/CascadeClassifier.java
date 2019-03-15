@@ -84,6 +84,7 @@ public class CascadeClassifier implements Serializable {
 		while(curFalsePositiveRate> targetMaxFalsePositive) {
 			System.out.println(toString());
 
+			// Init adaboost (reset image weights etc) and create a new layer (strong classifier)
 			ArrayList<LabeledIntegralImage> allSamples = Classifier.initForAdaBoost(positiveSamples, negativeSamples);
 			StrongClassifier strongClassifier = new StrongClassifier();
 			strongClassifiers.add(strongClassifier);
@@ -91,6 +92,7 @@ public class CascadeClassifier implements Serializable {
 			prevDetectionRate = curDetectionRate;
 			prevFalsePositiveRate = curFalsePositiveRate;
 
+			// Train weak classifiers until restraints are fulfilled.
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
 				System.out.println("Current Cascade:");
 				System.out.println(this.toStringSummary());
@@ -116,9 +118,12 @@ public class CascadeClassifier implements Serializable {
 			}
 
 			if(curFalsePositiveRate > targetMaxFalsePositive){
+				// Remove negative samples that were correctly classified
 				negativeSamples = Data.filter(this, negativeSamples);
 				if (negativeSamples.size() < 10000) {
+					// Add more negative samples that this classifier says are false positive
 					List<LabeledIntegralImage> refills = Data.getRefills(this, 10000 - negativeSamples.size());
+					Feature.calculateFeatureValues(refills);
 					negativeSamples.addAll(refills);
 				}
 			}

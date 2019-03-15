@@ -84,60 +84,58 @@ public class CascadeClassifier implements Serializable {
 		while(curFalsePositiveRate> targetMaxFalsePositive) {
 			System.out.println(toString());
 
+
+			// Init adaboost (reset image weights etc) and create a new layer (strong classifier)
 			ArrayList<LabeledIntegralImage> allSamples = WeakClassifier.initForAdaBoost(positiveSamples, negativeSamples);
+
 			StrongClassifier strongClassifier = new StrongClassifier();
 			strongClassifiers.add(strongClassifier);
 
 			prevDetectionRate = curDetectionRate;
 			prevFalsePositiveRate = curFalsePositiveRate;
 
+			// Train weak classifiers until restraints are fulfilled.
 			while(curFalsePositiveRate > maxFalsePositiveRatePerLayer*prevFalsePositiveRate){
-				System.out.println("Current Strong WeakClassifier:");
-				System.out.println(strongClassifier);
+				System.out.println("Current Cascade:");
+				System.out.println(this.toStringSummary());
 				System.out.printf("Validation data %d positive, %d negative. ", posValidation, validationData.size() - posValidation);
-				System.out.printf("Detection rate rate is %.4f. ", curDetectionRate);
+				System.out.printf("Detection rate is %.4f. ", curDetectionRate);
 				System.out.printf("False positive rate is %.4f.\n", curFalsePositiveRate);
-				System.out.println();
+				//System.out.println();
 				System.out.printf("Data left: %d positive, %d negative.\n", positiveSamples.size(), negativeSamples.size());
-				System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 
-				/*if (strongClassifier.getSize() == 0) {
-					strongClassifier.addClassifier(new WeakClassifier(allSamples));
-					strongClassifier.addClassifier(new WeakClassifier(allSamples));
-				} else {
-					strongClassifier.addClassifier(new WeakClassifier(allSamples));
-				}*/
+				//System.out.printf("Training strong classifier, now with %d weak.\n", strongClassifier.getSize() + 1);
 				strongClassifier.addClassifier(new WeakClassifier(allSamples));
+
 				strongClassifier.setThresholdMultiplier(1);
 
 				while(true) {
-					//System.out.printf("Evaluating threshold multiplier %.2f. With threshold: %.2f. ",
-					//        cascadedClassifier.get(cascadedClassifier.size()-1).getThresholdMultiplier(),
-					//        cascadedClassifier.get(cascadedClassifier.size()-1).getThreshold());
 					PerformanceStats stats = eval(validationData);
-					//System.out.printf("Performance: %s. ", stats);
 					curFalsePositiveRate = stats.falsePositive;
 					curDetectionRate = stats.truePositive;
 					if(curDetectionRate >= minDetectionRatePerLayer * prevDetectionRate) {
-						//System.out.printf("GOOD! Using this one. \n");
 						break;
-					} else {
-						//System.out.printf("\n");
 					}
-
 					strongClassifier.setThresholdMultiplier(Math.max(0, strongClassifier.getThresholdMultiplier() - 0.01));
-					//if (strongClassifier.getThresholdMultiplier() < FaceRecognition.DELTA) System.err.println("WARNING, thresholdMultiplier was 0.");
 				}
 			}
 
 			if(curFalsePositiveRate > targetMaxFalsePositive){
+				// Remove negative samples that were correctly classified
 				negativeSamples = Data.filter(this, negativeSamples);
+				if (negativeSamples.size() < 10000) {
+					// Add more negative samples that this classifier says are false positive
+					List<LabeledIntegralImage> refills = Data.getRefills(this, 10000 - negativeSamples.size());
+					Feature.calculateFeatureValues(refills);
+					negativeSamples.addAll(refills);
+				}
 			}
 
-			if (negativeSamples.size() < 10) {
+			// No longer needed after adding refills
+			/*if (negativeSamples.size() < 10) {
 				System.err.println("Cascade training stopped since we ran out of negative data.");
 				break;
-			}
+			}*/
 		}
 	}
 

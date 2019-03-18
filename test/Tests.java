@@ -251,13 +251,13 @@ public class Tests {
         HalIntegralImage img = new HalIntegralImage(new FastBitmap(ImageIO.read(file)), file.getName());
 
 
-        System.out.println("GRAY:");
+        /*System.out.println("GRAY:");
         printImageValues(new FastBitmap(ImageIO.read(file)));
 
         System.out.println();
         System.out.println();
         System.out.println("II:");
-        printIntegralImage(img.getInternalData());
+        printIntegralImage(img.getInternalData());*/
 
 
         assertTrue(img.getRectangleSum(0,0,18,4)>img.getRectangleSum(0,0,4,18),

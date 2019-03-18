@@ -48,6 +48,6 @@ Image detection on real images is handled my `hal2019.graphics.Detector`. The pa
 
 One thing to note is that many methods throw generic exceptions. This is done deliberately to crash the program if an error occurs rather than to continue training with faulty values. As such, exceptions are also used to enforce pre-conditions in some stages of the algorithms. Ideally, custom exception sub-classes should be created, but this was not done initially.
 
-## Things that are not done
+## Future improvements
 * Make single classifier training faster. Some leads:
    * Optimize feature calculation. Rectangle sum can be calculated in 4 array accesses (currently 4). Two-rectangle features can be calculated in 6 (currently 8).  Three-rectangle in 8 (not implemented).  Four-rectangle in 9 (not implemented).

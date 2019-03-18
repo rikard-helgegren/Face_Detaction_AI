@@ -122,16 +122,15 @@ public class WeakClassifier extends FaceDetector implements Serializable {
     }
 
     /**
-     * Trains a network using the AdaBoost algorithm as described in
+     * Runs one iteration of the AdaBoost algorithm as described in
      * http://www.vision.caltech.edu/html-files/EE148-2005-Spring/pprs/viola04ijcv.pdf
+     * that creates a single weak classifier.
      *
-     * @return a degenerate decision tree representing the strong classifier.
+     * @return a single weak classifier trained from one iteration of AdaBoost
      * @throws Exception if something goes wrong
      */
     private static WeakClassifier trainOneWeak(List<LabeledIntegralImage> allSamples) throws Exception {
         long t0 = System.currentTimeMillis();
-
-        // This is the Adaboost training algorithm
 
         // 1. Normalize weights
         double weightSum = 0;

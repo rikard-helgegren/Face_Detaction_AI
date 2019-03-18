@@ -38,35 +38,15 @@ At the top of `hal2019.training.TrainClassifiers` is a boolean variable `loadFro
 When training terminates, the classifier is automatically saved in `saves/save.cascade` or `saves/save.strong`. In addition, cascade classifiers are saved as `saves/autosave.cascade` after each finished layer. Be careful since existing saves with these names will be overwritten, rename or move any saves you want to keep.
 
 ## Startpoints for reading the code
+The main program code is located in `/src/`. Some additional scripts for pre-processing of images and scraping, using [ImageMagick](http://www.imagemagick.org/) and [Scrapy](https://scrapy.org/) respectively, can be found in `/scripts/`.
+
 Classifier training is initialized from `hal2019.training.TrainClassifiers`.
 
 Data loading and data set preparation is done in `hal2019.Data`. There are several variables that can be tweaked to adjust how much data is in each set. Note that feature pre-calculation can be done on any subset of the data and will result in speed-up on that data. If features are not pre-calculated, they will be calculated every time when needed.
 
 Image detection on real images is handled my `hal2019.graphics.Detector`. The path for the image to train on is set in that class.
 
-## Things that are done
-* Get some face images.
-* Get some no-face images.
-* Load images into java application.
-* Create integral images in java.
-* Create a function to calculate rectangle sum from integral image. See `hal2019.HalIntegralImage.getRectangleSum(x1, x2, y1, y2)`.
-* Implement function for calculating the 4 features.
-   * For horizontal rectangles.
-   * For vertical rectangles.
-* Implement core Adaboost algorithm.
-* Finish Adaboost algorithm by iterating multiple times to create many weak classifiers. Currently we only create a single weak classifier.
-* Implement final cascade classifier using all the simple classifiers. (But not finalized.)
-* Implement a way to save and load trained classifiers so that we can use them without first training them every time.
-* Implement function for calculating the 4 features.
-   * For three rectangles (the nose feature). Dummy function in `hal2019.training.Feature.calcThreeRectFeature()`.
-   * For four rectangles (the checkerboard feature). Dummy function in `hal2019.training.Feature.calcFourRectFeature()`.
-* Calculate __parity__ value in Adaboost single-classifier training.
-* Multithreaded step 2 in adaboost.
-* Test and improve AdaBoost and cascade classifier.
-* Report performance for 36 feature strong classifier.
-* Hand check S+T+ part of adaboost.
-* Move calculating featurevalues so that it is done once.
-* Add data refill.
+One thing to note is that many methods throw generic exceptions. This is done deliberately to crash the program if an error occurs rather than to continue training with faulty values. As such, exceptions are also used to enforce pre-conditions in some stages of the algorithms. Ideally, custom exception sub-classes should be created, but this was not done initially.
 
 ## Things that are not done
 * Make single classifier training faster. Some leads:

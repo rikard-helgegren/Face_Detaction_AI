@@ -22,7 +22,7 @@ public class Detector {
     //The minimum size of the sliding window
     private static final int minFaceSize = 28;
     //The maximum size of the sliding window
-    private static final int maxFaceSize = 28;
+    private static final int maxFaceSize = 40;
     //How much the slidning window increases every iteration.
     private static final int slidingWindowIncrease = 10;
     /*
@@ -37,8 +37,11 @@ public class Detector {
        |__________|
 
      */
-    private static final boolean allowOverlapping = true;
-    //Should the full image be scaled down or the features scaled up?
+    private static final boolean allowOverlapping = false;
+    //Should the full image be scaled down or the features scaled up? (Note
+    //that if the image is scaled down the sliding window will always move
+    //with slidingWindowMoveSpeed, thus will always move with a speed
+    //proportional to it's size)
     private static final boolean scaleFeatures = true;
     //If sliding windows should move at a speed proportional to it's size.
     private static final boolean slidingWindowSpeedAsScale = true;
@@ -55,17 +58,6 @@ public class Detector {
         BufferedImage img = Data.loadImageAsGrayscale(path);
         //Load the cascaded classifier
         CascadeClassifier cascade = new CascadeClassifier("saves/save.cascade");
-
-        // TODO Commented out this. It was for testing?
-        /*
-        ArrayList<HalIntegralImage> facesII = findFaceIntegralImagesScaleImage(cascade, img, 19);
-        for(HalIntegralImage h: facesII){
-            if(cascade.canBeFace(h)){
-                System.out.println("Noice");
-            }else{
-                System.out.println("No");
-            }
-        }*/
 
         //Find all faces in the image using the cascade
         ArrayList<Rectangle> faces = findFaces(cascade, img);
@@ -104,7 +96,7 @@ public class Detector {
     }
 
     /**
-     * Finds faces in an image using the method of scaling up the features to the appropriate size.
+     * Finds faces in an image using the method of scaling up the features.
      *
      * @param cascade The cascaded classifier to use
      * @param img The image to search for faces using the cascade
@@ -114,19 +106,51 @@ public class Detector {
     private static ArrayList<Rectangle> findFacesScaleImage(CascadeClassifier cascade, BufferedImage img) throws Exception {
         ArrayList<Rectangle> faces = new ArrayList<>();
 
+        /*
+         * scaleImageToMaxFace is the factor used to scale the image down
+         * enough to make the sliding windows size (trainingDataWidth)
+         * proportionally as big as maxFaceSize is to the original image.
+         *
+         * scaleImageToMinFace is the factor used to scale the image down
+         * enough to make the sliding windows size (trainingDataWidth)
+         * proportionally as big as minFaceSize is to the original image.
+         *
+         *
+         * Instead of increasing the sliding window size with
+         * slidingWindowIncrease scale down the full image with:
+         *
+         *                trainingDataWidth
+         *     —————————————————————————————————————————
+         *     trainingDataWidth + slidingWindowIncrease
+         *
+         *
+         */
         double scaleImageToMaxFace = (double) TrainClassifiers.trainingDataWidth/maxFaceSize;
         double scaleImageToMinFace = (double) TrainClassifiers.trainingDataWidth/minFaceSize;
-        double scalePerLayer = (double) TrainClassifiers.trainingDataWidth/(TrainClassifiers.trainingDataWidth + slidingWindowIncrease);
+        double scalePerLayer = (double) TrainClassifiers.trainingDataWidth/ (TrainClassifiers.trainingDataWidth + slidingWindowIncrease);
+        //Initially scale the image with scaleImageToMinFace.
         BufferedImage scaled = scaleImage(img, scaleImageToMinFace);
-        System.out.println(scaleImageToMinFace);
 
         while(scaled.getWidth()>=scaleImageToMaxFace*img.getWidth()){
+            //Find all the faces in the scaled image with the size
+            //trainingDataWidth.
             ArrayList<Rectangle> newFaces = findFaces(cascade, scaled, TrainClassifiers.trainingDataWidth);
+            //Scale all the new faces to where they were found but on the
+            // original image size.
             for(Rectangle r:newFaces){
                 r.scale((double)img.getWidth()/scaled.getWidth());
             }
-            faces.addAll(newFaces);
 
+            if(allowOverlapping) {
+                //Add all the new faces
+                faces.addAll(newFaces);
+            }
+            else {
+                //Add all the new faces without overlapping
+                addWithoutOverlap(faces, newFaces);
+            }
+
+            //Scale the image with scalePerLayer every iteration.
             scaled = scaleImage(scaled, scalePerLayer);
         }
 
@@ -146,7 +170,14 @@ public class Detector {
         ArrayList<Rectangle> faces = new ArrayList<>();
 
         for (int s = minFaceSize; s <= maxFaceSize; s+= slidingWindowIncrease) {
-            faces.addAll(findFaces(cascade, img, s));
+            if(allowOverlapping) {
+                //Add all the new faces
+                faces.addAll(findFaces(cascade, img, s));
+            }
+            else {
+                //Add all the new faces without overlapping
+                addWithoutOverlap(faces, findFaces(cascade, img, s));
+            }
         }
 
         return faces;
@@ -181,23 +212,13 @@ public class Detector {
                 if(cascade.canBeFace(integralImageFromSubwindow(x,y,slidingWindowSize,img))){
                     Rectangle newFace = new Rectangle(x, y, slidingWindowSize, slidingWindowSize);
 
-                    if(allowOverlapping) {
-                        //System.out.println("Face found: " + newFace);
-                        faces.add(newFace);
-                    }else{
-                        boolean overlaps = false;
-                        for(Rectangle sq:faces){
-                            if(sq.overlaps(newFace)){
-                                overlaps = true;
-                            }
-                        }
-                        if(!overlaps){
-                            //System.out.println("Face found: "+newFace);
-                            faces.add(newFace);
-                        }
-                    }
+                    faces.add(newFace);
 
-                    y+=slidingWindowSize;
+                    if(!allowOverlapping) {
+                        //If a face is found, make a bigger jump to avoid
+                        //looking at an overlapping squre.
+                        y+=slidingWindowSize;
+                    }
                 }
             }
         }
@@ -206,15 +227,49 @@ public class Detector {
         return faces;
     }
 
-    public static ArrayList<HalIntegralImage> findFaceIntegralImagesScaleImage(CascadeClassifier cascade, BufferedImage img, int resultingWidth) throws Exception {
+    /**
+     * Calculates integral images of faces found in an image.
+     * Uses the method of scaling up the features to find the faces.
+     *
+     * Mainly used to find false positives in images without any faces.
+     *
+     * @param cascade The cascaded classifier to use
+     * @param img The image to search for faces using the cascade
+     * @param resultingSize The size of the resulting images.
+     * @return An arraylist of HalIntegralImages of found faces.
+     * @throws Exception
+     */
+    public static ArrayList<HalIntegralImage> findFaceIntegralImagesScaleImage(CascadeClassifier cascade, BufferedImage img, int resultingSize) throws Exception {
         ArrayList<HalIntegralImage> faces = new ArrayList<>();
+
+        //The maximum and the minimum size of the sliding window.
         int maxSlidingWindowSize = 100;
         int minSlidingWindowSize = 19;
+        //How much the sliding window should increase every iteration.
         int slidingWindowIncrease = 1;
 
-        double scaleImageToMaxFace = (double)resultingWidth/maxSlidingWindowSize;
-        double scaleImageToMinFace = (double)resultingWidth/minSlidingWindowSize;
-        double scalePerLayer = (double)resultingWidth/(resultingWidth + slidingWindowIncrease);
+        /*
+         * scaleImageToMaxFace is the factor used to scale the image down
+         * enough to make the sliding windows size (resultingSize)
+         * proportionally as big as maxFaceSize is to the original image.
+         *
+         * scaleImageToMinFace is the factor used to scale the image down
+         * enough to make the sliding windows size (resultingSize)
+         * proportionally as big as minFaceSize is to the original image.
+         *
+         *
+         * Instead of increasing the sliding window size with
+         * slidingWindowIncrease scale down the full image with:
+         *
+         *                  resultingSize
+         *       —————————————————————————————————————
+         *       resultingSize + slidingWindowIncrease
+         *
+         */
+        double scaleImageToMaxFace = (double)resultingSize/maxSlidingWindowSize;
+        double scaleImageToMinFace = (double)resultingSize/minSlidingWindowSize;
+        double scalePerLayer = (double)resultingSize/(resultingSize + slidingWindowIncrease);
+        //Initially scale the image with scaleImageToMinFace.
         BufferedImage scaled = scaleImage(img, scaleImageToMinFace);
 
         while(scaled.getWidth()>=scaleImageToMaxFace*img.getWidth()){
@@ -226,9 +281,32 @@ public class Detector {
 
         return faces;
     }
-
+    /**
+     * Calculates integral images of faces, with a specified size, found in an
+     * image.
+     *
+     * Mainly used to find false positives in images without any faces.
+     *
+     * @param cascade The cascaded classifier to use
+     * @param img The image to search for faces using the cascade
+     * @param slidingWindowSize The size of the sliding window
+     * @return An arraylist of HalIntegralImages of found faces
+     * @throws Exception
+     */
     private static ArrayList<HalIntegralImage> findFaceIntegralImages(CascadeClassifier cascade, BufferedImage img, int slidingWindowSize) throws Exception {
         ArrayList<HalIntegralImage> faces = new ArrayList<>();
+
+        /*
+        * The sliding window will slow down when a face is found to search
+        * more closely at that area since it will be more likely that another
+        * face is found there.
+        *
+        * The IncreaseMax variables sets the max length the sliding window can
+        * move every iteration.
+        *
+        * The Increase variables contains the length the sliding window
+        * should move every iteration.
+        */
         int xIncreaseMax = 10;
         int yIncreaseMax = 10;
 
@@ -239,13 +317,16 @@ public class Detector {
             for (int y = 0; y < img.getHeight()-slidingWindowSize; y+=yIncrease) {
 
                 HalIntegralImage integralImage = integralImageFromSubwindow(x,y,slidingWindowSize,img);
+
+                //If a face was found
                 if(cascade.canBeFace(integralImage)){
                     faces.add(integralImage);
 
-                    y+=slidingWindowSize;
+                    //Reset the Increase variables.
                     xIncrease = 1;
                     yIncrease = 1;
                 }else{
+                    //Increase the Increase variables until max.
                     xIncrease = xIncrease==xIncreaseMax?xIncrease:xIncrease+1;
                     yIncrease = yIncrease==yIncreaseMax?yIncrease:yIncrease+1;
                 }
@@ -320,5 +401,13 @@ public class Detector {
         //Display the window.
         frame.pack();
         frame.setVisible(true);
+    }
+
+    private static void addWithoutOverlap(ArrayList<Rectangle> a, ArrayList<Rectangle> b){
+        for(Rectangle rectangle:b){
+            if(!rectangle.overlapsAny(a)){
+                a.add(rectangle);
+            }
+        }
     }
 }

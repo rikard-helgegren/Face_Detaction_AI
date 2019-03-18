@@ -7,12 +7,24 @@ import hal2019.training.Feature;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * This class handles step two of the adaboost algorithm: Make a classifier for
+ * each feature. But it does so concurrently with other threads of this class.
+ * Each with a subset of all the features.
+ */
 public class AdaTwo extends Thread {
 
     private List<Feature> features;
     private ConcurrentLinkedQueue<WeakClassifier> classifiers;
     private List<LabeledIntegralImage> allSamples;
 
+    /**
+     *
+     * @param features The features this thread should handle.
+     * @param classifiers The resulting classifiers from the features will
+     *                    be placed here.
+     * @param allSamples All the integral images of the data.
+     */
     public AdaTwo(List<Feature> features, ConcurrentLinkedQueue<WeakClassifier> classifiers, List<LabeledIntegralImage> allSamples) {
         this.features = features;
         this.classifiers = classifiers;

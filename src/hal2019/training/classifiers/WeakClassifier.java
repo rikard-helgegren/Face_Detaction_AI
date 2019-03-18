@@ -205,7 +205,6 @@ public class WeakClassifier extends FaceDetector implements Serializable {
      * @throws InterruptedException
      */
     private static Queue<WeakClassifier> adaBoostStepTwoThreaded(List<LabeledIntegralImage> allSamples, int partitions) throws InterruptedException {
-        // Multithreaded version of step 2
         ConcurrentLinkedQueue<WeakClassifier> classifiers = new ConcurrentLinkedQueue<>(); // List of classifiers
         List<Thread> threads = new ArrayList<>(); // List of all threads
 

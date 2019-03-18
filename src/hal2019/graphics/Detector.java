@@ -24,7 +24,7 @@ public class Detector {
     //The maximum size of the sliding window
     private static final int maxFaceSize = 40;
     //How much the slidning window increases every iteration.
-    private static final int slidingWindowIncrease = 10;
+    private static final int slidingWindowIncrease = 5;
     /*
     Should we allow the algorithm to find two or more overlapping faces?
     For example find a face in both squares below:
@@ -37,7 +37,7 @@ public class Detector {
        |__________|
 
      */
-    private static final boolean allowOverlapping = false;
+    private static final boolean allowOverlapping = true;
     //Should the full image be scaled down or the features scaled up? (Note
     //that if the image is scaled down the sliding window will always move
     //with slidingWindowMoveSpeed, thus will always move with a speed

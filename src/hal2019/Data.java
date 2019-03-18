@@ -60,8 +60,8 @@ public class Data {
         String manyScrapedNonFaces = "./res/non-faces/many-scraped-non-face";
 
         // Select which datasets to use
-        pathsToFaces = new String[]{originalTrainFaces, lfw2Faces, attFaces};
-        pathsToNonFaces = new String[]{originalTrainNonFaces, originalTestNonFaces, manyScrapedNonFaces};
+        pathsToFaces = new String[]{originalTrainFaces};
+        pathsToNonFaces = new String[]{originalTrainNonFaces};
 
         partitionData();
 

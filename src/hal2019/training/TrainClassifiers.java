@@ -13,7 +13,7 @@ public class TrainClassifiers {
     private static final boolean trainFullCascade = true;
 
     // True if a network should be loaded. Otherwise, one will be trained.
-    private static final boolean loadFromFile = true;
+    private static final boolean loadFromFile = false;
 
     public static final double DELTA = 0.00001;
     public static final int trainingDataWidth = 19;
@@ -32,9 +32,9 @@ public class TrainClassifiers {
                 cascadedClassifier = new CascadeClassifier("saves/save.cascade");
             } else {
                 cascadedClassifier = new CascadeClassifier(
-                        0.001,
+                        0.05,
                         0.4,
-                        0.99,
+                        0.9,
                         data.positiveSamples, data.negativeSamples, data.validationData);
                 // Save cascaded classifier
                 cascadedClassifier.save("saves/save.cascade");
